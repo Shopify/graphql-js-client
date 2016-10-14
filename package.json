@@ -1,0 +1,37 @@
+{
+  "name": "graphql-js-client",
+  "version": "0.0.1",
+  "description": "Feature light client library for fetching resources via GraphQL",
+  "main": "lib/index.js",
+  "license": "MIT",
+  "author": "Shopify Inc.",
+  "dependencies": {},
+  "devDependencies": {
+    "babel": "~6.5.2",
+    "babel-cli": "~6.11.4",
+    "babel-core": "~6.13.2",
+    "babel-plugin-add-shopify-header": "~1.0.5",
+    "babel-preset-shopify": "~13.0.0",
+    "babel-register": "~6.11.6",
+    "eslint": "~3.3.1",
+    "eslint-plugin-shopify": "~14.0.0",
+    "mocha": "~3.0.2"
+  },
+  "scripts": {
+    "test": "npm run lint && npm run mocha",
+    "prepublish": "babel -d lib/ src/",
+    "mocha": "mocha --compilers js:babel-register -u tdd $([ -n \"${CI}\" ] && echo --reporter xunit --reporter-options output=$CIRCLE_TEST_REPORTS/junit/mocha.xml) test/*",
+    "lint": "eslint --max-warnings 0 -c .eslintrc.json $([ -n \"${CI}\" ] && echo -o $CIRCLE_TEST_REPORTS/junit/eslint.xml -f junit) src/ test/"
+  },
+  "keywords": [
+    "graphql,api,client"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Shopify/graphql-js-client.git"
+  },
+  "homepage": "https://github.com/Shopify/graphql-js-client",
+  "bugs": {
+    "url": "https://github.com/Shopify/graphql-js-client/issues"
+  }
+}

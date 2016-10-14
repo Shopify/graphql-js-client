@@ -1,0 +1,6 @@
+machine:
+  node:
+    version: v6.7.0
+test:
+  pre:
+    - mkdir -p $CIRCLE_TEST_REPORTS/junit

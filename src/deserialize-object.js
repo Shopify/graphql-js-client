@@ -3,7 +3,7 @@ import ClassRegistry from './class-registry';
 import assign from '../metal/assign';
 
 function extractDescriptors(objectGraph, typeName) {
-  return Object.keys(objectGraph).map(fieldName => {
+  return Object.keys(objectGraph).map((fieldName) => {
     return descriptorForField(fieldName, typeName);
   });
 }
@@ -35,7 +35,7 @@ function extractObjects(objectGraph, descriptors, registry) {
 
   return objectDescriptors.reduce((objectAcc, descriptor) => {
     if (descriptor.isList) {
-      objectAcc[descriptor.fieldName] = objectGraph[descriptor.fieldName].map(object => {
+      objectAcc[descriptor.fieldName] = objectGraph[descriptor.fieldName].map((object) => {
         // eslint-disable-next-line no-use-before-define
         return deserializeObject(object, descriptor.type, registry);
       });
@@ -55,7 +55,7 @@ function extractConnections(objectGraph, descriptors, registry) {
     const edgeDescriptor = descriptorForField('edges', descriptor.type);
     const nodeDescriptor = descriptorForField('node', edgeDescriptor.type);
 
-    connectionsAcc[descriptor.fieldName] = objectGraph[descriptor.fieldName].edges.map(object => {
+    connectionsAcc[descriptor.fieldName] = objectGraph[descriptor.fieldName].edges.map((object) => {
       // eslint-disable-next-line no-use-before-define
       return deserializeObject(object.node, nodeDescriptor.type, registry);
     });

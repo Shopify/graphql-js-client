@@ -1,7 +1,7 @@
-import { module, test } from 'qunit';
-import GraphModel from 'shopify-buy/graph-helpers/graph-model';
-import deserializeObject from 'shopify-buy/graph-helpers/deserialize-object';
-import ClassRegistry from 'shopify-buy/graph-helpers/class-registry';
+import assert from 'assert';
+import GraphModel from '../src/graph-model';
+import deserializeObject from '../src/deserialize-object';
+import ClassRegistry from '../src/class-registry';
 
 
 const graphFixture = {
@@ -69,75 +69,70 @@ const productFixture = {
   }
 };
 
-module('Unit | GraphHelpers | deserializeObject');
+suite('Unit | GraphHelpers | deserializeObject', () => {
+  test('it creates a GraphModel from the root type', () => {
 
-test('it creates a GraphModel from the root type', function (assert) {
-  assert.expect(1);
+    const graph = deserializeObject(graphFixture.data, 'QueryRoot');
 
-  const graph = deserializeObject(graphFixture.data, 'QueryRoot');
-
-  assert.ok(GraphModel.prototype.isPrototypeOf(graph), 'root type is a graph model');
-});
-
-test('it instantiates a model with relationship fields', function (assert) {
-  assert.expect(2);
-
-  const graph = deserializeObject(graphFixture.data, 'QueryRoot');
-
-  assert.ok(GraphModel.prototype.isPrototypeOf(graph.shop), 'shop relationship is a graph model');
-  assert.deepEqual(graph.shop.attrs, { name: 'buckets-o-stuff' }, 'shop model contains payloads attrs');
-});
-
-test('it creates an array from lists of paginated relationships', function (assert) {
-  assert.expect(2);
-
-  const graph = deserializeObject(graphFixture.data, 'QueryRoot');
-
-  assert.ok(Array.isArray(graph.shop.products), 'shops products are in an array');
-  assert.equal(graph.shop.products.length, 3, 'there are three products');
-});
-
-test('it instantiates paginated list members as models', function (assert) {
-  assert.expect(graphFixture.data.shop.products.edges.length * 2);
-
-  const graph = deserializeObject(graphFixture.data, 'QueryRoot');
-
-  graphFixture.data.shop.products.edges.forEach((product, index) => {
-    assert.ok(GraphModel.prototype.isPrototypeOf(graph.shop.products[index]), 'products are graph models');
-    assert.equal(graph.shop.products[index].attrs.handle, product.node.handle, 'products contain payload attrs');
+    assert.ok(GraphModel.prototype.isPrototypeOf(graph), 'root type is a graph model');
   });
-});
 
-test('it creates an array from lists of non-paginated relationships', function (assert) {
-  assert.expect(2);
+  test('it instantiates a model with relationship fields', () => {
 
-  const graph = deserializeObject(productFixture.data, 'QueryRoot');
+    const graph = deserializeObject(graphFixture.data, 'QueryRoot');
 
-  assert.ok(Array.isArray(graph.product.options), 'products images are in an array');
-  assert.equal(graph.product.options.length, 2, 'there are two options');
-});
+    assert.ok(GraphModel.prototype.isPrototypeOf(graph.shop), 'shop relationship is a graph model');
+    assert.deepEqual(graph.shop.attrs, {name: 'buckets-o-stuff'}, 'shop model contains payloads attrs');
+  });
 
-test('it instantiates basic list members as models', function (assert) {
-  assert.expect(2);
+  test('it creates an array from lists of paginated relationships', () => {
 
-  const graph = deserializeObject(productFixture.data, 'QueryRoot');
+    const graph = deserializeObject(graphFixture.data, 'QueryRoot');
 
-  assert.ok(GraphModel.prototype.isPrototypeOf(graph.product.options[0]));
-  assert.equal(graph.product.options[0].name, productFixture.data.product.options[0].name);
-});
+    assert.ok(Array.isArray(graph.shop.products), 'shops products are in an array');
+    assert.equal(graph.shop.products.length, 3, 'there are three products');
+  });
 
-test('it instantiates types with their registered models', function (assert) {
-  const registry = new ClassRegistry();
+  test('it instantiates paginated list members as models', () => {
+    assert.expect(graphFixture.data.shop.products.edges.length * 2);
 
-  class ShopModel extends GraphModel { }
+    const graph = deserializeObject(graphFixture.data, 'QueryRoot');
 
-  class ProductModel extends GraphModel { }
+    graphFixture.data.shop.products.edges.forEach((product, index) => {
+      assert.ok(GraphModel.prototype.isPrototypeOf(graph.shop.products[index]), 'products are graph models');
+      assert.equal(graph.shop.products[index].attrs.handle, product.node.handle, 'products contain payload attrs');
+    });
+  });
 
-  registry.registerClassForType(ShopModel, 'Shop');
-  registry.registerClassForType(ProductModel, 'Product');
+  test('it creates an array from lists of non-paginated relationships', () => {
 
-  const graph = deserializeObject(graphFixture.data, 'QueryRoot', registry);
+    const graph = deserializeObject(productFixture.data, 'QueryRoot');
 
-  assert.ok(ShopModel.prototype.isPrototypeOf(graph.shop), 'shop node is a shop model');
-  assert.ok(ProductModel.prototype.isPrototypeOf(graph.shop.products[0]), 'product node is a product model');
+    assert.ok(Array.isArray(graph.product.options), 'products images are in an array');
+    assert.equal(graph.product.options.length, 2, 'there are two options');
+  });
+
+  test('it instantiates basic list members as models', () => {
+
+    const graph = deserializeObject(productFixture.data, 'QueryRoot');
+
+    assert.ok(GraphModel.prototype.isPrototypeOf(graph.product.options[0]));
+    assert.equal(graph.product.options[0].name, productFixture.data.product.options[0].name);
+  });
+
+  test('it instantiates types with their registered models', () => {
+    const registry = new ClassRegistry();
+
+    class ShopModel extends GraphModel { }
+
+    class ProductModel extends GraphModel { }
+
+    registry.registerClassForType(ShopModel, 'Shop');
+    registry.registerClassForType(ProductModel, 'Product');
+
+    const graph = deserializeObject(graphFixture.data, 'QueryRoot', registry);
+
+    assert.ok(ShopModel.prototype.isPrototypeOf(graph.shop), 'shop node is a shop model');
+    assert.ok(ProductModel.prototype.isPrototypeOf(graph.shop.products[0]), 'product node is a product model');
+  });
 });

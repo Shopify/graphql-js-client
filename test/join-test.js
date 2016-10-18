@@ -1,11 +1,10 @@
-import { module, test } from 'qunit';
+import assert from 'assert';
 
-import join from 'shopify-buy/graph-helpers/join';
+import join from '../src/join';
 
-module('Unit | GraphHelpers | join');
+suite('Unit | GraphHelpers | join', () => {
+  test('it joins fields with a single comma followed by a space', () => {
 
-test('it joins fields with a single comma followed by a space', function (assert) {
-  assert.expect(1);
-
-  assert.equal(join('query1', 'query2'), 'query1, query2');
+    assert.equal(join('query1', 'query2'), 'query1, query2');
+  });
 });

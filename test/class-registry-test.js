@@ -8,7 +8,8 @@ suite('Unit | GraphHelpers | ClassRegistry', () => {
 
     const registry = new ClassRegistry();
 
-    function MyClass(``) {}
+    // eslint-disable-next-line no-empty-function
+    function MyClass() {}
 
     registry.registerClassForType(MyClass, 'SomeType');
 
@@ -26,6 +27,7 @@ suite('Unit | GraphHelpers | ClassRegistry', () => {
 
     const registry = new ClassRegistry();
 
+    // eslint-disable-next-line no-empty-function
     function MyClass() {}
 
     registry.registerClassForType(MyClass, 'SomeType');

@@ -94,7 +94,6 @@ suite('Unit | GraphHelpers | deserializeObject', () => {
   });
 
   test('it instantiates paginated list members as models', () => {
-    assert.expect(graphFixture.data.shop.products.edges.length * 2);
 
     const graph = deserializeObject(graphFixture.data, 'QueryRoot');
 

@@ -31,7 +31,7 @@ suite('Unit | GraphHelpers | class Graph', () => {
   test('it yields an instance of Graph representing the type passed to addField', () => {
     const graph = new Graph();
 
-    graph.addField('shop', {}, function(shop) {
+    graph.addField('shop', {}, (shop) => {
       assert.ok(Graph.prototype.isPrototypeOf(shop));
     });
   });
@@ -39,7 +39,7 @@ suite('Unit | GraphHelpers | class Graph', () => {
   test('it composes nested graphs', () => {
     const graph = new Graph();
 
-    graph.addField('shop', {}, function(shop) {
+    graph.addField('shop', {}, (shop) => {
       shop.addField('name');
     });
 
@@ -49,7 +49,7 @@ suite('Unit | GraphHelpers | class Graph', () => {
   test('it can attach args to nested nodes', () => {
     const graph = new Graph();
 
-    graph.addField('product', {id: '1'}, function(shop) {
+    graph.addField('product', {id: '1'}, (shop) => {
       shop.addField('title');
     });
 
@@ -59,9 +59,9 @@ suite('Unit | GraphHelpers | class Graph', () => {
   test('it adds connections with pagination info', () => {
     const graph = new Graph();
 
-    graph.addField('shop', {}, function(shop) {
+    graph.addField('shop', {}, (shop) => {
       shop.addField('name');
-      shop.addConnection('products', {first: 10}, function(product) {
+      shop.addConnection('products', {first: 10}, (product) => {
         product.addField('handle');
       });
     });

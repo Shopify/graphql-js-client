@@ -26,7 +26,7 @@ suite('Unit | GraphHelpers | GraphModel', () => {
 
     const model = new GraphModel(attrs);
 
-    assert.throws(function() {
+    assert.throws(() => {
       model.beans = 'Gosh darn beans';
     });
   });

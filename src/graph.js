@@ -1,6 +1,7 @@
 import join from './join';
 import descriptorForField from './descriptor-for-field';
 import schemaForType from './schema-for-type';
+import noop from './noop';
 
 function formatArgPair(key, hash) {
   return `${key}: ${JSON.stringify(hash[key])}`;
@@ -62,7 +63,7 @@ export default class Graph {
     return `${this.label} ${this.body}`;
   }
 
-  addField(name, args = {}, fieldTypeCb = function() {}) {
+  addField(name, args = {}, fieldTypeCb = noop) {
     const fieldDescriptor = descriptorForField(name, this.typeSchema.name);
     const node = new Graph(fieldDescriptor.schema, this);
 
@@ -71,7 +72,7 @@ export default class Graph {
     this.fields.push({name, args, node, fieldTypeCb});
   }
 
-  addConnection(name, args = {}, fieldTypeCb = function() {}) {
+  addConnection(name, args = {}, fieldTypeCb = noop) {
     const fieldDescriptor = descriptorForField(name, this.typeSchema.name);
     const node = new Graph(fieldDescriptor.schema, this);
 

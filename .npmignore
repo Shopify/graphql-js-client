@@ -9,3 +9,5 @@ demo/
 .npmignore
 LICENSE.md
 src/
+junit
+.tmp

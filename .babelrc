@@ -1,8 +1,28 @@
 {
-  "presets": [
-    "shopify"
-  ],
   "plugins": [
-    ["add-shopify-header", {"files": [ "src/index.js" ]}]
-  ]
+    ["add-shopify-header", {"files": [ "src/index.js" ]}],
+    ["eslint-test-generator", {
+      "template": "mocha",
+      "paths": [
+        "src/**/*.js",
+        "test/**/*.js",
+      ],
+      "file": "test/lint-tests.js"
+    }]
+  ],
+  "env": {
+    "development": {
+      "presets": [
+        "shopify"
+      ]
+    },
+    "tdd": {
+      "presets": [
+        ["shopify/web", {
+          "modules": false
+        }],
+        "es2015-rollup"
+      ],
+    }
+  },
 }

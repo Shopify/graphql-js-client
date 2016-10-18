@@ -1,7 +1,7 @@
 import assert from 'assert';
 import Graph from '../src/graph';
 
-suite('Unit | GraphHelpers | class Graph', () => {
+suite('Unit | Graph', () => {
   const querySplitter = /[\s,]+/;
 
   function splitQuery(query) {

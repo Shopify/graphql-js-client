@@ -2,7 +2,7 @@ import assert from 'assert';
 import descriptorForField from '../src/descriptor-for-field';
 import graphSchema from '../graph/schema';
 
-suite('Unit | GraphHelpers | descriptorForField', () => {
+suite('Unit | descriptorForField', () => {
   test('it can generate descriptors for fields of the query root', () => {
 
     const shopDescriptor = descriptorForField('shop', 'QueryRoot');

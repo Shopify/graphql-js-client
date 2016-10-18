@@ -1,11 +1,10 @@
 import schemaForType from './schema-for-type';
-import assign from '../metal/assign';
 
 function findInScalars(fieldName, type) {
   const fieldDescriptor = type.scalars[fieldName];
 
   if (fieldDescriptor) {
-    return assign({
+    return Object.assign({
       schema: {
         kind: 'SCALAR',
         name: fieldDescriptor.type
@@ -23,7 +22,7 @@ function findInObjects(fieldName, type) {
   const fieldDescriptor = type.objects[fieldName];
 
   if (fieldDescriptor) {
-    return assign({
+    return Object.assign({
       schema: schemaForType(fieldDescriptor.type),
       fieldName,
       onType: type.name,
@@ -38,7 +37,7 @@ function findInConnections(fieldName, type) {
   const fieldDescriptor = type.connections[fieldName];
 
   if (fieldDescriptor) {
-    return assign({
+    return Object.assign({
       schema: schemaForType(fieldDescriptor.type),
       fieldName,
       onType: type.name,

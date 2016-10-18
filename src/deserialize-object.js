@@ -1,6 +1,5 @@
 import descriptorForField from './descriptor-for-field';
 import ClassRegistry from './class-registry';
-import assign from '../metal/assign';
 
 function extractDescriptors(objectGraph, typeName) {
   return Object.keys(objectGraph).map((fieldName) => {
@@ -73,7 +72,7 @@ export default function deserializeObject(objectGraph, typeName, registry = new 
 
   const model = new (registry.classForType(typeName))(scalars);
 
-  assign(model, objects, connections);
+  Object.assign(model, objects, connections);
 
   return model;
 

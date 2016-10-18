@@ -1,6 +1,7 @@
 import join from './join';
 import descriptorForField from './descriptor-for-field';
 import schemaForType from './schema-for-type';
+import noop from './noop';
 
 function formatArgPair(key, hash) {
   return `${key}: ${JSON.stringify(hash[key])}`;
@@ -13,7 +14,7 @@ function formatArgs(argumentHash) {
     return '';
   }
 
-  const formattedArgs = Object.keys(argumentHash).map(key => {
+  const formattedArgs = Object.keys(argumentHash).map((key) => {
     return formatArgPair(key, argumentHash);
   });
 
@@ -49,7 +50,7 @@ export default class Graph {
   }
 
   get selections() {
-    return join(this.fields.map(field => {
+    return join(this.fields.map((field) => {
       return `${field.name}${formatArgs(field.args)}${field.node.toQuery()}`;
     }));
   }
@@ -62,29 +63,29 @@ export default class Graph {
     return `${this.label} ${this.body}`;
   }
 
-  addField(name, args = {}, fieldTypeCb = function () {}) {
+  addField(name, args = {}, fieldTypeCb = noop) {
     const fieldDescriptor = descriptorForField(name, this.typeSchema.name);
     const node = new Graph(fieldDescriptor.schema, this);
 
     fieldTypeCb(node);
 
-    this.fields.push({ name, args, node, fieldTypeCb });
+    this.fields.push({name, args, node, fieldTypeCb});
   }
 
-  addConnection(name, args = {}, fieldTypeCb = function () {}) {
+  addConnection(name, args = {}, fieldTypeCb = noop) {
     const fieldDescriptor = descriptorForField(name, this.typeSchema.name);
     const node = new Graph(fieldDescriptor.schema, this);
 
-    node.addField('pageInfo', {}, pageInfo => {
+    node.addField('pageInfo', {}, (pageInfo) => {
       pageInfo.addField('hasNextPage');
       pageInfo.addField('hasPreviousPage');
     });
 
-    node.addField('edges', {}, edges => {
+    node.addField('edges', {}, (edges) => {
       edges.addField('cursor');
       edges.addField('node', {}, fieldTypeCb);
     });
 
-    this.fields.push({ name, args, node, fieldTypeCb });
+    this.fields.push({name, args, node, fieldTypeCb});
   }
 }

@@ -1,4 +1,4 @@
-import graphSchema from 'graph/schema';
+import graphSchema from '../graph/schema';
 
 export default function schemaForType(typeName) {
   const type = graphSchema[typeName];

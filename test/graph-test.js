@@ -37,6 +37,28 @@ suite('Unit | Graph', () => {
     });
   });
 
+  test('it doesn\'t require query args when using addField or addConnection', () => {
+    const graph = new Graph(typeBundle);
+    let addFieldCalledCallBack = false;
+
+    graph.addField('shop', () => {
+      addFieldCalledCallBack = true;
+    });
+
+    assert.ok(addFieldCalledCallBack, 'addField called callback even if args wasn\'t passed');
+  });
+
+  test('it doesn\'t require query args when using addConnection', () => {
+    const graph = new Graph(typeBundle, 'Shop');
+    let addConnectionCalledCallBack = false;
+
+    graph.addConnection('collections', () => {
+      addConnectionCalledCallBack = true;
+    });
+
+    assert.ok(addConnectionCalledCallBack, 'addConnection called callback even if args wasn\'t passed');
+  });
+
   test('it composes nested graphs', () => {
     const graph = new Graph(typeBundle);
 

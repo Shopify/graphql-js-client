@@ -21,6 +21,23 @@ function formatArgs(argumentHash) {
   return ` (${join(formattedArgs)})`;
 }
 
+function getArgsAndCallback(paramArgsCallback) {
+  let callback = noop;
+  let args = {};
+
+  if (paramArgsCallback.length === 1) {
+    if (typeof paramArgsCallback[0] === 'function') {
+      callback = paramArgsCallback[0];
+    } else {
+      args = paramArgsCallback[0];
+    }
+  } else if (paramArgsCallback.length === 2) {
+    [args, callback] = paramArgsCallback;
+  }
+
+  return {args, callback};
+}
+
 export default class Graph {
   constructor(typeBundle, type = 'QueryRoot', parent) {
     if (typeof type === 'string') {
@@ -64,16 +81,34 @@ export default class Graph {
     return `${this.label} ${this.body}`;
   }
 
-  addField(name, args = {}, fieldTypeCb = noop) {
+  /**
+   * will add a field to be queried to the current query node.
+   *
+   * @param {String}    name The name of the field to add to the query
+   * @param {Object}    [args] Arguments for the field to query
+   * @param {Function}  [callback] Callback which will return a new query node for the field added
+   */
+  addField(name, ...paramArgsCallback) {
+    const {args, callback} = getArgsAndCallback(paramArgsCallback);
+
     const fieldDescriptor = descriptorForField(this.typeBundle, name, this.typeSchema.name);
     const node = new Graph(this.typeBundle, fieldDescriptor.schema, this);
 
-    fieldTypeCb(node);
+    callback(node);
 
-    this.fields.push({name, args, node, fieldTypeCb});
+    this.fields.push({name, args, node, callback});
   }
 
-  addConnection(name, args = {}, fieldTypeCb = noop) {
+  /**
+   * will add a connection to be queried to the current query node.
+   *
+   * @param {String}    name The name of the connection to add to the query
+   * @param {Object}    [args] Arguments for the connection query eg. { first: 10 }
+   * @param {Function}  [callback] Callback which will return a new query node for the connection added
+   */
+  addConnection(name, ...paramArgsCallback) {
+    const {args, callback} = getArgsAndCallback(paramArgsCallback);
+
     const fieldDescriptor = descriptorForField(this.typeBundle, name, this.typeSchema.name);
     const node = new Graph(this.typeBundle, fieldDescriptor.schema, this);
 
@@ -84,9 +119,9 @@ export default class Graph {
 
     node.addField('edges', {}, (edges) => {
       edges.addField('cursor');
-      edges.addField('node', {}, fieldTypeCb);
+      edges.addField('node', {}, callback);
     });
 
-    this.fields.push({name, args, node, fieldTypeCb});
+    this.fields.push({name, args, node, callback});
   }
 }

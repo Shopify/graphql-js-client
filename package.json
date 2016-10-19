@@ -23,6 +23,7 @@
     "eslint": "3.3.1",
     "eslint-plugin-shopify": "14.0.0",
     "http-server": "0.9.0",
+    "jq-cli-wrapper": "0.3.0",
     "mocha": "3.0.2",
     "nodemon": "1.11.0",
     "rollup": "0.36.3",
@@ -42,7 +43,10 @@
     "prepublish": "babel -d lib/ src/",
     "mocha": "cross-env BABEL_ENV='development' mocha --compilers js:babel-register -u tdd $([ -n \"${CI}\" ] && echo --reporter xunit --reporter-options output=$CIRCLE_TEST_REPORTS/junit/mocha.xml) test/**/*.js",
     "lint": "eslint --max-warnings 0 -c .eslintrc.json $([ -n \"${CI}\" ] && echo -o $CIRCLE_TEST_REPORTS/junit/eslint.xml -f junit) src/ test/",
-    "print-start-message": "wait-on file:.tmp/test/index.html file:.tmp/test/tests.js tcp:4200 && echo \"\n\n⚡️⚡️⚡️  Good to go at http://localhost:4200 ⚡️⚡️⚡️\""
+    "print-start-message": "wait-on file:.tmp/test/index.html file:.tmp/test/tests.js tcp:4200 && echo \"\n\n⚡️⚡️⚡️  Good to go at http://localhost:4200 ⚡️⚡️⚡️\"",
+    "fetch-graphql-schema": "graphql-js-schema-fetch --url https://graphql.myshopify.com/api/graph --header 'Authorization: Basic MzUxYzEyMjAxN2QwZjJhOTU3ZDMyYWU3MjhhZDc0OWM=' | jq '.' > schema.json",
+    "generate-graphql-types": "graphql-js-schema --schema-file schema.json --outdir .tmp/schema --schema-bundle-name 'Types'",
+    "extract-type-bundle": "rollup -i .tmp/schema/types.js -f es > test/fixtures/types.js"
   },
   "keywords": [
     "graphql,api,client"

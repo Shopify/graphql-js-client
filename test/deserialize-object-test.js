@@ -2,6 +2,7 @@ import assert from 'assert';
 import GraphModel from '../src/graph-model';
 import deserializeObject from '../src/deserialize-object';
 import ClassRegistry from '../src/class-registry';
+import typeBundle from '../fixtures/types';
 
 
 const graphFixture = {
@@ -72,14 +73,14 @@ const productFixture = {
 suite('Unit | GraphHelpers | deserializeObject', () => {
   test('it creates a GraphModel from the root type', () => {
 
-    const graph = deserializeObject(graphFixture.data, 'QueryRoot');
+    const graph = deserializeObject(typeBundle, graphFixture.data, 'QueryRoot');
 
     assert.ok(GraphModel.prototype.isPrototypeOf(graph), 'root type is a graph model');
   });
 
   test('it instantiates a model with relationship fields', () => {
 
-    const graph = deserializeObject(graphFixture.data, 'QueryRoot');
+    const graph = deserializeObject(typeBundle, graphFixture.data, 'QueryRoot');
 
     assert.ok(GraphModel.prototype.isPrototypeOf(graph.shop), 'shop relationship is a graph model');
     assert.deepEqual(graph.shop.attrs, {name: 'buckets-o-stuff'}, 'shop model contains payloads attrs');
@@ -87,7 +88,7 @@ suite('Unit | GraphHelpers | deserializeObject', () => {
 
   test('it creates an array from lists of paginated relationships', () => {
 
-    const graph = deserializeObject(graphFixture.data, 'QueryRoot');
+    const graph = deserializeObject(typeBundle, graphFixture.data, 'QueryRoot');
 
     assert.ok(Array.isArray(graph.shop.products), 'shops products are in an array');
     assert.equal(graph.shop.products.length, 3, 'there are three products');
@@ -95,7 +96,7 @@ suite('Unit | GraphHelpers | deserializeObject', () => {
 
   test('it instantiates paginated list members as models', () => {
 
-    const graph = deserializeObject(graphFixture.data, 'QueryRoot');
+    const graph = deserializeObject(typeBundle, graphFixture.data, 'QueryRoot');
 
     graphFixture.data.shop.products.edges.forEach((product, index) => {
       assert.ok(GraphModel.prototype.isPrototypeOf(graph.shop.products[index]), 'products are graph models');
@@ -105,7 +106,7 @@ suite('Unit | GraphHelpers | deserializeObject', () => {
 
   test('it creates an array from lists of non-paginated relationships', () => {
 
-    const graph = deserializeObject(productFixture.data, 'QueryRoot');
+    const graph = deserializeObject(typeBundle, productFixture.data, 'QueryRoot');
 
     assert.ok(Array.isArray(graph.product.options), 'products images are in an array');
     assert.equal(graph.product.options.length, 2, 'there are two options');
@@ -113,7 +114,7 @@ suite('Unit | GraphHelpers | deserializeObject', () => {
 
   test('it instantiates basic list members as models', () => {
 
-    const graph = deserializeObject(productFixture.data, 'QueryRoot');
+    const graph = deserializeObject(typeBundle, productFixture.data, 'QueryRoot');
 
     assert.ok(GraphModel.prototype.isPrototypeOf(graph.product.options[0]));
     assert.equal(graph.product.options[0].name, productFixture.data.product.options[0].name);
@@ -129,7 +130,7 @@ suite('Unit | GraphHelpers | deserializeObject', () => {
     registry.registerClassForType(ShopModel, 'Shop');
     registry.registerClassForType(ProductModel, 'Product');
 
-    const graph = deserializeObject(graphFixture.data, 'QueryRoot', registry);
+    const graph = deserializeObject(typeBundle, graphFixture.data, 'QueryRoot', registry);
 
     assert.ok(ShopModel.prototype.isPrototypeOf(graph.shop), 'shop node is a shop model');
     assert.ok(ProductModel.prototype.isPrototypeOf(graph.shop.products[0]), 'product node is a product model');

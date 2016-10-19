@@ -18,12 +18,12 @@ function findInScalars(fieldName, type) {
   return null;
 }
 
-function findInObjects(fieldName, type) {
+function findInObjects(typeBundle, fieldName, type) {
   const fieldDescriptor = type.objects[fieldName];
 
   if (fieldDescriptor) {
     return Object.assign({
-      schema: schemaForType(fieldDescriptor.type),
+      schema: schemaForType(typeBundle, fieldDescriptor.type),
       fieldName,
       onType: type.name,
       isConnection: false
@@ -33,12 +33,12 @@ function findInObjects(fieldName, type) {
   return null;
 }
 
-function findInConnections(fieldName, type) {
+function findInConnections(typeBundle, fieldName, type) {
   const fieldDescriptor = type.connections[fieldName];
 
   if (fieldDescriptor) {
     return Object.assign({
-      schema: schemaForType(fieldDescriptor.type),
+      schema: schemaForType(typeBundle, fieldDescriptor.type),
       fieldName,
       onType: type.name,
       isConnection: true
@@ -48,20 +48,20 @@ function findInConnections(fieldName, type) {
   return null;
 }
 
-function find(fieldName, type) {
+function find(typeBundle, fieldName, type) {
   return (
     findInScalars(fieldName, type) ||
-    findInObjects(fieldName, type) ||
-    findInConnections(fieldName, type)
+    findInObjects(typeBundle, fieldName, type) ||
+    findInConnections(typeBundle, fieldName, type)
   );
 }
 
-export default function descriptorForField(fieldName, typeModuleName) {
-  const containerType = schemaForType(typeModuleName);
+export default function descriptorForField(typeBundle, fieldName, typeModuleName) {
+  const containerType = schemaForType(typeBundle, typeModuleName);
 
   if (!containerType) {
     throw new Error(`Unknown parent GraphQL type ${typeModuleName}`);
   }
 
-  return find(fieldName, containerType);
+  return find(typeBundle, fieldName, containerType);
 }

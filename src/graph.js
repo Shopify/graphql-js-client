@@ -38,6 +38,27 @@ function getArgsAndCallback(paramArgsCallback) {
   return {args, callback};
 }
 
+class Field {
+  constructor(name, args, selectionSet) {
+    this.name = name;
+    this.args = args;
+    this.selectionSet = selectionSet;
+  }
+  toQuery() {
+    return `${this.name}${formatArgs(this.args)}${this.selectionSet.toQuery()}`;
+  }
+}
+
+class InlineFragment {
+  constructor(typeName, selectionSet) {
+    this.typeName = typeName;
+    this.selectionSet = selectionSet;
+  }
+  toQuery() {
+    return `... on ${this.typeName}${this.selectionSet.toQuery()}`;
+  }
+}
+
 export default class Graph {
   constructor(typeBundle, type = 'QueryRoot', parent) {
     if (typeof type === 'string') {
@@ -69,7 +90,7 @@ export default class Graph {
 
   get selections() {
     return join(this.fields.map((field) => {
-      return `${field.name}${formatArgs(field.args)}${field.node.toQuery()}`;
+      return field.toQuery();
     }));
   }
 
@@ -92,11 +113,11 @@ export default class Graph {
     const {args, callback} = getArgsAndCallback(paramArgsCallback);
 
     const fieldDescriptor = descriptorForField(this.typeBundle, name, this.typeSchema.name);
-    const node = new Graph(this.typeBundle, fieldDescriptor.schema, this);
+    const selectionSet = new Graph(this.typeBundle, fieldDescriptor.schema, this);
 
-    callback(node);
+    callback(selectionSet);
 
-    this.fields.push({name, args, node, callback});
+    this.fields.push(new Field(name, args, selectionSet));
   }
 
   /**
@@ -110,18 +131,25 @@ export default class Graph {
     const {args, callback} = getArgsAndCallback(paramArgsCallback);
 
     const fieldDescriptor = descriptorForField(this.typeBundle, name, this.typeSchema.name);
-    const node = new Graph(this.typeBundle, fieldDescriptor.schema, this);
+    const selectionSet = new Graph(this.typeBundle, fieldDescriptor.schema, this);
 
-    node.addField('pageInfo', {}, (pageInfo) => {
+    selectionSet.addField('pageInfo', {}, (pageInfo) => {
       pageInfo.addField('hasNextPage');
       pageInfo.addField('hasPreviousPage');
     });
 
-    node.addField('edges', {}, (edges) => {
+    selectionSet.addField('edges', {}, (edges) => {
       edges.addField('cursor');
       edges.addField('node', {}, callback);
     });
 
-    this.fields.push({name, args, node, callback});
+    this.fields.push(new Field(name, args, selectionSet));
+  }
+
+  addInlineFragmentOn(typeName, fieldTypeCb = noop) {
+    const selectionSet = new Graph(this.typeBundle, schemaForType(this.typeBundle, typeName), this);
+
+    fieldTypeCb(selectionSet);
+    this.fields.push(new InlineFragment(typeName, selectionSet));
   }
 }

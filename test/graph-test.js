@@ -108,4 +108,23 @@ suite('Unit | Graph', () => {
     }`));
   });
 
+  test('it adds inline fragments', () => {
+    const graph = new Graph(typeBundle);
+
+    graph.addField('shop', {}, (shop) => {
+      shop.addInlineFragmentOn('Shop', (fragment) => {
+        fragment.addField('name');
+      });
+    });
+
+    assert.deepEqual(splitQuery(graph.toQuery()), splitQuery(`query {
+      shop {
+        ... on Shop {
+          name
+        }
+      }
+    }`));
+  });
+
+
 });

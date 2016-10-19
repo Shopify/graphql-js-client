@@ -1,9 +1,9 @@
 import descriptorForField from './descriptor-for-field';
 import ClassRegistry from './class-registry';
 
-function extractDescriptors(objectGraph, typeName) {
+function extractDescriptors(typeBundle, objectGraph, typeName) {
   return Object.keys(objectGraph).map((fieldName) => {
-    return descriptorForField(fieldName, typeName);
+    return descriptorForField(typeBundle, fieldName, typeName);
   });
 }
 
@@ -29,46 +29,46 @@ function extractScalars(objectGraph, descriptors) {
   }, {});
 }
 
-function extractObjects(objectGraph, descriptors, registry) {
+function extractObjects(typeBundle, objectGraph, descriptors, registry) {
   const objectDescriptors = descriptors.filter(isObject);
 
   return objectDescriptors.reduce((objectAcc, descriptor) => {
     if (descriptor.isList) {
       objectAcc[descriptor.fieldName] = objectGraph[descriptor.fieldName].map((object) => {
         // eslint-disable-next-line no-use-before-define
-        return deserializeObject(object, descriptor.type, registry);
+        return deserializeObject(typeBundle, object, descriptor.type, registry);
       });
     } else {
       // eslint-disable-next-line no-use-before-define
-      objectAcc[descriptor.fieldName] = deserializeObject(objectGraph[descriptor.fieldName], descriptor.type, registry);
+      objectAcc[descriptor.fieldName] = deserializeObject(typeBundle, objectGraph[descriptor.fieldName], descriptor.type, registry);
     }
 
     return objectAcc;
   }, {});
 }
 
-function extractConnections(objectGraph, descriptors, registry) {
+function extractConnections(typeBundle, objectGraph, descriptors, registry) {
   const connectionDescriptors = descriptors.filter(isConnection);
 
   return connectionDescriptors.reduce((connectionsAcc, descriptor) => {
-    const edgeDescriptor = descriptorForField('edges', descriptor.type);
-    const nodeDescriptor = descriptorForField('node', edgeDescriptor.type);
+    const edgeDescriptor = descriptorForField(typeBundle, 'edges', descriptor.type);
+    const nodeDescriptor = descriptorForField(typeBundle, 'node', edgeDescriptor.type);
 
     connectionsAcc[descriptor.fieldName] = objectGraph[descriptor.fieldName].edges.map((object) => {
       // eslint-disable-next-line no-use-before-define
-      return deserializeObject(object.node, nodeDescriptor.type, registry);
+      return deserializeObject(typeBundle, object.node, nodeDescriptor.type, registry);
     });
 
     return connectionsAcc;
   }, {});
 }
 
-export default function deserializeObject(objectGraph, typeName, registry = new ClassRegistry()) {
-  const descriptors = extractDescriptors(objectGraph, typeName);
+export default function deserializeObject(typeBundle, objectGraph, typeName, registry = new ClassRegistry()) {
+  const descriptors = extractDescriptors(typeBundle, objectGraph, typeName);
 
   const scalars = extractScalars(objectGraph, descriptors);
-  const objects = extractObjects(objectGraph, descriptors, registry);
-  const connections = extractConnections(objectGraph, descriptors, registry);
+  const objects = extractObjects(typeBundle, objectGraph, descriptors, registry);
+  const connections = extractConnections(typeBundle, objectGraph, descriptors, registry);
 
   const model = new (registry.classForType(typeName))(scalars);
 

@@ -11,3 +11,4 @@ LICENSE.md
 src/
 junit
 .tmp
+fixtures/types.js

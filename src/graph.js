@@ -22,13 +22,14 @@ function formatArgs(argumentHash) {
 }
 
 export default class Graph {
-  constructor(type = 'QueryRoot', parent) {
+  constructor(typeBundle, type = 'QueryRoot', parent) {
     if (typeof type === 'string') {
-      this.typeSchema = schemaForType(type);
+      this.typeSchema = schemaForType(typeBundle, type);
     } else {
       this.typeSchema = type;
     }
 
+    this.typeBundle = typeBundle;
     this.parent = parent;
     this.fields = [];
   }
@@ -64,8 +65,8 @@ export default class Graph {
   }
 
   addField(name, args = {}, fieldTypeCb = noop) {
-    const fieldDescriptor = descriptorForField(name, this.typeSchema.name);
-    const node = new Graph(fieldDescriptor.schema, this);
+    const fieldDescriptor = descriptorForField(this.typeBundle, name, this.typeSchema.name);
+    const node = new Graph(this.typeBundle, fieldDescriptor.schema, this);
 
     fieldTypeCb(node);
 
@@ -73,8 +74,8 @@ export default class Graph {
   }
 
   addConnection(name, args = {}, fieldTypeCb = noop) {
-    const fieldDescriptor = descriptorForField(name, this.typeSchema.name);
-    const node = new Graph(fieldDescriptor.schema, this);
+    const fieldDescriptor = descriptorForField(this.typeBundle, name, this.typeSchema.name);
+    const node = new Graph(this.typeBundle, fieldDescriptor.schema, this);
 
     node.addField('pageInfo', {}, (pageInfo) => {
       pageInfo.addField('hasNextPage');

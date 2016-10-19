@@ -1,7 +1,5 @@
-import graphSchema from '../graph/schema';
-
-export default function schemaForType(typeName) {
-  const type = graphSchema[typeName];
+export default function schemaForType(typeBundle, typeName) {
+  const type = typeBundle[typeName];
 
   if (type) {
     return type;

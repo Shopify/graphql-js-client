@@ -8,3 +8,4 @@ lib/
 .tmp
 junit
 dist
+fixtures/types.js

@@ -1,5 +1,6 @@
 import assert from 'assert';
 import Graph from '../src/graph';
+import typeBundle from '../fixtures/types'; // eslint-disable-line import/no-unresolved
 
 suite('Unit | Graph', () => {
   const querySplitter = /[\s,]+/;
@@ -9,19 +10,19 @@ suite('Unit | Graph', () => {
   }
 
   test('it builds queries off the root', () => {
-    const graph = new Graph();
+    const graph = new Graph(typeBundle);
 
     assert.deepEqual(splitQuery(graph.toQuery()), splitQuery('query { }'));
   });
 
   test('it builds queries off the passed type', () => {
-    const graph = new Graph('Shop');
+    const graph = new Graph(typeBundle, 'Shop');
 
     assert.deepEqual(splitQuery(graph.toQuery()), splitQuery('fragment on Shop { }'));
   });
 
   test('it can add basic fields', () => {
-    const graph = new Graph('Shop');
+    const graph = new Graph(typeBundle, 'Shop');
 
     graph.addField('name');
 
@@ -29,7 +30,7 @@ suite('Unit | Graph', () => {
   });
 
   test('it yields an instance of Graph representing the type passed to addField', () => {
-    const graph = new Graph();
+    const graph = new Graph(typeBundle);
 
     graph.addField('shop', {}, (shop) => {
       assert.ok(Graph.prototype.isPrototypeOf(shop));
@@ -37,7 +38,7 @@ suite('Unit | Graph', () => {
   });
 
   test('it composes nested graphs', () => {
-    const graph = new Graph();
+    const graph = new Graph(typeBundle);
 
     graph.addField('shop', {}, (shop) => {
       shop.addField('name');
@@ -47,7 +48,7 @@ suite('Unit | Graph', () => {
   });
 
   test('it can attach args to nested nodes', () => {
-    const graph = new Graph();
+    const graph = new Graph(typeBundle);
 
     graph.addField('product', {id: '1'}, (shop) => {
       shop.addField('title');
@@ -57,7 +58,7 @@ suite('Unit | Graph', () => {
   });
 
   test('it adds connections with pagination info', () => {
-    const graph = new Graph();
+    const graph = new Graph(typeBundle);
 
     graph.addField('shop', {}, (shop) => {
       shop.addField('name');

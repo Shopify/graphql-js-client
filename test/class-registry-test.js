@@ -3,7 +3,7 @@ import assert from 'assert';
 import ClassRegistry from '../src/class-registry';
 import GraphModel from '../src/graph-model';
 
-suite('Unit | GraphHelpers | ClassRegistry', () => {
+suite('Unit | ClassRegistry', () => {
   test('it returns the defined constructor fot the type', () => {
 
     const registry = new ClassRegistry();

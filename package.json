@@ -39,9 +39,9 @@
     "start": "npm run clean && npm run setup-paths && concurrently 'npm run types-fixture:build' 'npm run watch' 'http-server -p 4200 .tmp/test' 'npm run -s print-start-message'",
     "clean": "rimraf .tmp dist",
     "setup-paths": "mkdir -p dist .tmp/test",
-    "watch": "nodemon --exec 'npm run test:build && cp test/index.html dist/tests.js .tmp/test' -w src/ -w test/",
+    "watch": "nodemon --exec 'npm run test:build && cp test/index.html dist/tests.js* .tmp/test' -w src/ -w test/",
     "test": "npm run lint && npm run mocha",
-    "test:build": "cross-env BABEL_ENV='tdd' rollup -c .rollup-tests.js -f iife -i test/**/*.js > dist/tests.js",
+    "test:build": "cross-env BABEL_ENV='tdd' rollup -o dist/tests.js -m -c .rollup-tests.js -f iife -i test/**/*.js",
     "prepublish": "babel -d lib/ src/",
     "mocha": "npm run types-fixture:build && cross-env BABEL_ENV='development' mocha --compilers js:babel-register -u tdd $(npm run -s mocha:reporter-args) test/**/*.js",
     "mocha:reporter-args": "[ -n \"${CI}\" ] && echo --reporter xunit --reporter-options output=$CIRCLE_TEST_REPORTS/junit/mocha.xml",
@@ -52,7 +52,7 @@
     "types-fixture:build": "rimraf fixtures/types.js && npm run types-fixture:generate-graphql-types && npm run types-fixture:extract-type-bundle",
     "types-fixture:fetch-graphql-schema": "graphql-js-schema-fetch --url https://graphql.myshopify.com/api/graph --header 'Authorization: Basic MzUxYzEyMjAxN2QwZjJhOTU3ZDMyYWU3MjhhZDc0OWM=' | jq '.' > schema.json",
     "types-fixture:generate-graphql-types": "graphql-js-schema --schema-file schema.json --outdir .tmp/schema --schema-bundle-name 'Types'",
-    "types-fixture:extract-type-bundle": "rollup -i .tmp/schema/types.js -f es > fixtures/types.js"
+    "types-fixture:extract-type-bundle": "rollup -o fixtures/types.js -m inline -i .tmp/schema/types.js -f es"
   },
   "keywords": [
     "graphql,api,client"

@@ -122,5 +122,45 @@ suite('Unit | SelectionSet', () => {
     }`));
   });
 
+  test('it cannot add the same field twice', () => {
+    const set = new SelectionSet(typeBundle, 'QueryRoot');
 
+    set.addField('shop', (shop) => {
+      shop.addField('name');
+      shop.addField('name');
+    });
+
+    assert.deepEqual(tokens(set.toString()), tokens(' { shop { name } }'));
+  });
+
+  test('it cannot add the same connection twice', () => {
+    const set = new SelectionSet(typeBundle, 'QueryRoot');
+
+    set.addField('shop', {}, (shop) => {
+      shop.addConnection('products', {first: 10}, (product) => {
+        product.addField('handle');
+      });
+
+      shop.addConnection('products', {first: 10}, (product) => {
+        product.addField('handle');
+      });
+    });
+
+    assert.deepEqual(tokens(set.toString()), tokens(` {
+      shop {
+        products (first: 10) {
+          pageInfo {
+            hasNextPage,
+            hasPreviousPage
+          },
+          edges {
+            cursor,
+            node {
+              handle
+            }
+          }
+        }
+      }
+    }`));
+  });
 });

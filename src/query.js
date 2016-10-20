@@ -84,6 +84,12 @@ export class SelectionSet {
     }
   }
 
+  getSelectionIndex(name) {
+    return this.selections.findIndex((field) => {
+      return field.name === name;
+    });
+  }
+
   /**
    * will add a field to be queried to the current query node.
    *
@@ -94,12 +100,17 @@ export class SelectionSet {
   addField(name, ...paramArgsCallback) {
     const {args, callback} = getArgsAndCallback(paramArgsCallback);
 
+    const idxSelection = this.getSelectionIndex(name);
     const fieldDescriptor = descriptorForField(this.typeBundle, name, this.typeSchema.name);
     const selectionSet = new SelectionSet(this.typeBundle, fieldDescriptor.schema, this);
 
     callback(selectionSet);
 
-    this.selections.push(new Field(name, args, selectionSet));
+    if (idxSelection === -1) {
+      this.selections.push(new Field(name, args, selectionSet));
+    } else {
+      this.selections[idxSelection] = new Field(name, args, selectionSet);
+    }
   }
 
   /**
@@ -112,6 +123,7 @@ export class SelectionSet {
   addConnection(name, ...paramArgsCallback) {
     const {args, callback} = getArgsAndCallback(paramArgsCallback);
 
+    const idxSelection = this.getSelectionIndex(name);
     const fieldDescriptor = descriptorForField(this.typeBundle, name, this.typeSchema.name);
     const selectionSet = new SelectionSet(this.typeBundle, fieldDescriptor.schema, this);
 
@@ -125,7 +137,11 @@ export class SelectionSet {
       edges.addField('node', {}, callback);
     });
 
-    this.selections.push(new Field(name, args, selectionSet));
+    if (idxSelection === -1) {
+      this.selections.push(new Field(name, args, selectionSet));
+    } else {
+      this.selections[idxSelection] = new Field(name, args, selectionSet);
+    }
   }
 
   addInlineFragmentOn(typeName, fieldTypeCb = noop) {

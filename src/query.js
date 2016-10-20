@@ -44,8 +44,8 @@ class Field {
     this.args = args;
     this.selectionSet = selectionSet;
   }
-  toQuery() {
-    return `${this.name}${formatArgs(this.args)}${this.selectionSet.toQuery()}`;
+  toString() {
+    return `${this.name}${formatArgs(this.args)}${this.selectionSet.toString()}`;
   }
 }
 
@@ -54,8 +54,8 @@ class InlineFragment {
     this.typeName = typeName;
     this.selectionSet = selectionSet;
   }
-  toQuery() {
-    return `... on ${this.typeName}${this.selectionSet.toQuery()}`;
+  toString() {
+    return `... on ${this.typeName}${this.selectionSet.toString()}`;
   }
 }
 
@@ -90,11 +90,11 @@ export default class Query {
 
   get selections() {
     return join(this.fields.map((field) => {
-      return field.toQuery();
+      return field.toString();
     }));
   }
 
-  toQuery() {
+  toString() {
     if (this.parent) {
       return this.body;
     }

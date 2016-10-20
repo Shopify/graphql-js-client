@@ -12,13 +12,13 @@ suite('Unit | Query', () => {
   test('it builds queries off the root', () => {
     const query = new Query(typeBundle);
 
-    assert.deepEqual(splitQuery(query.toQuery()), splitQuery('query { }'));
+    assert.deepEqual(splitQuery(query.toString()), splitQuery('query { }'));
   });
 
   test('it builds queries off the passed type', () => {
     const query = new Query(typeBundle, 'Shop');
 
-    assert.deepEqual(splitQuery(query.toQuery()), splitQuery('fragment on Shop { }'));
+    assert.deepEqual(splitQuery(query.toString()), splitQuery('fragment on Shop { }'));
   });
 
   test('it can add basic fields', () => {
@@ -26,7 +26,7 @@ suite('Unit | Query', () => {
 
     query.addField('name');
 
-    assert.deepEqual(splitQuery(query.toQuery()), splitQuery('fragment on Shop { name }'));
+    assert.deepEqual(splitQuery(query.toString()), splitQuery('fragment on Shop { name }'));
   });
 
   test('it yields an instance of Query representing the type passed to addField', () => {
@@ -66,7 +66,7 @@ suite('Unit | Query', () => {
       shop.addField('name');
     });
 
-    assert.deepEqual(splitQuery(query.toQuery()), splitQuery('query { shop { name } }'));
+    assert.deepEqual(splitQuery(query.toString()), splitQuery('query { shop { name } }'));
   });
 
   test('it can attach args to nested nodes', () => {
@@ -76,7 +76,7 @@ suite('Unit | Query', () => {
       shop.addField('title');
     });
 
-    assert.deepEqual(splitQuery(query.toQuery()), splitQuery('query { product (id: "1") { title } }'));
+    assert.deepEqual(splitQuery(query.toString()), splitQuery('query { product (id: "1") { title } }'));
   });
 
   test('it adds connections with pagination info', () => {
@@ -89,7 +89,7 @@ suite('Unit | Query', () => {
       });
     });
 
-    assert.deepEqual(splitQuery(query.toQuery()), splitQuery(`query {
+    assert.deepEqual(splitQuery(query.toString()), splitQuery(`query {
       shop {
         name,
         products (first: 10) {
@@ -117,7 +117,7 @@ suite('Unit | Query', () => {
       });
     });
 
-    assert.deepEqual(splitQuery(query.toQuery()), splitQuery(`query {
+    assert.deepEqual(splitQuery(query.toString()), splitQuery(`query {
       shop {
         ... on Shop {
           name

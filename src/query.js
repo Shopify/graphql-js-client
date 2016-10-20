@@ -44,8 +44,8 @@ class Field {
     this.args = args;
     this.selectionSet = selectionSet;
   }
-  toQuery() {
-    return `${this.name}${formatArgs(this.args)}${this.selectionSet.toQuery()}`;
+  toString() {
+    return `${this.name}${formatArgs(this.args)}${this.selectionSet.toString()}`;
   }
 }
 
@@ -54,52 +54,34 @@ class InlineFragment {
     this.typeName = typeName;
     this.selectionSet = selectionSet;
   }
-  toQuery() {
-    return `... on ${this.typeName}${this.selectionSet.toQuery()}`;
+  toString() {
+    return `... on ${this.typeName}${this.selectionSet.toString()}`;
   }
 }
 
-export default class Query {
-  constructor(typeBundle, type = 'QueryRoot', parent) {
+
+export class SelectionSet {
+  constructor(typeBundle, type, parent) {
     if (typeof type === 'string') {
       this.typeSchema = schemaForType(typeBundle, type);
     } else {
       this.typeSchema = type;
     }
-
     this.typeBundle = typeBundle;
     this.parent = parent;
-    this.fields = [];
+    this.selections = [];
   }
 
-  get label() {
-    if (this.typeSchema.name === 'QueryRoot') {
-      return 'query';
-    }
-
-    return `fragment on ${this.typeSchema.name}`;
-  }
-
-  get body() {
+  toString() {
     if (this.typeSchema.kind === 'SCALAR') {
       return '';
+    } else {
+      const commaDelimitedSelections = join(this.selections.map((selection) => {
+        return selection.toString();
+      }));
+
+      return ` { ${commaDelimitedSelections} }`;
     }
-
-    return ` { ${this.selections} }`;
-  }
-
-  get selections() {
-    return join(this.fields.map((field) => {
-      return field.toQuery();
-    }));
-  }
-
-  toQuery() {
-    if (this.parent) {
-      return this.body;
-    }
-
-    return `${this.label} ${this.body}`;
   }
 
   /**
@@ -113,11 +95,11 @@ export default class Query {
     const {args, callback} = getArgsAndCallback(paramArgsCallback);
 
     const fieldDescriptor = descriptorForField(this.typeBundle, name, this.typeSchema.name);
-    const selectionSet = new Query(this.typeBundle, fieldDescriptor.schema, this);
+    const selectionSet = new SelectionSet(this.typeBundle, fieldDescriptor.schema, this);
 
     callback(selectionSet);
 
-    this.fields.push(new Field(name, args, selectionSet));
+    this.selections.push(new Field(name, args, selectionSet));
   }
 
   /**
@@ -131,7 +113,7 @@ export default class Query {
     const {args, callback} = getArgsAndCallback(paramArgsCallback);
 
     const fieldDescriptor = descriptorForField(this.typeBundle, name, this.typeSchema.name);
-    const selectionSet = new Query(this.typeBundle, fieldDescriptor.schema, this);
+    const selectionSet = new SelectionSet(this.typeBundle, fieldDescriptor.schema, this);
 
     selectionSet.addField('pageInfo', {}, (pageInfo) => {
       pageInfo.addField('hasNextPage');
@@ -143,13 +125,25 @@ export default class Query {
       edges.addField('node', {}, callback);
     });
 
-    this.fields.push(new Field(name, args, selectionSet));
+    this.selections.push(new Field(name, args, selectionSet));
   }
 
   addInlineFragmentOn(typeName, fieldTypeCb = noop) {
-    const selectionSet = new Query(this.typeBundle, schemaForType(this.typeBundle, typeName), this);
+    const selectionSet = new SelectionSet(this.typeBundle, schemaForType(this.typeBundle, typeName), this);
 
     fieldTypeCb(selectionSet);
-    this.fields.push(new InlineFragment(typeName, selectionSet));
+    this.selections.push(new InlineFragment(typeName, selectionSet));
+  }
+}
+
+export class Query {
+  constructor(typeBundle, selectionSetCallback) {
+    this.typeBundle = typeBundle;
+    this.selectionSet = new SelectionSet(typeBundle, 'QueryRoot', null);
+    selectionSetCallback(this.selectionSet);
+  }
+
+  toString() {
+    return `query${this.selectionSet.toString()}`;
   }
 }

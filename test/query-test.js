@@ -1,8 +1,8 @@
 import assert from 'assert';
-import Graph from '../src/graph';
+import Query from '../src/query';
 import typeBundle from '../fixtures/types'; // eslint-disable-line import/no-unresolved
 
-suite('Unit | Graph', () => {
+suite('Unit | Query', () => {
   const querySplitter = /[\s,]+/;
 
   function splitQuery(query) {
@@ -10,38 +10,38 @@ suite('Unit | Graph', () => {
   }
 
   test('it builds queries off the root', () => {
-    const graph = new Graph(typeBundle);
+    const query = new Query(typeBundle);
 
-    assert.deepEqual(splitQuery(graph.toQuery()), splitQuery('query { }'));
+    assert.deepEqual(splitQuery(query.toQuery()), splitQuery('query { }'));
   });
 
   test('it builds queries off the passed type', () => {
-    const graph = new Graph(typeBundle, 'Shop');
+    const query = new Query(typeBundle, 'Shop');
 
-    assert.deepEqual(splitQuery(graph.toQuery()), splitQuery('fragment on Shop { }'));
+    assert.deepEqual(splitQuery(query.toQuery()), splitQuery('fragment on Shop { }'));
   });
 
   test('it can add basic fields', () => {
-    const graph = new Graph(typeBundle, 'Shop');
+    const query = new Query(typeBundle, 'Shop');
 
-    graph.addField('name');
+    query.addField('name');
 
-    assert.deepEqual(splitQuery(graph.toQuery()), splitQuery('fragment on Shop { name }'));
+    assert.deepEqual(splitQuery(query.toQuery()), splitQuery('fragment on Shop { name }'));
   });
 
-  test('it yields an instance of Graph representing the type passed to addField', () => {
-    const graph = new Graph(typeBundle);
+  test('it yields an instance of Query representing the type passed to addField', () => {
+    const query = new Query(typeBundle);
 
-    graph.addField('shop', {}, (shop) => {
-      assert.ok(Graph.prototype.isPrototypeOf(shop));
+    query.addField('shop', {}, (shop) => {
+      assert.ok(Query.prototype.isPrototypeOf(shop));
     });
   });
 
   test('it doesn\'t require query args when using addField or addConnection', () => {
-    const graph = new Graph(typeBundle);
+    const query = new Query(typeBundle);
     let addFieldCalledCallBack = false;
 
-    graph.addField('shop', () => {
+    query.addField('shop', () => {
       addFieldCalledCallBack = true;
     });
 
@@ -49,47 +49,47 @@ suite('Unit | Graph', () => {
   });
 
   test('it doesn\'t require query args when using addConnection', () => {
-    const graph = new Graph(typeBundle, 'Shop');
+    const query = new Query(typeBundle, 'Shop');
     let addConnectionCalledCallBack = false;
 
-    graph.addConnection('collections', () => {
+    query.addConnection('collections', () => {
       addConnectionCalledCallBack = true;
     });
 
     assert.ok(addConnectionCalledCallBack, 'addConnection called callback even if args wasn\'t passed');
   });
 
-  test('it composes nested graphs', () => {
-    const graph = new Graph(typeBundle);
+  test('it composes nested querys', () => {
+    const query = new Query(typeBundle);
 
-    graph.addField('shop', {}, (shop) => {
+    query.addField('shop', {}, (shop) => {
       shop.addField('name');
     });
 
-    assert.deepEqual(splitQuery(graph.toQuery()), splitQuery('query { shop { name } }'));
+    assert.deepEqual(splitQuery(query.toQuery()), splitQuery('query { shop { name } }'));
   });
 
   test('it can attach args to nested nodes', () => {
-    const graph = new Graph(typeBundle);
+    const query = new Query(typeBundle);
 
-    graph.addField('product', {id: '1'}, (shop) => {
+    query.addField('product', {id: '1'}, (shop) => {
       shop.addField('title');
     });
 
-    assert.deepEqual(splitQuery(graph.toQuery()), splitQuery('query { product (id: "1") { title } }'));
+    assert.deepEqual(splitQuery(query.toQuery()), splitQuery('query { product (id: "1") { title } }'));
   });
 
   test('it adds connections with pagination info', () => {
-    const graph = new Graph(typeBundle);
+    const query = new Query(typeBundle);
 
-    graph.addField('shop', {}, (shop) => {
+    query.addField('shop', {}, (shop) => {
       shop.addField('name');
       shop.addConnection('products', {first: 10}, (product) => {
         product.addField('handle');
       });
     });
 
-    assert.deepEqual(splitQuery(graph.toQuery()), splitQuery(`query {
+    assert.deepEqual(splitQuery(query.toQuery()), splitQuery(`query {
       shop {
         name,
         products (first: 10) {
@@ -109,15 +109,15 @@ suite('Unit | Graph', () => {
   });
 
   test('it adds inline fragments', () => {
-    const graph = new Graph(typeBundle);
+    const query = new Query(typeBundle);
 
-    graph.addField('shop', {}, (shop) => {
+    query.addField('shop', {}, (shop) => {
       shop.addInlineFragmentOn('Shop', (fragment) => {
         fragment.addField('name');
       });
     });
 
-    assert.deepEqual(splitQuery(graph.toQuery()), splitQuery(`query {
+    assert.deepEqual(splitQuery(query.toQuery()), splitQuery(`query {
       shop {
         ... on Shop {
           name

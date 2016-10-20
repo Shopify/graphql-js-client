@@ -59,7 +59,7 @@ class InlineFragment {
   }
 }
 
-export default class Graph {
+export default class Query {
   constructor(typeBundle, type = 'QueryRoot', parent) {
     if (typeof type === 'string') {
       this.typeSchema = schemaForType(typeBundle, type);
@@ -113,7 +113,7 @@ export default class Graph {
     const {args, callback} = getArgsAndCallback(paramArgsCallback);
 
     const fieldDescriptor = descriptorForField(this.typeBundle, name, this.typeSchema.name);
-    const selectionSet = new Graph(this.typeBundle, fieldDescriptor.schema, this);
+    const selectionSet = new Query(this.typeBundle, fieldDescriptor.schema, this);
 
     callback(selectionSet);
 
@@ -131,7 +131,7 @@ export default class Graph {
     const {args, callback} = getArgsAndCallback(paramArgsCallback);
 
     const fieldDescriptor = descriptorForField(this.typeBundle, name, this.typeSchema.name);
-    const selectionSet = new Graph(this.typeBundle, fieldDescriptor.schema, this);
+    const selectionSet = new Query(this.typeBundle, fieldDescriptor.schema, this);
 
     selectionSet.addField('pageInfo', {}, (pageInfo) => {
       pageInfo.addField('hasNextPage');
@@ -147,7 +147,7 @@ export default class Graph {
   }
 
   addInlineFragmentOn(typeName, fieldTypeCb = noop) {
-    const selectionSet = new Graph(this.typeBundle, schemaForType(this.typeBundle, typeName), this);
+    const selectionSet = new Query(this.typeBundle, schemaForType(this.typeBundle, typeName), this);
 
     fieldTypeCb(selectionSet);
     this.fields.push(new InlineFragment(typeName, selectionSet));

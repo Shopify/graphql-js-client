@@ -5,9 +5,10 @@
       "template": "mocha",
       "paths": [
         "src/**/*.js",
-        "test/**/*.js",
+        "test/**/*.js"
       ],
-      "file": "test/lint-tests.js"
+      "file": "test/lint-tests.js",
+      "maxWarnings": 0
     }]
   ],
   "env": {
@@ -22,7 +23,7 @@
           "modules": false
         }],
         "es2015-rollup"
-      ],
+      ]
     }
-  },
+  }
 }

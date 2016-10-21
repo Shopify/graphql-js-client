@@ -185,4 +185,24 @@ suite('Unit | SelectionSet', () => {
       }
     }`));
   });
+
+  test('it will throw an error when no selection set is passed to addFieldFromSelectionSet', () => {
+    const set = new SelectionSet(typeBundle, 'Shop');
+
+    assert.throws(
+      () => {
+        set.addFieldFromSelectionSet('products', {});
+      },
+      /You must pass in a SelectionSet/,
+      'Threw an error stating SelectionSet must be passed in when using one param'
+    );
+
+    assert.throws(
+      () => {
+        set.addFieldFromSelectionSet('products', {}, {});
+      },
+      /You must pass in a SelectionSet/,
+      'Threw an error stating SelectionSet must be passed in when using two params'
+    );
+  });
 });

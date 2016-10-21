@@ -168,13 +168,13 @@ suite('Unit | SelectionSet', () => {
 
   test('it can add a field with SelectionSet using args', () => {
     const set = new SelectionSet(typeBundle, 'Shop');
-    const products = new SelectionSet(typeBundle, 'ProductConnection');
+    const productConnection = new SelectionSet(typeBundle, 'ProductConnection');
 
-    products.addField('pageInfo', (pageInfo) => {
+    productConnection.addField('pageInfo', (pageInfo) => {
       pageInfo.addField('hasNextPage');
       pageInfo.addField('hasPreviousPage');
     });
-    set.addFieldFromSelectionSet('products', {first: 10}, products);
+    set.addFieldFromSelectionSet('products', {first: 10}, productConnection);
 
     assert.deepEqual(tokens(set.toString()), tokens(` {
       products (first: 10) {

@@ -72,6 +72,12 @@ export class SelectionSet {
     this.selections = [];
   }
 
+  hasSelectionWithName(name) {
+    return this.selections.some((field) => {
+      return field.name === name;
+    });
+  }
+
   toString() {
     if (this.typeSchema.kind === 'SCALAR') {
       return '';
@@ -84,12 +90,6 @@ export class SelectionSet {
     }
   }
 
-  getSelectionIndex(name) {
-    return this.selections.findIndex((field) => {
-      return field.name === name;
-    });
-  }
-
   /**
    * will add a field to be queried to the current query node.
    *
@@ -98,6 +98,10 @@ export class SelectionSet {
    * @param {Function}  [callback] Callback which will return a new query node for the field added
    */
   addField(name, ...paramArgsCallback) {
+    if (this.hasSelectionWithName(name)) {
+      throw new Error(`The field '${name}' has already been added`);
+    }
+
     const {args, callback} = getArgsAndCallback(paramArgsCallback);
 
     const fieldDescriptor = descriptorForField(this.typeBundle, name, this.typeSchema.name);
@@ -105,11 +109,7 @@ export class SelectionSet {
 
     callback(selectionSet);
 
-    if (this.getSelectionIndex(name) === -1) {
-      this.selections.push(new Field(name, args, selectionSet));
-    } else {
-      throw new Error(`The field '${name}' has already been added`);
-    }
+    this.selections.push(new Field(name, args, selectionSet));
   }
 
   /**
@@ -120,6 +120,10 @@ export class SelectionSet {
    * @param {Function}  [callback] Callback which will return a new query node for the connection added
    */
   addConnection(name, ...paramArgsCallback) {
+    if (this.hasSelectionWithName(name)) {
+      throw new Error(`The connection '${name}' has already been added`);
+    }
+
     const {args, callback} = getArgsAndCallback(paramArgsCallback);
 
     const fieldDescriptor = descriptorForField(this.typeBundle, name, this.typeSchema.name);
@@ -135,11 +139,7 @@ export class SelectionSet {
       edges.addField('node', {}, callback);
     });
 
-    if (this.getSelectionIndex(name) === -1) {
-      this.selections.push(new Field(name, args, selectionSet));
-    } else {
-      throw new Error(`The connection '${name}' has already been added`);
-    }
+    this.selections.push(new Field(name, args, selectionSet));
   }
 
   addInlineFragmentOn(typeName, fieldTypeCb = noop) {

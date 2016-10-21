@@ -72,6 +72,12 @@ export class SelectionSet {
     this.selections = [];
   }
 
+  hasSelectionWithName(name) {
+    return this.selections.some((field) => {
+      return field.name === name;
+    });
+  }
+
   toString() {
     if (this.typeSchema.kind === 'SCALAR') {
       return '';
@@ -92,6 +98,10 @@ export class SelectionSet {
    * @param {Function}  [callback] Callback which will return a new query node for the field added
    */
   addField(name, ...paramArgsCallback) {
+    if (this.hasSelectionWithName(name)) {
+      throw new Error(`The field '${name}' has already been added`);
+    }
+
     const {args, callback} = getArgsAndCallback(paramArgsCallback);
 
     const fieldDescriptor = descriptorForField(this.typeBundle, name, this.typeSchema.name);
@@ -110,6 +120,10 @@ export class SelectionSet {
    * @param {Function}  [callback] Callback which will return a new query node for the connection added
    */
   addConnection(name, ...paramArgsCallback) {
+    if (this.hasSelectionWithName(name)) {
+      throw new Error(`The connection '${name}' has already been added`);
+    }
+
     const {args, callback} = getArgsAndCallback(paramArgsCallback);
 
     const fieldDescriptor = descriptorForField(this.typeBundle, name, this.typeSchema.name);

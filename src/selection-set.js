@@ -76,16 +76,26 @@ export default class SelectionSet {
    *
    * @param {String}    name The name of the field to add to the query
    * @param {Object}    [args] Arguments for the field to query
-   * @param {Function}  [callback] Callback which will return a new query node for the field added
+   * @param {SelectionSet} [selectionSet] [description]
    */
-  addFieldFromSelectionSet(name, selectionSet, ...paramArgsCallback) {
-    const {args, callback} = getArgsAndCallback(paramArgsCallback);
+  addFieldFromSelectionSet(name, ...parameters) {
+    let args;
+    let selectionSet;
+
+    if (parameters.length === 1) {
+      selectionSet = parameters[0];
+      args = {};
+    } else {
+      [args, selectionSet] = parameters;
+    }
+
+    if (!(selectionSet instanceof SelectionSet)) {
+      throw new Error('You must pass in a SelectionSet');
+    }
 
     const field = new Field(name, args, selectionSet);
 
     this.selections.push(field);
-
-    callback(selectionSet);
   }
 
   /**

@@ -174,7 +174,7 @@ suite('Unit | SelectionSet', () => {
       pageInfo.addField('hasNextPage');
       pageInfo.addField('hasPreviousPage');
     });
-    set.addFieldFromSelectionSet('products', products, {first: 10});
+    set.addFieldFromSelectionSet('products', {first: 10}, products);
 
     assert.deepEqual(tokens(set.toString()), tokens(` {
       products (first: 10) {

@@ -100,16 +100,15 @@ export class SelectionSet {
   addField(name, ...paramArgsCallback) {
     const {args, callback} = getArgsAndCallback(paramArgsCallback);
 
-    const idxSelection = this.getSelectionIndex(name);
     const fieldDescriptor = descriptorForField(this.typeBundle, name, this.typeSchema.name);
     const selectionSet = new SelectionSet(this.typeBundle, fieldDescriptor.schema, this);
 
     callback(selectionSet);
 
-    if (idxSelection === -1) {
+    if (this.getSelectionIndex(name) === -1) {
       this.selections.push(new Field(name, args, selectionSet));
     } else {
-      this.selections[idxSelection] = new Field(name, args, selectionSet);
+      throw new Error(`The field '${name}' has already been added`);
     }
   }
 
@@ -123,7 +122,6 @@ export class SelectionSet {
   addConnection(name, ...paramArgsCallback) {
     const {args, callback} = getArgsAndCallback(paramArgsCallback);
 
-    const idxSelection = this.getSelectionIndex(name);
     const fieldDescriptor = descriptorForField(this.typeBundle, name, this.typeSchema.name);
     const selectionSet = new SelectionSet(this.typeBundle, fieldDescriptor.schema, this);
 
@@ -137,10 +135,10 @@ export class SelectionSet {
       edges.addField('node', {}, callback);
     });
 
-    if (idxSelection === -1) {
+    if (this.getSelectionIndex(name) === -1) {
       this.selections.push(new Field(name, args, selectionSet));
     } else {
-      this.selections[idxSelection] = new Field(name, args, selectionSet);
+      throw new Error(`The connection '${name}' has already been added`);
     }
   }
 

@@ -135,4 +135,54 @@ suite('Unit | SelectionSet', () => {
       /The field 'name' has already been added/
     );
   });
+
+  test('it can add a field with SelectionSet', () => {
+    const shop = new SelectionSet(typeBundle, 'Shop');
+    const set = new SelectionSet(typeBundle, 'QueryRoot');
+
+    shop.addField('name');
+    shop.addConnection('products', {first: 10}, (products) => {
+      products.addField('handle');
+    });
+
+    set.addFieldFromSelectionSet('shop', shop);
+
+    assert.deepEqual(tokens(set.toString()), tokens(` {
+      shop {
+        name
+        products (first: 10) {
+          pageInfo {
+            hasNextPage
+            hasPreviousPage
+          }
+          edges {
+            cursor,
+            node {
+              handle
+            }
+          }
+        }
+      }
+    }`));
+  });
+
+  test('it can add a field with SelectionSet using args', () => {
+    const set = new SelectionSet(typeBundle, 'Shop');
+    const products = new SelectionSet(typeBundle, 'ProductConnection');
+
+    products.addField('pageInfo', (pageInfo) => {
+      pageInfo.addField('hasNextPage');
+      pageInfo.addField('hasPreviousPage');
+    });
+    set.addFieldFromSelectionSet('products', products, {first: 10});
+
+    assert.deepEqual(tokens(set.toString()), tokens(` {
+      products (first: 10) {
+        pageInfo {
+          hasNextPage
+          hasPreviousPage
+        }
+      }
+    }`));
+  });
 });

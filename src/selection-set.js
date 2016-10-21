@@ -72,6 +72,23 @@ export default class SelectionSet {
   }
 
   /**
+   * will add a field to be queried based on a SelectionSet
+   *
+   * @param {String}    name The name of the field to add to the query
+   * @param {Object}    [args] Arguments for the field to query
+   * @param {Function}  [callback] Callback which will return a new query node for the field added
+   */
+  addFieldFromSelectionSet(name, selectionSet, ...paramArgsCallback) {
+    const {args, callback} = getArgsAndCallback(paramArgsCallback);
+
+    const field = new Field(name, args, selectionSet);
+
+    this.selections.push(field);
+
+    callback(selectionSet);
+  }
+
+  /**
    * will add a field to be queried to the current query node.
    *
    * @param {String}    name The name of the field to add to the query

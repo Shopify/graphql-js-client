@@ -76,7 +76,7 @@ export default class SelectionSet {
    *
    * @param {String}    name The name of the field to add to the query
    * @param {Object}    [args] Arguments for the field to query
-   * @param {SelectionSet} [selectionSet] [description]
+   * @param {SelectionSet} selectionSet A selection set to be added to this query
    */
   addFieldFromSelectionSet(name, ...parameters) {
     let args;

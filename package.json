@@ -7,7 +7,7 @@
   "author": "Shopify Inc.",
   "dependencies": {},
   "devDependencies": {
-    "@shopify/graphql-js-schema": "0.0.1",
+    "@shopify/graphql-js-schema": "0.0.2",
     "@shopify/graphql-js-schema-fetch": "0.0.1",
     "babel": "6.5.2",
     "babel-cli": "6.11.4",
@@ -49,10 +49,9 @@
     "lint:reporter-args": "[ -n \"${CI}\" ] && echo -o $CIRCLE_TEST_REPORTS/junit/eslint.xml -f junit",
     "print-start-message": "wait-on file:.tmp/test/index.html file:.tmp/test/tests.js tcp:4200 file:fixtures/types.js && echo \"\n\n⚡️⚡️⚡️  Good to go at http://localhost:4200 ⚡️⚡️⚡️\"",
     "types-fixture:refresh": "npm run types-fixture:fetch-graphql-schema && npm run types-fixture:build",
-    "types-fixture:build": "rimraf fixtures/types.js && npm run types-fixture:generate-graphql-types && npm run types-fixture:extract-type-bundle",
+    "types-fixture:build": "rimraf fixtures/types.js && npm run types-fixture:transform-graphql-schema",
     "types-fixture:fetch-graphql-schema": "graphql-js-schema-fetch --url https://graphql.myshopify.com/api/graph --header 'Authorization: Basic MzUxYzEyMjAxN2QwZjJhOTU3ZDMyYWU3MjhhZDc0OWM=' | jq '.' > schema.json",
-    "types-fixture:generate-graphql-types": "graphql-js-schema --schema-file schema.json --outdir .tmp/schema --schema-bundle-name 'Types'",
-    "types-fixture:extract-type-bundle": "rollup -o fixtures/types.js -m inline -i .tmp/schema/types.js -f es"
+    "types-fixture:transform-graphql-schema": "graphql-js-schema --schema-file schema.json --outdir fixtures --schema-bundle-name 'Types' --bundle-only"
   },
   "keywords": [
     "graphql,api,client"

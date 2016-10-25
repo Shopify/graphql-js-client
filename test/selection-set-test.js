@@ -1,5 +1,5 @@
 import assert from 'assert';
-import {SelectionSet} from '../src/query';
+import SelectionSet from '../src/selection-set';
 import typeBundle from '../fixtures/types'; // eslint-disable-line import/no-unresolved
 
 suite('Unit | SelectionSet', () => {

@@ -1,5 +1,5 @@
 import assert from 'assert';
-import {Query} from '../src/query';
+import Query from '../src/query';
 import typeBundle from '../fixtures/types'; // eslint-disable-line import/no-unresolved
 
 suite('Unit | Query', () => {
@@ -9,7 +9,7 @@ suite('Unit | Query', () => {
     return query.split(querySplitter);
   }
 
-  test('constructor taks a typeBundle and a callback which is called with the query\'s SelectionSet', () => {
+  test('constructor takes a typeBundle and a callback which is called with the query\'s SelectionSet', () => {
     let rootType = null;
     const query = new Query(typeBundle, (root) => {
       rootType = root.typeSchema;

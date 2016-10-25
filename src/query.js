@@ -119,26 +119,18 @@ export class SelectionSet {
    * @param {Function}  [callback] Callback which will return a new query node for the connection added
    */
   addConnection(name, ...paramArgsCallback) {
-    if (this.hasSelectionWithName(name)) {
-      throw new Error(`The connection '${name}' has already been added`);
-    }
-
     const {args, callback} = getArgsAndCallback(paramArgsCallback);
 
-    const fieldDescriptor = descriptorForField(this.typeBundle, name, this.typeSchema.name);
-    const selectionSet = new SelectionSet(this.typeBundle, fieldDescriptor.schema);
-
-    selectionSet.addField('pageInfo', {}, (pageInfo) => {
-      pageInfo.addField('hasNextPage');
-      pageInfo.addField('hasPreviousPage');
+    this.addField(name, args, (connection) => {
+      connection.addField('pageInfo', {}, (pageInfo) => {
+        pageInfo.addField('hasNextPage');
+        pageInfo.addField('hasPreviousPage');
+      });
+      connection.addField('edges', {}, (edges) => {
+        edges.addField('cursor');
+        edges.addField('node', {}, callback);
+      });
     });
-
-    selectionSet.addField('edges', {}, (edges) => {
-      edges.addField('cursor');
-      edges.addField('node', {}, callback);
-    });
-
-    this.selections.push(new Field(name, args, selectionSet));
   }
 
   addInlineFragmentOn(typeName, fieldTypeCb = noop) {

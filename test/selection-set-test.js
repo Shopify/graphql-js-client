@@ -135,23 +135,4 @@ suite('Unit | SelectionSet', () => {
       /The field 'name' has already been added/
     );
   });
-
-  test('it cannot add the same connection twice', () => {
-    assert.throws(
-      () => {
-        const set = new SelectionSet(typeBundle, 'QueryRoot');
-
-        set.addField('shop', {}, (shop) => {
-          shop.addConnection('products', {first: 10}, (product) => {
-            product.addField('handle');
-          });
-
-          shop.addConnection('products', {first: 10}, (product) => {
-            product.addField('handle');
-          });
-        });
-      },
-      /The connection 'products' has already been added/
-    );
-  });
 });

@@ -7,4 +7,12 @@ suite('Unit | join', () => {
 
     assert.equal(join('query1', 'query2'), 'query1, query2');
   });
+
+  test('it does not join a single value', () => {
+    assert.equal(join('query1'), 'query1');
+  });
+
+  test('it joins arrays', () => {
+    assert.equal(join(['query1', 'query2']), 'query1, query2');
+  });
 });

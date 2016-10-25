@@ -1,25 +1,8 @@
 import join from './join';
 import descriptorForField from './descriptor-for-field';
 import schemaForType from './schema-for-type';
+import formatArgs from './format-args';
 import noop from './noop';
-
-function formatArgPair(key, hash) {
-  return `${key}: ${JSON.stringify(hash[key])}`;
-}
-
-function formatArgs(argumentHash) {
-  const keys = Object.keys(argumentHash);
-
-  if (!keys.length) {
-    return '';
-  }
-
-  const formattedArgs = Object.keys(argumentHash).map((key) => {
-    return formatArgPair(key, argumentHash);
-  });
-
-  return ` (${join(formattedArgs)})`;
-}
 
 function getArgsAndCallback(paramArgsCallback) {
   let callback = noop;

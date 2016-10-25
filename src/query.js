@@ -61,14 +61,13 @@ class InlineFragment {
 
 
 export class SelectionSet {
-  constructor(typeBundle, type, parent) {
+  constructor(typeBundle, type) {
     if (typeof type === 'string') {
       this.typeSchema = schemaForType(typeBundle, type);
     } else {
       this.typeSchema = type;
     }
     this.typeBundle = typeBundle;
-    this.parent = parent;
     this.selections = [];
   }
 
@@ -105,7 +104,7 @@ export class SelectionSet {
     const {args, callback} = getArgsAndCallback(paramArgsCallback);
 
     const fieldDescriptor = descriptorForField(this.typeBundle, name, this.typeSchema.name);
-    const selectionSet = new SelectionSet(this.typeBundle, fieldDescriptor.schema, this);
+    const selectionSet = new SelectionSet(this.typeBundle, fieldDescriptor.schema);
 
     callback(selectionSet);
 
@@ -127,7 +126,7 @@ export class SelectionSet {
     const {args, callback} = getArgsAndCallback(paramArgsCallback);
 
     const fieldDescriptor = descriptorForField(this.typeBundle, name, this.typeSchema.name);
-    const selectionSet = new SelectionSet(this.typeBundle, fieldDescriptor.schema, this);
+    const selectionSet = new SelectionSet(this.typeBundle, fieldDescriptor.schema);
 
     selectionSet.addField('pageInfo', {}, (pageInfo) => {
       pageInfo.addField('hasNextPage');
@@ -143,7 +142,7 @@ export class SelectionSet {
   }
 
   addInlineFragmentOn(typeName, fieldTypeCb = noop) {
-    const selectionSet = new SelectionSet(this.typeBundle, schemaForType(this.typeBundle, typeName), this);
+    const selectionSet = new SelectionSet(this.typeBundle, schemaForType(this.typeBundle, typeName));
 
     fieldTypeCb(selectionSet);
     this.selections.push(new InlineFragment(typeName, selectionSet));
@@ -153,7 +152,7 @@ export class SelectionSet {
 export class Query {
   constructor(typeBundle, selectionSetCallback) {
     this.typeBundle = typeBundle;
-    this.selectionSet = new SelectionSet(typeBundle, 'QueryRoot', null);
+    this.selectionSet = new SelectionSet(typeBundle, 'QueryRoot');
     selectionSetCallback(this.selectionSet);
   }
 

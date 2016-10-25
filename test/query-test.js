@@ -21,4 +21,17 @@ suite('Unit | Query', () => {
     assert.deepEqual(typeBundle.QueryRoot, rootType);
     assert.deepEqual(splitQuery(query.toString()), splitQuery('query { shop { name } }'));
   });
+
+  test('constructor takes a typeBundle, a name, and a callback rendering a named query', () => {
+    let rootType = null;
+    const query = new Query(typeBundle, 'myQuery', (root) => {
+      rootType = root.typeSchema;
+      root.addField('shop', (shop) => {
+        shop.addField('name');
+      });
+    });
+
+    assert.deepEqual(typeBundle.QueryRoot, rootType);
+    assert.deepEqual(splitQuery(query.toString()), splitQuery('query myQuery { shop { name } }'));
+  });
 });

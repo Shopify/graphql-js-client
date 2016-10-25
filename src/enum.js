@@ -1,8 +1,13 @@
+export class Enum {
+  constructor(key) {
+    this.key = key;
+  }
+
+  toString() {
+    return this.key;
+  }
+}
+
 export default (key) => {
-  // eslint-disable-next-line no-new-wrappers
-  const anEnum = new String(key);
-
-  anEnum.isEnum = true;
-
-  return anEnum;
+  return new Enum(key);
 };

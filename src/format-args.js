@@ -1,9 +1,10 @@
 import join from './join';
+import {Enum} from './enum';
 
 function formatValue(value) {
   let valueFormatted;
 
-  if (value.isEnum) {
+  if (value instanceof Enum) {
     valueFormatted = String(value);
   } else if (Array.isArray(value)) {
     valueFormatted = `[${join(value.map(formatValue))}]`;

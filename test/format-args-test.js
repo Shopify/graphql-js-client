@@ -1,6 +1,6 @@
 import assert from 'assert';
 import formatArgs from '../src/format-args';
-import enum from '../src/enum';
+import _enum from '../src/enum';
 
 suite('Unit | format arguments', () => {
   test('it formats args with only scalars', () => {
@@ -22,13 +22,13 @@ suite('Unit | format arguments', () => {
   });
 
   test('it formats args with enums', () => {
-    const result = formatArgs({enumOne: enum('ONE'), enumTwo: enum('TWO')});
+    const result = formatArgs({enumOne: _enum('ONE'), enumTwo: _enum('TWO')});
 
     assert.equal(result, ' (enumOne: ONE enumTwo: TWO)');
   });
 
   test('it formats args with lists of enums', () => {
-    const result = formatArgs({list: [enum('ONE'), enum('TWO')]});
+    const result = formatArgs({list: [_enum('ONE'), _enum('TWO')]});
 
     assert.equal(result, ' (list: [ONE TWO])');
   });

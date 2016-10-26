@@ -9,13 +9,17 @@ suite('Unit | Query', () => {
     return query.split(querySplitter);
   }
 
+  function buildQuery(root) {
+    root.addField('shop', (shop) => {
+      shop.addField('name');
+    });
+  }
+
   test('constructor takes a typeBundle and a callback which is called with the query\'s SelectionSet', () => {
     let rootType = null;
     const query = new Query(typeBundle, (root) => {
       rootType = root.typeSchema;
-      root.addField('shop', (shop) => {
-        shop.addField('name');
-      });
+      buildQuery(root);
     });
 
     assert.deepEqual(typeBundle.QueryRoot, rootType);

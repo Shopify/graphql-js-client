@@ -4,11 +4,11 @@ import {Enum} from './enum';
 function formatValue(value) {
   let valueFormatted;
 
-  if (value instanceof Enum) {
+  if (Enum.prototype.isPrototypeOf(value)) {
     valueFormatted = String(value);
   } else if (Array.isArray(value)) {
-    valueFormatted = `[${join(value.map(formatValue))}]`;
-  } else if (typeof value === 'object') {
+    valueFormatted = `[${join(...value.map(formatValue))}]`;
+  } else if (Object.prototype.toString.call(value) === '[object Object]') {
     valueFormatted = `{${formatObject(value)}}`;
   } else {
     valueFormatted = JSON.stringify(value);
@@ -26,7 +26,7 @@ function formatObject(value) {
     return formatArgPair(key, value[key]);
   });
 
-  return join(arrayKeysValues);
+  return join(...arrayKeysValues);
 }
 
 export default function formatArgs(args) {

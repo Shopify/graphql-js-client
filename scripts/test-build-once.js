@@ -1,0 +1,1 @@
+require('./rollup-tests')();

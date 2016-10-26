@@ -1,3 +1,3 @@
 export default function join(...fields) {
-  return fields.join(', ');
+  return fields.join(' ');
 }

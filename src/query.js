@@ -38,6 +38,10 @@ export default class Query {
     selectionSetCallback(this.selectionSet);
   }
 
+  get isAnonymous() {
+    return !this.name.toString();
+  }
+
   toString() {
     return `query${this.name.toString()}${this.selectionSet.toString()}`;
   }

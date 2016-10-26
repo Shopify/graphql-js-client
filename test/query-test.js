@@ -30,12 +30,22 @@ suite('Unit | Query', () => {
     let rootType = null;
     const query = new Query(typeBundle, 'myQuery', (root) => {
       rootType = root.typeSchema;
-      root.addField('shop', (shop) => {
-        shop.addField('name');
-      });
+      buildQuery(root);
     });
 
     assert.deepEqual(typeBundle.QueryRoot, rootType);
     assert.deepEqual(splitQuery(query.toString()), splitQuery('query myQuery { shop { name } }'));
+  });
+
+  test('it identifies anonymous queries', () => {
+    const query = new Query(typeBundle, buildQuery);
+
+    assert.equal(query.isAnonymous, true);
+  });
+
+  test('it identifies named queries as not anonymous', () => {
+    const query = new Query(typeBundle, 'myQuery', buildQuery);
+
+    assert.equal(query.isAnonymous, false);
   });
 });

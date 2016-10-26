@@ -21,7 +21,7 @@ class Name {
 
   toString() {
     if (this.value) {
-      return ` ${this.value} `;
+      return ` ${this.value}`;
     }
 
     return '';

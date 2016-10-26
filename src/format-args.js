@@ -1,10 +1,13 @@
 import join from './join';
 import {Enum} from './enum';
+import Variable from './variable';
 
 function formatValue(value) {
   let valueFormatted;
 
-  if (Enum.prototype.isPrototypeOf(value)) {
+  if (Variable.prototype.isPrototypeOf(value)) {
+    valueFormatted = value.nameFormatted;
+  } else if (Enum.prototype.isPrototypeOf(value)) {
     valueFormatted = String(value);
   } else if (Array.isArray(value)) {
     valueFormatted = `[${join(...value.map(formatValue))}]`;

@@ -46,8 +46,11 @@ export default class Document {
   /**
    * will add a query to the document
    *
-   * @param {...2} args Receives either a query instance, or a query callback or
-   *                    a name and query callback.
+   * @param {TypeBundle} typeBundle The bundle of all supported types.
+   * @param {Query|String} [query|queryName] Either an instance of a query
+   * object, or the name of a query. Both are optional.
+   * @param {Function} [callback] The query builder callback. If a query
+   * instance is passed, this callback will be ignored.
    */
   addQuery(...args) {
     const query = extractQuery(this.typeBundle, ...args);

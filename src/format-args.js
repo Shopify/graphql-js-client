@@ -1,12 +1,12 @@
 import join from './join';
 import {Enum} from './enum';
-import Variable from './variable';
+import {VariableDefinition} from './variable';
 
 function formatValue(value) {
   let valueFormatted;
 
-  if (Variable.prototype.isPrototypeOf(value)) {
-    valueFormatted = value.nameFormatted;
+  if (VariableDefinition.prototype.isPrototypeOf(value)) {
+    valueFormatted = value.toInputValueString();
   } else if (Enum.prototype.isPrototypeOf(value)) {
     valueFormatted = String(value);
   } else if (Array.isArray(value)) {

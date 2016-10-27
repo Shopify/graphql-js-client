@@ -1,14 +1,18 @@
-export default class Variable {
+export class VariableDefinition {
   constructor(name, type) {
     this.name = name;
     this.type = type;
   }
 
-  get nameFormatted() {
+  toInputValueString() {
     return `$${this.name}`;
   }
 
-  toString() {
-    return `${this.nameFormatted}:${this.type}`;
+  toVariableDefinitionString() {
+    return `$${this.name}:${this.type}`;
   }
+}
+
+export default function variable(name, type) {
+  return new VariableDefinition(name, type);
 }

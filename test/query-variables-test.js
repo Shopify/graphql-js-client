@@ -1,8 +1,7 @@
 import assert from 'assert';
 import Query from '../src/query';
-import Variable from '../src/variable';
+import variable, {VariableDefinition} from '../src/variable';
 import typeBundle from '../fixtures/types'; // eslint-disable-line import/no-unresolved
-import noop from '../src/noop';
 
 suite('Unit | Query Variables', () => {
   const querySplitter = /[\s,]+/;
@@ -11,24 +10,19 @@ suite('Unit | Query Variables', () => {
     return query.split(querySplitter);
   }
 
-  test('it can can create variables', () => {
-    const query = new Query(typeBundle, noop);
-    const variableCountProducts = query.addVariable('countProducts', 'Int!');
+  test('it can create variables', () => {
+    const variableId = variable('id', 'ID!');
 
-    assert.ok(Variable.prototype.isPrototypeOf(variableCountProducts));
+    assert.ok(VariableDefinition.prototype.isPrototypeOf(variableId));
   });
 
   test('it can use variables with fields', () => {
-    let queryRoot;
+    const variableId = variable('id', 'ID!');
 
-    const query = new Query(typeBundle, (root) => {
-      queryRoot = root;
-    });
-
-    const variableId = query.addVariable('id', 'ID!');
-
-    queryRoot.addField('product', {id: variableId}, (product) => {
-      product.addField('title');
+    const query = new Query(typeBundle, [variableId], (root) => {
+      root.addField('product', {id: variableId}, (product) => {
+        product.addField('title');
+      });
     });
 
     assert.deepEqual(splitQuery(query.toString()), splitQuery(`query ($id:ID!) {
@@ -38,19 +32,31 @@ suite('Unit | Query Variables', () => {
     }`));
   });
 
-  test('it can use variables with connections', () => {
-    let queryRoot;
+  test('it can use variables when a query is named', () => {
+    const variableId = variable('id', 'ID!');
 
-    const query = new Query(typeBundle, (root) => {
-      queryRoot = root;
+    const query = new Query(typeBundle, 'bestQueryEver', [variableId], (root) => {
+      root.addField('product', {id: variableId}, (product) => {
+        product.addField('title');
+      });
     });
 
-    const variableCount = query.addVariable('count', 'Int!');
-    const variableAfter = query.addVariable('after', 'String');
+    assert.deepEqual(splitQuery(query.toString()), splitQuery(`query bestQueryEver ($id:ID!) {
+      product (id: $id) {
+        title
+      }
+    }`));
+  });
 
-    queryRoot.addField('shop', (shop) => {
-      shop.addConnection('products', {first: variableCount, after: variableAfter}, (product) => {
-        product.addField('title');
+  test('it can use variables with connections', () => {
+    const variableCount = variable('count', 'Int!');
+    const variableAfter = variable('after', 'String');
+
+    const query = new Query(typeBundle, [variableCount, variableAfter], (root) => {
+      root.addField('shop', (shop) => {
+        shop.addConnection('products', {first: variableCount, after: variableAfter}, (product) => {
+          product.addField('title');
+        });
       });
     });
 

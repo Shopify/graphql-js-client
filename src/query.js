@@ -1,60 +1,62 @@
 import SelectionSet from './selection-set';
 import join from './join';
-import Variable from './variable';
 
 function parseArgs(nameAndCallback) {
   let name;
+  let variables;
   let selectionSetCallback;
 
-  if (nameAndCallback.length === 2) {
-    [name, selectionSetCallback] = nameAndCallback;
+  if (nameAndCallback.length === 3) {
+    [name, variables, selectionSetCallback] = nameAndCallback;
+  } else if (nameAndCallback.length === 2) {
+    if (Object.prototype.toString.call(nameAndCallback[0]) === '[object String]') {
+      name = nameAndCallback[0];
+      variables = null;
+    } else if (Array.isArray(nameAndCallback[0])) {
+      variables = nameAndCallback[0];
+      name = null;
+    }
+
+    selectionSetCallback = nameAndCallback[1];
   } else {
     selectionSetCallback = nameAndCallback[0];
     name = null;
   }
 
-  return {name, selectionSetCallback};
+  return {name, variables, selectionSetCallback};
 }
 
 class VariableDefinitions {
-  constructor() {
-    this.variables = [];
-  }
-
-  addVariable(name, type) {
-    const variable = new Variable(name, type);
-
-    this.variables.push(variable);
-
-    return variable;
+  constructor(variableDefinitions) {
+    this.variableDefinitions = variableDefinitions || [];
   }
 
   toString() {
-    if (this.variables.length === 0) {
+    if (this.variableDefinitions.length === 0) {
       return '';
     }
 
-    return ` (${join(...this.variables)}) `;
+    const variableDefinitionsStrings = this.variableDefinitions.map((variableDefinition) => {
+      return variableDefinition.toVariableDefinitionString();
+    });
+
+    return ` (${join(variableDefinitionsStrings)}) `;
   }
 }
 
 export default class Query {
   constructor(typeBundle, ...nameAndCallback) {
-    const {name, selectionSetCallback} = parseArgs(nameAndCallback);
+    const {name, variables, selectionSetCallback} = parseArgs(nameAndCallback);
 
     this.typeBundle = typeBundle;
     this.selectionSet = new SelectionSet(typeBundle, 'QueryRoot');
     this.name = name;
-    this.variableDefinitions = new VariableDefinitions();
+    this.variableDefinitions = new VariableDefinitions(variables);
     selectionSetCallback(this.selectionSet);
   }
 
   get isAnonymous() {
     return !this.name;
-  }
-
-  addVariable(name, type) {
-    return this.variableDefinitions.addVariable(name, type);
   }
 
   toString() {

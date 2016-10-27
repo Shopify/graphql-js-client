@@ -65,10 +65,7 @@ function createSubscriptions(client, dirsAndExtensions) {
       logWarning(response.warning);
     }
 
-    dirsAndExtensions.forEach((dirAndExtension) => {
-      const dir = dirAndExtension[0];
-      const extension = dirAndExtension[1];
-
+    dirsAndExtensions.forEach(([dir, extension]) => {
       client.command(['subscribe', process.cwd(), `directory:${dir}:extension:${extension}`, {
         expression: ['allof',
           ['dirname', dir],

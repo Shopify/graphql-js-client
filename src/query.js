@@ -14,35 +14,23 @@ function parseArgs(nameAndCallback) {
   return {name, selectionSetCallback};
 }
 
-class Name {
-  constructor(value) {
-    this.value = value;
-  }
-
-  toString() {
-    if (this.value) {
-      return ` ${this.value}`;
-    }
-
-    return '';
-  }
-}
-
 export default class Query {
   constructor(typeBundle, ...nameAndCallback) {
     const {name, selectionSetCallback} = parseArgs(nameAndCallback);
 
     this.typeBundle = typeBundle;
     this.selectionSet = new SelectionSet(typeBundle, 'QueryRoot');
-    this.name = new Name(name);
+    this.name = name;
     selectionSetCallback(this.selectionSet);
   }
 
   get isAnonymous() {
-    return !this.name.toString();
+    return !this.name;
   }
 
   toString() {
-    return `query${this.name.toString()}${this.selectionSet.toString()}`;
+    const nameString = (this.name) ? ` ${this.name}` : '';
+
+    return `query${nameString}${this.selectionSet.toString()}`;
   }
 }

@@ -1,13 +1,13 @@
 const fetch = require('node-fetch');
 const watcher = require('./watcher');
 const rollupTests = require('./rollup-tests');
-const LivereloadPort = require('../package.json').livereloadPort;
+const livereloadPort = require('../package.json').livereloadPort;
 
 let bundle;
 let building = false;
 
 const testDestination = process.argv[2];
-const reloadUri = `http://localhost:${LivereloadPort}/changed?files=tests.js`
+const reloadUri = `http://localhost:${livereloadPort}/changed?files=tests.js`
 
 function notifyReload() {
   fetch(reloadUri);

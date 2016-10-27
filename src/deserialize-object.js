@@ -1,79 +1,48 @@
-import descriptorForField from './descriptor-for-field';
 import ClassRegistry from './class-registry';
+import schemaForType from './schema-for-type';
 
-function extractDescriptors(typeBundle, objectGraph, typeName) {
-  return Object.keys(objectGraph).map((fieldName) => {
-    return descriptorForField(typeBundle, fieldName, typeName);
-  });
+function serializedAsObject(type) {
+  return type.kind === 'OBJECT' || type.kind === 'INTERFACE' || type.kind === 'UNION';
 }
 
-function isScalar(descriptor) {
-  return descriptor.kind === 'SCALAR';
+function isConnection(type) {
+  return type.name.endsWith('Connection');
 }
 
-function isObject(descriptor) {
-  return descriptor.kind === 'OBJECT' && !descriptor.isConnection;
+function deserializeConnection(typeBundle, value, baseTypeName, registry) {
+  const connectionType = schemaForType(typeBundle, baseTypeName);
+  const edgeType = schemaForType(typeBundle, connectionType.fieldBaseTypes.edges);
+  const nodeType = schemaForType(typeBundle, edgeType.fieldBaseTypes.node);
+
+  return value.edges.map((edge) => deserializeValue(typeBundle, edge.node, nodeType.name, registry));
 }
 
-function isConnection(descriptor) {
-  return descriptor.isConnection;
-}
+function deserializeValue(typeBundle, value, baseTypeName, registry) {
+  const baseType = schemaForType(typeBundle, baseTypeName);
 
-function extractScalars(objectGraph, descriptors) {
-  const scalarDescriptors = descriptors.filter(isScalar);
-
-  return scalarDescriptors.reduce((scalarAcc, descriptor) => {
-    scalarAcc[descriptor.fieldName] = objectGraph[descriptor.fieldName];
-
-    return scalarAcc;
-  }, {});
-}
-
-function extractObjects(typeBundle, objectGraph, descriptors, registry) {
-  const objectDescriptors = descriptors.filter(isObject);
-
-  return objectDescriptors.reduce((objectAcc, descriptor) => {
-    if (descriptor.isList) {
-      objectAcc[descriptor.fieldName] = objectGraph[descriptor.fieldName].map((object) => {
-        // eslint-disable-next-line no-use-before-define
-        return deserializeObject(typeBundle, object, descriptor.type, registry);
-      });
-    } else {
-      // eslint-disable-next-line no-use-before-define
-      objectAcc[descriptor.fieldName] = deserializeObject(typeBundle, objectGraph[descriptor.fieldName], descriptor.type, registry);
-    }
-
-    return objectAcc;
-  }, {});
-}
-
-function extractConnections(typeBundle, objectGraph, descriptors, registry) {
-  const connectionDescriptors = descriptors.filter(isConnection);
-
-  return connectionDescriptors.reduce((connectionsAcc, descriptor) => {
-    const edgeDescriptor = descriptorForField(typeBundle, 'edges', descriptor.type);
-    const nodeDescriptor = descriptorForField(typeBundle, 'node', edgeDescriptor.type);
-
-    connectionsAcc[descriptor.fieldName] = objectGraph[descriptor.fieldName].edges.map((object) => {
-      // eslint-disable-next-line no-use-before-define
-      return deserializeObject(typeBundle, object.node, nodeDescriptor.type, registry);
-    });
-
-    return connectionsAcc;
-  }, {});
+  if (Array.isArray(value)) {
+    return value.map((item) => deserializeValue(typeBundle, item, baseTypeName, registry));
+  } else if (value === null) {
+    return null;
+  } else if (isConnection(baseType)) {
+    return deserializeConnection(typeBundle, value, baseTypeName, registry);
+  } else if (serializedAsObject(baseType)) {
+    return deserializeObject(typeBundle, value, baseTypeName, registry);
+  } else {
+    return value;
+  }
 }
 
 export default function deserializeObject(typeBundle, objectGraph, typeName, registry = new ClassRegistry()) {
-  const descriptors = extractDescriptors(typeBundle, objectGraph, typeName);
+  const objectType = schemaForType(typeBundle, typeName);
+  const attrs = Object.keys(objectGraph).reduce((acc, fieldName) => {
+    const baseTypeName = objectType.fieldBaseTypes[fieldName];
+    const value = objectGraph[fieldName];
 
-  const scalars = extractScalars(objectGraph, descriptors);
-  const objects = extractObjects(typeBundle, objectGraph, descriptors, registry);
-  const connections = extractConnections(typeBundle, objectGraph, descriptors, registry);
+    acc[fieldName] = deserializeValue(typeBundle, value, baseTypeName, registry);
 
-  const model = new (registry.classForType(typeName))(scalars);
+    return acc;
+  }, {});
 
-  Object.assign(model, objects, connections);
-
-  return model;
-
+  return new (registry.classForType(typeName))(attrs);
 }

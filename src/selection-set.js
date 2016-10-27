@@ -1,5 +1,4 @@
 import join from './join';
-import descriptorForField from './descriptor-for-field';
 import schemaForType from './schema-for-type';
 import formatArgs from './format-args';
 import noop from './noop';
@@ -86,8 +85,8 @@ export default class SelectionSet {
 
     const {args, callback} = getArgsAndCallback(paramArgsCallback);
 
-    const fieldDescriptor = descriptorForField(this.typeBundle, name, this.typeSchema.name);
-    const selectionSet = new SelectionSet(this.typeBundle, fieldDescriptor.schema);
+    const fieldBaseType = schemaForType(this.typeBundle, this.typeSchema.fieldBaseTypes[name]);
+    const selectionSet = new SelectionSet(this.typeBundle, fieldBaseType);
 
     callback(selectionSet);
 

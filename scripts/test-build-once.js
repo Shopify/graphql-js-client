@@ -1,1 +1,1 @@
-require('./rollup-tests')();
+require('./rollup-tests')('dist/tests.js');

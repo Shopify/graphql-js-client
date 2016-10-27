@@ -6,7 +6,7 @@ const builtins = require('rollup-plugin-node-builtins');
 const globals = require('rollup-plugin-node-globals');
 const babel = require('rollup-plugin-babel');
 
-function rollupTests(cache, dest) {
+function rollupTests(dest, cache) {
   return rollup.rollup({
     entry: 'test/**/*.js',
     plugins: [
@@ -28,7 +28,7 @@ function rollupTests(cache, dest) {
     cache
   }).then((bundle) => {
     return bundle.write({
-      dest: 'dist/tests.js',
+      dest,
       format: 'iife',
       sourceMap: 'inline'
     }).then(() => {

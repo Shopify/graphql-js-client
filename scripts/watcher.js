@@ -77,9 +77,7 @@ function createSubscriptions(client, dirsAndExtensions) {
           ['suffix', extension]
         ],
         fields: ['name']
-      }],
-      handleSubscriptionCreation
-      )
+      }], handleSubscriptionCreation)
     });
   });
 }

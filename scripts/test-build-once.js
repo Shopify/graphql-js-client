@@ -1,1 +1,1 @@
-require('./rollup-tests')('dist/tests.js');
+require('./rollup-tests')(process.argv[2]);

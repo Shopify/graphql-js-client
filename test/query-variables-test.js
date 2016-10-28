@@ -6,7 +6,7 @@ import typeBundle from '../fixtures/types'; // eslint-disable-line import/no-unr
 suite('Unit | Query Variables', () => {
   const querySplitter = /[\s,]+/;
 
-  function splitQuery(query) {
+  function tokens(query) {
     return query.split(querySplitter);
   }
 
@@ -25,7 +25,7 @@ suite('Unit | Query Variables', () => {
       });
     });
 
-    assert.deepEqual(splitQuery(query.toString()), splitQuery(`query ($id:ID!) {
+    assert.deepEqual(tokens(query.toString()), tokens(`query ($id:ID!) {
       product (id: $id) {
         title
       }
@@ -41,7 +41,7 @@ suite('Unit | Query Variables', () => {
       });
     });
 
-    assert.deepEqual(splitQuery(query.toString()), splitQuery(`query bestQueryEver ($id:ID!) {
+    assert.deepEqual(tokens(query.toString()), tokens(`query bestQueryEver ($id:ID!) {
       product (id: $id) {
         title
       }
@@ -60,7 +60,7 @@ suite('Unit | Query Variables', () => {
       });
     });
 
-    assert.deepEqual(splitQuery(query.toString()), splitQuery(`query ($count:Int! $after:String) {
+    assert.deepEqual(tokens(query.toString()), tokens(`query ($count:Int! $after:String) {
       shop {
         products (first: $count after: $after) {
           pageInfo {

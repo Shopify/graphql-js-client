@@ -1,137 +1,36 @@
-import join from './join';
-import descriptorForField from './descriptor-for-field';
-import schemaForType from './schema-for-type';
-import formatArgs from './format-args';
-import noop from './noop';
+import SelectionSet from './selection-set';
 
-function getArgsAndCallback(paramArgsCallback) {
-  let callback = noop;
-  let args = {};
+function parseArgs(nameAndCallback) {
+  let name;
+  let selectionSetCallback;
 
-  if (paramArgsCallback.length === 1) {
-    if (typeof paramArgsCallback[0] === 'function') {
-      callback = paramArgsCallback[0];
-    } else {
-      args = paramArgsCallback[0];
-    }
-  } else if (paramArgsCallback.length === 2) {
-    [args, callback] = paramArgsCallback;
+  if (nameAndCallback.length === 2) {
+    [name, selectionSetCallback] = nameAndCallback;
+  } else {
+    selectionSetCallback = nameAndCallback[0];
+    name = null;
   }
 
-  return {args, callback};
+  return {name, selectionSetCallback};
 }
 
-class Field {
-  constructor(name, args, selectionSet) {
-    this.name = name;
-    this.args = args;
-    this.selectionSet = selectionSet;
-  }
-  toString() {
-    return `${this.name}${formatArgs(this.args)}${this.selectionSet.toString()}`;
-  }
-}
+export default class Query {
+  constructor(typeBundle, ...nameAndCallback) {
+    const {name, selectionSetCallback} = parseArgs(nameAndCallback);
 
-class InlineFragment {
-  constructor(typeName, selectionSet) {
-    this.typeName = typeName;
-    this.selectionSet = selectionSet;
-  }
-  toString() {
-    return `... on ${this.typeName}${this.selectionSet.toString()}`;
-  }
-}
-
-
-export class SelectionSet {
-  constructor(typeBundle, type) {
-    if (typeof type === 'string') {
-      this.typeSchema = schemaForType(typeBundle, type);
-    } else {
-      this.typeSchema = type;
-    }
-    this.typeBundle = typeBundle;
-    this.selections = [];
-  }
-
-  hasSelectionWithName(name) {
-    return this.selections.some((field) => {
-      return field.name === name;
-    });
-  }
-
-  toString() {
-    if (this.typeSchema.kind === 'SCALAR') {
-      return '';
-    } else {
-      const commaDelimitedSelections = join(this.selections.map((selection) => {
-        return selection.toString();
-      }));
-
-      return ` { ${commaDelimitedSelections} }`;
-    }
-  }
-
-  /**
-   * will add a field to be queried to the current query node.
-   *
-   * @param {String}    name The name of the field to add to the query
-   * @param {Object}    [args] Arguments for the field to query
-   * @param {Function}  [callback] Callback which will return a new query node for the field added
-   */
-  addField(name, ...paramArgsCallback) {
-    if (this.hasSelectionWithName(name)) {
-      throw new Error(`The field '${name}' has already been added`);
-    }
-
-    const {args, callback} = getArgsAndCallback(paramArgsCallback);
-
-    const fieldDescriptor = descriptorForField(this.typeBundle, name, this.typeSchema.name);
-    const selectionSet = new SelectionSet(this.typeBundle, fieldDescriptor.schema);
-
-    callback(selectionSet);
-
-    this.selections.push(new Field(name, args, selectionSet));
-  }
-
-  /**
-   * will add a connection to be queried to the current query node.
-   *
-   * @param {String}    name The name of the connection to add to the query
-   * @param {Object}    [args] Arguments for the connection query eg. { first: 10 }
-   * @param {Function}  [callback] Callback which will return a new query node for the connection added
-   */
-  addConnection(name, ...paramArgsCallback) {
-    const {args, callback} = getArgsAndCallback(paramArgsCallback);
-
-    this.addField(name, args, (connection) => {
-      connection.addField('pageInfo', {}, (pageInfo) => {
-        pageInfo.addField('hasNextPage');
-        pageInfo.addField('hasPreviousPage');
-      });
-      connection.addField('edges', {}, (edges) => {
-        edges.addField('cursor');
-        edges.addField('node', {}, callback);
-      });
-    });
-  }
-
-  addInlineFragmentOn(typeName, fieldTypeCb = noop) {
-    const selectionSet = new SelectionSet(this.typeBundle, schemaForType(this.typeBundle, typeName));
-
-    fieldTypeCb(selectionSet);
-    this.selections.push(new InlineFragment(typeName, selectionSet));
-  }
-}
-
-export class Query {
-  constructor(typeBundle, selectionSetCallback) {
     this.typeBundle = typeBundle;
     this.selectionSet = new SelectionSet(typeBundle, 'QueryRoot');
+    this.name = name;
     selectionSetCallback(this.selectionSet);
   }
 
+  get isAnonymous() {
+    return !this.name;
+  }
+
   toString() {
-    return `query${this.selectionSet.toString()}`;
+    const nameString = (this.name) ? ` ${this.name}` : '';
+
+    return `query${nameString}${this.selectionSet.toString()}`;
   }
 }

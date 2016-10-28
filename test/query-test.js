@@ -1,5 +1,5 @@
 import assert from 'assert';
-import {Query} from '../src/query';
+import Query from '../src/query';
 import typeBundle from '../fixtures/types'; // eslint-disable-line import/no-unresolved
 
 suite('Unit | Query', () => {
@@ -9,16 +9,43 @@ suite('Unit | Query', () => {
     return query.split(querySplitter);
   }
 
-  test('constructor taks a typeBundle and a callback which is called with the query\'s SelectionSet', () => {
+  function buildQuery(root) {
+    root.addField('shop', (shop) => {
+      shop.addField('name');
+    });
+  }
+
+  test('constructor takes a typeBundle and a callback which is called with the query\'s SelectionSet', () => {
     let rootType = null;
     const query = new Query(typeBundle, (root) => {
       rootType = root.typeSchema;
-      root.addField('shop', (shop) => {
-        shop.addField('name');
-      });
+      buildQuery(root);
     });
 
     assert.deepEqual(typeBundle.QueryRoot, rootType);
     assert.deepEqual(splitQuery(query.toString()), splitQuery('query { shop { name } }'));
+  });
+
+  test('constructor takes a typeBundle, a name, and a callback rendering a named query', () => {
+    let rootType = null;
+    const query = new Query(typeBundle, 'myQuery', (root) => {
+      rootType = root.typeSchema;
+      buildQuery(root);
+    });
+
+    assert.deepEqual(typeBundle.QueryRoot, rootType);
+    assert.deepEqual(splitQuery(query.toString()), splitQuery('query myQuery { shop { name } }'));
+  });
+
+  test('it identifies anonymous queries', () => {
+    const query = new Query(typeBundle, buildQuery);
+
+    assert.equal(query.isAnonymous, true);
+  });
+
+  test('it identifies named queries as not anonymous', () => {
+    const query = new Query(typeBundle, 'myQuery', buildQuery);
+
+    assert.equal(query.isAnonymous, false);
   });
 });

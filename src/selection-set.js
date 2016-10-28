@@ -3,27 +3,27 @@ import schemaForType from './schema-for-type';
 import formatArgs from './format-args';
 import noop from './noop';
 
-function getArgsAndCallback(paramArgsCallback) {
+function parseFieldCreationArgs(creationArgs) {
   let callback = noop;
   let args = {};
   let selectionSet = null;
 
-  if (paramArgsCallback.length === 2) {
-    if (typeof paramArgsCallback[1] === 'function') {
-      [args, callback] = paramArgsCallback;
+  if (creationArgs.length === 2) {
+    if (typeof creationArgs[1] === 'function') {
+      [args, callback] = creationArgs;
     } else {
-      [args, selectionSet] = paramArgsCallback;
+      [args, selectionSet] = creationArgs;
     }
-  } else if (paramArgsCallback.length === 1) {
-    if (typeof paramArgsCallback[0] === 'function') {
-      callback = paramArgsCallback[0];
+  } else if (creationArgs.length === 1) {
+    if (typeof creationArgs[0] === 'function') {
+      callback = creationArgs[0];
     // SelectionSet is defined before this function is called since it's
     // called by SelectionSet
     // eslint-disable-next-line no-use-before-define
-    } else if (SelectionSet.prototype.isPrototypeOf(paramArgsCallback[0])) {
-      selectionSet = paramArgsCallback[0];
+    } else if (SelectionSet.prototype.isPrototypeOf(creationArgs[0])) {
+      selectionSet = creationArgs[0];
     } else {
-      args = paramArgsCallback[0];
+      args = creationArgs[0];
     }
   }
 
@@ -88,12 +88,12 @@ export default class SelectionSet {
    * @param {Object}    [args] Arguments for the field to query
    * @param {Function}  [callback] Callback which will return a new query node for the field added
    */
-  addField(name, ...paramArgsCallback) {
+  addField(name, ...creationArgs) {
     if (this.hasSelectionWithName(name)) {
       throw new Error(`The field '${name}' has already been added`);
     }
 
-    const parsedArgs = getArgsAndCallback(paramArgsCallback);
+    const parsedArgs = parseFieldCreationArgs(creationArgs);
     const {args, callback} = parsedArgs;
     let {selectionSet} = parsedArgs;
 
@@ -116,8 +116,8 @@ export default class SelectionSet {
    * @param {Function|SelectionSet}  [callback|selectionSet] Either pass a callback which will return a new
    *                                                         SelectionSet. Or pass an existing SelectionSet.
    */
-  addConnection(name, ...paramArgsCallback) {
-    const {args, callback} = getArgsAndCallback(paramArgsCallback);
+  addConnection(name, ...creationArgs) {
+    const {args, callback} = parseFieldCreationArgs(creationArgs);
 
     this.addField(name, args, (connection) => {
       connection.addField('pageInfo', {}, (pageInfo) => {

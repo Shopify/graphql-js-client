@@ -1,25 +1,25 @@
 import SelectionSet from './selection-set';
 import join from './join';
 
-function parseArgs(nameAndCallback) {
+function parseArgs(args) {
   let name;
   let variables;
   let selectionSetCallback;
 
-  if (nameAndCallback.length === 3) {
-    [name, variables, selectionSetCallback] = nameAndCallback;
-  } else if (nameAndCallback.length === 2) {
-    if (Object.prototype.toString.call(nameAndCallback[0]) === '[object String]') {
-      name = nameAndCallback[0];
+  if (args.length === 3) {
+    [name, variables, selectionSetCallback] = args;
+  } else if (args.length === 2) {
+    if (Object.prototype.toString.call(args[0]) === '[object String]') {
+      name = args[0];
       variables = null;
-    } else if (Array.isArray(nameAndCallback[0])) {
-      variables = nameAndCallback[0];
+    } else if (Array.isArray(args[0])) {
+      variables = args[0];
       name = null;
     }
 
-    selectionSetCallback = nameAndCallback[1];
+    selectionSetCallback = args[1];
   } else {
-    selectionSetCallback = nameAndCallback[0];
+    selectionSetCallback = args[0];
     name = null;
   }
 
@@ -45,8 +45,8 @@ class VariableDefinitions {
 }
 
 export default class Query {
-  constructor(typeBundle, ...nameAndCallback) {
-    const {name, variables, selectionSetCallback} = parseArgs(nameAndCallback);
+  constructor(typeBundle, ...args) {
+    const {name, variables, selectionSetCallback} = parseArgs(args);
 
     this.typeBundle = typeBundle;
     this.selectionSet = new SelectionSet(typeBundle, 'QueryRoot');

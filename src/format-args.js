@@ -1,20 +1,23 @@
 import join from './join';
 import {Enum} from './enum';
+import {VariableDefinition} from './variable';
 
 function formatValue(value) {
-  let valueFormatted;
+  let formattedValue;
 
-  if (Enum.prototype.isPrototypeOf(value)) {
-    valueFormatted = String(value);
+  if (VariableDefinition.prototype.isPrototypeOf(value)) {
+    formattedValue = value.toInputValueString();
+  } else if (Enum.prototype.isPrototypeOf(value)) {
+    formattedValue = String(value);
   } else if (Array.isArray(value)) {
-    valueFormatted = `[${join(...value.map(formatValue))}]`;
+    formattedValue = `[${join(...value.map(formatValue))}]`;
   } else if (Object.prototype.toString.call(value) === '[object Object]') {
-    valueFormatted = `{${formatObject(value)}}`;
+    formattedValue = `{${formatObject(value)}}`;
   } else {
-    valueFormatted = JSON.stringify(value);
+    formattedValue = JSON.stringify(value);
   }
 
-  return valueFormatted;
+  return formattedValue;
 }
 
 function formatArgPair(key, value) {

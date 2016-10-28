@@ -83,7 +83,16 @@ suite('Unit | deserializeObject', () => {
     const graph = deserializeObject(typeBundle, graphFixture.data, 'QueryRoot');
 
     assert.ok(GraphModel.prototype.isPrototypeOf(graph.shop), 'shop relationship is a graph model');
-    assert.deepEqual(graph.shop.attrs, {name: 'buckets-o-stuff'}, 'shop model contains payloads attrs');
+    assert.equal(graph.shop.attrs.name, 'buckets-o-stuff', 'shop model contains scalar attrs');
+    assert.deepEqual(
+      graph.shop.attrs.products.map((product) => product.attrs),
+      [
+        {handle: 'aluminum-pole'},
+        {handle: 'electricity-socket-with-jam'},
+        {handle: 'borktown'}
+      ],
+      'shop model contains connection attrs'
+    );
   });
 
   test('it creates an array from lists of paginated relationships', () => {

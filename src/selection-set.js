@@ -6,18 +6,28 @@ import noop from './noop';
 function getArgsAndCallback(paramArgsCallback) {
   let callback = noop;
   let args = {};
+  let selectionSet = null;
 
-  if (paramArgsCallback.length === 1) {
+  if (paramArgsCallback.length === 2) {
+    if (typeof paramArgsCallback[1] === 'function') {
+      [args, callback] = paramArgsCallback;
+    } else {
+      [args, selectionSet] = paramArgsCallback;
+    }
+  } else if (paramArgsCallback.length === 1) {
     if (typeof paramArgsCallback[0] === 'function') {
       callback = paramArgsCallback[0];
+    // SelectionSet is defined before this function is called since it's
+    // called by SelectionSet
+    // eslint-disable-next-line no-use-before-define
+    } else if (SelectionSet.prototype.isPrototypeOf(paramArgsCallback[0])) {
+      selectionSet = paramArgsCallback[0];
     } else {
       args = paramArgsCallback[0];
     }
-  } else if (paramArgsCallback.length === 2) {
-    [args, callback] = paramArgsCallback;
   }
 
-  return {args, callback};
+  return {args, selectionSet, callback};
 }
 
 class Field {
@@ -72,33 +82,6 @@ export default class SelectionSet {
   }
 
   /**
-   * will add a field to be queried based on a SelectionSet
-   *
-   * @param {String}    name The name of the field to add to the query
-   * @param {Object}    [args] Arguments for the field to query
-   * @param {SelectionSet} selectionSet A selection set to be added to this query
-   */
-  addFieldWithSelectionSet(name, ...parameters) {
-    let args;
-    let selectionSet;
-
-    if (parameters.length === 1) {
-      selectionSet = parameters[0];
-      args = {};
-    } else {
-      [args, selectionSet] = parameters;
-    }
-
-    if (!(selectionSet instanceof SelectionSet)) {
-      throw new Error('You must pass in a SelectionSet');
-    }
-
-    const field = new Field(name, args, selectionSet);
-
-    this.selections.push(field);
-  }
-
-  /**
    * will add a field to be queried to the current query node.
    *
    * @param {String}    name The name of the field to add to the query
@@ -110,12 +93,17 @@ export default class SelectionSet {
       throw new Error(`The field '${name}' has already been added`);
     }
 
-    const {args, callback} = getArgsAndCallback(paramArgsCallback);
+    const parsedArgs = getArgsAndCallback(paramArgsCallback);
+    const {args, callback} = parsedArgs;
+    let {selectionSet} = parsedArgs;
 
-    const fieldBaseType = schemaForType(this.typeBundle, this.typeSchema.fieldBaseTypes[name]);
-    const selectionSet = new SelectionSet(this.typeBundle, fieldBaseType);
+    if (!selectionSet) {
+      const fieldBaseType = schemaForType(this.typeBundle, this.typeSchema.fieldBaseTypes[name]);
 
-    callback(selectionSet);
+      selectionSet = new SelectionSet(this.typeBundle, fieldBaseType);
+      // selectionSet = new SelectionSet(this.typeBundle, fieldDescriptor.schema);
+      callback(selectionSet);
+    }
 
     this.selections.push(new Field(name, args, selectionSet));
   }
@@ -125,7 +113,8 @@ export default class SelectionSet {
    *
    * @param {String}    name The name of the connection to add to the query
    * @param {Object}    [args] Arguments for the connection query eg. { first: 10 }
-   * @param {Function}  [callback] Callback which will return a new query node for the connection added
+   * @param {Function|SelectionSet}  [callback|selectionSet] Either pass a callback which will return a new
+   *                                                         SelectionSet. Or pass an existing SelectionSet.
    */
   addConnection(name, ...paramArgsCallback) {
     const {args, callback} = getArgsAndCallback(paramArgsCallback);

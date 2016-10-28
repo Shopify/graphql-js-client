@@ -145,7 +145,7 @@ suite('Unit | SelectionSet', () => {
       products.addField('handle');
     });
 
-    set.addFieldFromSelectionSet('shop', shop);
+    set.addFieldWithSelectionSet('shop', shop);
 
     assert.deepEqual(tokens(set.toString()), tokens(` {
       shop {
@@ -174,7 +174,7 @@ suite('Unit | SelectionSet', () => {
       pageInfo.addField('hasNextPage');
       pageInfo.addField('hasPreviousPage');
     });
-    set.addFieldFromSelectionSet('products', {first: 10}, productConnection);
+    set.addFieldWithSelectionSet('products', {first: 10}, productConnection);
 
     assert.deepEqual(tokens(set.toString()), tokens(` {
       products (first: 10) {
@@ -186,12 +186,12 @@ suite('Unit | SelectionSet', () => {
     }`));
   });
 
-  test('it will throw an error when no selection set is passed to addFieldFromSelectionSet', () => {
+  test('it will throw an error when no selection set is passed to addFieldWithSelectionSet', () => {
     const set = new SelectionSet(typeBundle, 'Shop');
 
     assert.throws(
       () => {
-        set.addFieldFromSelectionSet('products', {});
+        set.addFieldWithSelectionSet('products', {});
       },
       /You must pass in a SelectionSet/,
       'Threw an error stating SelectionSet must be passed in when using one param'
@@ -199,7 +199,7 @@ suite('Unit | SelectionSet', () => {
 
     assert.throws(
       () => {
-        set.addFieldFromSelectionSet('products', {}, {});
+        set.addFieldWithSelectionSet('products', {}, {});
       },
       /You must pass in a SelectionSet/,
       'Threw an error stating SelectionSet must be passed in when using two params'

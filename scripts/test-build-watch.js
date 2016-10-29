@@ -7,7 +7,7 @@ let bundle;
 let building = false;
 
 const testDestination = process.argv[2];
-const reloadUri = `http://localhost:${livereloadPort}/changed?files=tests.js`
+const reloadUri = `http://localhost:${livereloadPort}/changed?files=tests.js,index.html`
 
 function notifyReload() {
   fetch(reloadUri);

@@ -15,13 +15,13 @@ function parseFieldCreationArgs(creationArgs) {
       [args, selectionSet] = creationArgs;
     }
   } else if (creationArgs.length === 1) {
-    if (typeof creationArgs[0] === 'function') {
-      callback = creationArgs[0];
     // SelectionSet is defined before this function is called since it's
     // called by SelectionSet
     // eslint-disable-next-line no-use-before-define
-    } else if (SelectionSet.prototype.isPrototypeOf(creationArgs[0])) {
+    if (SelectionSet.prototype.isPrototypeOf(creationArgs[0])) {
       selectionSet = creationArgs[0];
+    } else if (typeof creationArgs[0] === 'function') {
+      callback = creationArgs[0];
     } else {
       args = creationArgs[0];
     }

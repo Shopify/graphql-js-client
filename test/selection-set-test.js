@@ -6,7 +6,7 @@ suite('Unit | SelectionSet', () => {
   const querySplitter = /[\s,]+/;
 
   function tokens(query) {
-    return query.split(querySplitter);
+    return query.split(querySplitter).filter((token) => Boolean(token));
   }
 
   test('it builds sets using the passed type', () => {
@@ -113,7 +113,7 @@ suite('Unit | SelectionSet', () => {
       });
     });
 
-    assert.deepEqual(tokens(set.toString()), tokens(` {
+    assert.deepEqual(tokens(set.toString()), tokens(`{
       shop {
         ... on Shop {
           name

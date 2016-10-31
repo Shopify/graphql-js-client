@@ -101,7 +101,7 @@ export default class SelectionSet {
       const fieldBaseType = schemaForType(this.typeBundle, this.typeSchema.fieldBaseTypes[name]);
 
       selectionSet = new SelectionSet(this.typeBundle, fieldBaseType);
-      // selectionSet = new SelectionSet(this.typeBundle, fieldDescriptor.schema);
+
       callback(selectionSet);
     }
 

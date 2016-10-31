@@ -3,21 +3,31 @@ import schemaForType from './schema-for-type';
 import formatArgs from './format-args';
 import noop from './noop';
 
-function getArgsAndCallback(paramArgsCallback) {
+function parseFieldCreationArgs(creationArgs) {
   let callback = noop;
   let args = {};
+  let selectionSet = null;
 
-  if (paramArgsCallback.length === 1) {
-    if (typeof paramArgsCallback[0] === 'function') {
-      callback = paramArgsCallback[0];
+  if (creationArgs.length === 2) {
+    if (typeof creationArgs[1] === 'function') {
+      [args, callback] = creationArgs;
     } else {
-      args = paramArgsCallback[0];
+      [args, selectionSet] = creationArgs;
     }
-  } else if (paramArgsCallback.length === 2) {
-    [args, callback] = paramArgsCallback;
+  } else if (creationArgs.length === 1) {
+    // SelectionSet is defined before this function is called since it's
+    // called by SelectionSet
+    // eslint-disable-next-line no-use-before-define
+    if (SelectionSet.prototype.isPrototypeOf(creationArgs[0])) {
+      selectionSet = creationArgs[0];
+    } else if (typeof creationArgs[0] === 'function') {
+      callback = creationArgs[0];
+    } else {
+      args = creationArgs[0];
+    }
   }
 
-  return {args, callback};
+  return {args, selectionSet, callback};
 }
 
 class Field {
@@ -78,17 +88,22 @@ export default class SelectionSet {
    * @param {Object}    [args] Arguments for the field to query
    * @param {Function}  [callback] Callback which will return a new query node for the field added
    */
-  addField(name, ...paramArgsCallback) {
+  addField(name, ...creationArgs) {
     if (this.hasSelectionWithName(name)) {
       throw new Error(`The field '${name}' has already been added`);
     }
 
-    const {args, callback} = getArgsAndCallback(paramArgsCallback);
+    const parsedArgs = parseFieldCreationArgs(creationArgs);
+    const {args, callback} = parsedArgs;
+    let {selectionSet} = parsedArgs;
 
-    const fieldBaseType = schemaForType(this.typeBundle, this.typeSchema.fieldBaseTypes[name]);
-    const selectionSet = new SelectionSet(this.typeBundle, fieldBaseType);
+    if (!selectionSet) {
+      const fieldBaseType = schemaForType(this.typeBundle, this.typeSchema.fieldBaseTypes[name]);
 
-    callback(selectionSet);
+      selectionSet = new SelectionSet(this.typeBundle, fieldBaseType);
+
+      callback(selectionSet);
+    }
 
     this.selections.push(new Field(name, args, selectionSet));
   }
@@ -98,10 +113,11 @@ export default class SelectionSet {
    *
    * @param {String}    name The name of the connection to add to the query
    * @param {Object}    [args] Arguments for the connection query eg. { first: 10 }
-   * @param {Function}  [callback] Callback which will return a new query node for the connection added
+   * @param {Function|SelectionSet}  [callback|selectionSet] Either pass a callback which will return a new
+   *                                                         SelectionSet. Or pass an existing SelectionSet.
    */
-  addConnection(name, ...paramArgsCallback) {
-    const {args, callback} = getArgsAndCallback(paramArgsCallback);
+  addConnection(name, ...creationArgs) {
+    const {args, callback} = parseFieldCreationArgs(creationArgs);
 
     this.addField(name, args, (connection) => {
       connection.addField('pageInfo', {}, (pageInfo) => {

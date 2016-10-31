@@ -6,7 +6,7 @@ suite('Unit | SelectionSet', () => {
   const querySplitter = /[\s,]+/;
 
   function tokens(query) {
-    return query.split(querySplitter);
+    return query.split(querySplitter).filter((token) => Boolean(token));
   }
 
   test('it builds sets using the passed type', () => {
@@ -113,7 +113,7 @@ suite('Unit | SelectionSet', () => {
       });
     });
 
-    assert.deepEqual(tokens(set.toString()), tokens(` {
+    assert.deepEqual(tokens(set.toString()), tokens(`{
       shop {
         ... on Shop {
           name
@@ -134,5 +134,55 @@ suite('Unit | SelectionSet', () => {
       },
       /The field 'name' has already been added/
     );
+  });
+
+  test('it can add a field with SelectionSet', () => {
+    const shop = new SelectionSet(typeBundle, 'Shop');
+    const set = new SelectionSet(typeBundle, 'QueryRoot');
+
+    shop.addField('name');
+    shop.addConnection('products', {first: 10}, (products) => {
+      products.addField('handle');
+    });
+
+    set.addField('shop', shop);
+
+    assert.deepEqual(tokens(set.toString()), tokens(` {
+      shop {
+        name
+        products (first: 10) {
+          pageInfo {
+            hasNextPage
+            hasPreviousPage
+          }
+          edges {
+            cursor,
+            node {
+              handle
+            }
+          }
+        }
+      }
+    }`));
+  });
+
+  test('it can add a field with SelectionSet using args', () => {
+    const set = new SelectionSet(typeBundle, 'Shop');
+    const productConnection = new SelectionSet(typeBundle, 'ProductConnection');
+
+    productConnection.addField('pageInfo', (pageInfo) => {
+      pageInfo.addField('hasNextPage');
+      pageInfo.addField('hasPreviousPage');
+    });
+    set.addField('products', {first: 10}, productConnection);
+
+    assert.deepEqual(tokens(set.toString()), tokens(` {
+      products (first: 10) {
+        pageInfo {
+          hasNextPage
+          hasPreviousPage
+        }
+      }
+    }`));
   });
 });

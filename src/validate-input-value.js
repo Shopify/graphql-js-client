@@ -18,22 +18,18 @@ export default (type, value) => {
       const graphTypeToJSType = {
         String,
         Boolean,
-        Object,
         Int: Number,
-        Float: Number,
-        List: Array
+        Float: Number
       };
 
       if (type[type.length - 1] === '!') {
         throw new Error('You cannot use a default value when using a non-null type');
       }
 
-      const typeWithoutNull = type.split('!').join('');
-
-      if (graphTypeToJSType[typeWithoutNull]) {
-        if (!validateType(value, graphTypeToJSType[typeWithoutNull])) {
+      if (graphTypeToJSType[type]) {
+        if (!validateType(value, graphTypeToJSType[type])) {
           throwTypeMismatch(type);
-        } else if (typeWithoutNull === 'Int' && isFloat(value)) {
+        } else if (type === 'Int' && isFloat(value)) {
           throwTypeMismatch(type);
         }
       }

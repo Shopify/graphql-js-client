@@ -12,7 +12,7 @@ export default (type, value) => {
       function isFloat(floatValue) {
         const valueString = floatValue.toString().toLowerCase();
 
-        return valueString.indexOf('.') > -1 || valueString.indexOf('e') > -1;
+        return valueString.includes('.') || valueString.includes('e');
       }
 
       const graphTypeToJSType = {

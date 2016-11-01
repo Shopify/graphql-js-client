@@ -2,7 +2,7 @@ import join from './join';
 import {VariableDefinition} from './variable';
 import {Enum} from './enum';
 
-export function formatArgPair(key, value) {
+function formatArgPair(key, value) {
   return `${key}: ${formatValue(value)}`;
 }
 

@@ -30,7 +30,7 @@ function parseFieldCreationArgs(creationArgs) {
   return {args, selectionSet, callback};
 }
 
-class Field {
+export class Field {
   constructor(name, args, selectionSet) {
     this.name = name;
     this.args = args;

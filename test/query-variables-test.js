@@ -139,6 +139,8 @@ suite('Unit | Query Variables', () => {
     // all of them should be incompatible except using Int with a float
     types.forEach((type, i) => {
       values.forEach((value, j) => {
+        // we do not want test against the current type against itself or float against int because
+        // an int is a valid float
         if (i !== j && !(type === 'Float' && types[j] === 'Int')) {
           assert.throws(() => {
             variable('testName', type, value);
@@ -160,5 +162,16 @@ suite('Unit | Query Variables', () => {
 
       assert.ok(!threwError, `Should not have thrown error- ${type} with value ${JSON.stringify(value)}`);
     });
+
+    // now finally test a float with an int value
+    let threwError = false;
+
+    try {
+      variable('testName', 'Float', 10);
+    } catch (error) {
+      threwError = true;
+    }
+
+    assert.ok(!threwError, 'Int values can be used in Float');
   });
 });

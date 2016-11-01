@@ -124,7 +124,7 @@ suite('Unit | Query Variables', () => {
     assert.equal(list2DFloatVariable.toVariableDefinitionString(), '$list2DFloatVariable:[[Float]]=[[0.1 0.2 0.3]]');
   });
 
-  test('it will validate variable types', () => {
+  test('it will throw errors with invalid types', () => {
     const typeAndValue = {
       String: 'test string',
       Boolean: true,
@@ -148,22 +148,9 @@ suite('Unit | Query Variables', () => {
         }
       });
     });
+  });
 
-    // test values which should not throw errors
-    types.forEach((type, i) => {
-      const value = values[i];
-      let threwError = false;
-
-      try {
-        variable('testName', type, value);
-      } catch (error) {
-        threwError = true;
-      }
-
-      assert.ok(!threwError, `Should not have thrown error- ${type} with value ${JSON.stringify(value)}`);
-    });
-
-    // now finally test a float with an int value
+  test('it will not throw an error when Int is used in a Float', () => {
     let threwError = false;
 
     try {

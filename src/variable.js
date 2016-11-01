@@ -1,4 +1,4 @@
-import {formatValue} from './format-variables';
+import {formatValue} from './format-input-value';
 import validateInputValue from './validate-input-value';
 
 export class VariableDefinition {

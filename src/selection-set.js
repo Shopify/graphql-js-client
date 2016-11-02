@@ -1,6 +1,6 @@
 import join from './join';
 import schemaForType from './schema-for-type';
-import formatArgs from './format-args';
+import formatFieldArgs from './format-field-args';
 import noop from './noop';
 
 function parseFieldCreationArgs(creationArgs) {
@@ -37,7 +37,7 @@ class Field {
     this.selectionSet = selectionSet;
   }
   toString() {
-    return `${this.name}${formatArgs(this.args)}${this.selectionSet.toString()}`;
+    return `${this.name}${formatFieldArgs(this.args)}${this.selectionSet.toString()}`;
   }
 }
 

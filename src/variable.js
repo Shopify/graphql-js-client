@@ -1,7 +1,17 @@
+import formatInputValue from './format-input-value';
+import validateInputValue from './validate-input-value';
+import check from './check-js-type';
+
 export class VariableDefinition {
-  constructor(name, type) {
+  constructor(name, type, defaultValue) {
     this.name = name;
-    this.type = type;
+    this.type = type.trim();
+    this.defaultValue = defaultValue;
+
+    // eslint-disable-next-line no-undefined
+    if (this.defaultValue !== undefined) {
+      validateInputValue(this.type, this.defaultValue);
+    }
   }
 
   toInputValueString() {
@@ -9,10 +19,12 @@ export class VariableDefinition {
   }
 
   toVariableDefinitionString() {
-    return `$${this.name}:${this.type}`;
+    const defaultValueString = check.isUndefined(this.defaultValue) ? '' : `=${formatInputValue(this.defaultValue)}`;
+
+    return `$${this.name}:${this.type}${defaultValueString}`;
   }
 }
 
-export default function variable(name, type) {
-  return new VariableDefinition(name, type);
+export default function variable(name, type, defaultValue) {
+  return new VariableDefinition(name, type, defaultValue);
 }

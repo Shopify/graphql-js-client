@@ -38,7 +38,7 @@ function deserializeValue(typeBundle, value, baseTypeName, registry, valuesSelec
   const baseType = schemaForType(typeBundle, baseTypeName);
 
   if (Array.isArray(value)) {
-    return value.map((item) => deserializeValue(typeBundle, item, baseTypeName, registry, valuesSelectionSet));
+    return value.map((item) => deserializeValue(typeBundle, item, baseTypeName, registry, valuesSelectionSet, ancestralNode));
   } else if (value === null) {
     return null;
   } else if (isConnection(baseType)) {

@@ -28,18 +28,9 @@ suite('Integration | Ancestral Nodes', () => {
                   node: {
                     id: productId,
                     handle: 'aluminum-pole',
-                    images: {
-                      pageInfo: {
-                        hasNextPage: true
-                      },
-                      edges: [{
-                        cursor: 'images-cursor',
-                        node: {
-                          id: 'gid://shopify/Image/12346',
-                          src: 'https://cdn.shopify.com/s/files/1/1090/1932/products/giphy.gif?v=1450204755'
-                        }
-                      }]
-                    }
+                    options: [{
+                      name: 'beans'
+                    }]
                   }
                 }]
               }
@@ -67,8 +58,8 @@ suite('Integration | Ancestral Nodes', () => {
           collections.addConnection('products', {first: 1}, (products) => {
             productsSelectionSet = products;
             products.addField('handle');
-            products.addConnection('images', {first: 1}, (images) => {
-              images.addField('src');
+            products.addField('options', (options) => {
+              options.addField('name');
             });
           });
         });
@@ -84,7 +75,7 @@ suite('Integration | Ancestral Nodes', () => {
     assert.equal(graph.shop.ancestry.isNode, false, 'shop is not a node');
     assert.equal(graph.shop.collections[0].ancestry.isNode, true, 'collections are nodes');
     assert.equal(graph.shop.collections[0].products[0].ancestry.isNode, true, 'products are nodes');
-    assert.equal(graph.shop.collections[0].products[0].images[0].ancestry.isNode, false, 'images are not nodes');
+    assert.equal(graph.shop.collections[0].products[0].options[0].ancestry.isNode, false, 'options are not nodes');
   });
 
   test('it identifies the nearest parent Node', () => {
@@ -95,10 +86,10 @@ suite('Integration | Ancestral Nodes', () => {
       id: collectionId,
       selectionSet: collectionsSelectionSet
     }, 'product has a nearest node of the parent collection');
-    assert.deepEqual(graph.shop.collections[0].products[0].images[0].ancestry.nearestNode, {
+    assert.deepEqual(graph.shop.collections[0].products[0].options[0].ancestry.nearestNode, {
       id: productId,
       selectionSet: productsSelectionSet
-    }, 'image has a nearest node of the parent product');
+    }, 'option has a nearest node of the parent product');
   });
 });
 

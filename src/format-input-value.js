@@ -2,17 +2,18 @@ import join from './join';
 import {VariableDefinition} from './variable';
 import {Enum} from './enum';
 import formatObject from './format-object';
+import check from './check-js-type';
 
 export default function formatInputValue(value) {
   let formattedValue;
 
-  if (VariableDefinition.prototype.isPrototypeOf(value)) {
+  if (check.is(value, VariableDefinition)) {
     formattedValue = value.toInputValueString();
-  } else if (Enum.prototype.isPrototypeOf(value)) {
+  } else if (check.is(value, Enum)) {
     formattedValue = String(value);
-  } else if (Array.isArray(value)) {
+  } else if (check.isArray(value)) {
     formattedValue = `[${join(...value.map(formatInputValue))}]`;
-  } else if (Object.prototype.toString.call(value) === '[object Object]') {
+  } else if (check.isObject(value)) {
     formattedValue = formatObject(value, '{', '}');
   } else {
     formattedValue = JSON.stringify(value);

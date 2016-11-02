@@ -94,7 +94,7 @@ suite('Unit | Query Variables', () => {
     const booleanVariable = variable('booleanVariable', 'Boolean', false);
     const floatVariable = variable('floatVariable', 'Float', 0.333);
     const floatVariableE = variable('floatVariableE', 'Float', 0.33e3);
-    const enumVariable = variable('enumVariable', 'FancyEnum', createEnum('FANCY_ENUM'));
+    const enumVariable = variable('enumVariable', 'Enum', createEnum('FANCY_ENUM'));
     const inputObjectVariable = variable('inputObjectVariable', 'InputObject', {one: 1, two: 'two', three: true});
 
     assert.equal(intVariable.toVariableDefinitionString(), '$intVariable:Int=33');
@@ -102,7 +102,7 @@ suite('Unit | Query Variables', () => {
     assert.equal(booleanVariable.toVariableDefinitionString(), '$booleanVariable:Boolean=false');
     assert.equal(floatVariable.toVariableDefinitionString(), '$floatVariable:Float=0.333');
     assert.equal(floatVariableE.toVariableDefinitionString(), '$floatVariableE:Float=330');
-    assert.equal(enumVariable.toVariableDefinitionString(), '$enumVariable:FancyEnum=FANCY_ENUM');
+    assert.equal(enumVariable.toVariableDefinitionString(), '$enumVariable:Enum=FANCY_ENUM');
     assert.equal(inputObjectVariable.toVariableDefinitionString(), '$inputObjectVariable:InputObject={one: 1 two: "two" three: true}');
   });
 
@@ -111,7 +111,7 @@ suite('Unit | Query Variables', () => {
     const listStringVariable = variable('listStringVariable', '[String]', ['1', '2', '3']);
     const listBooleanVariable = variable('listBooleanVariable', '[Boolean]', [true, false, true]);
     const listFloatVariable = variable('listFloatVariable', '[Float]', [0.1, 0.2, 0.3]);
-    const listEnumVariable = variable('listEnumVariable', '[FancyEnum]', [createEnum('ENUM1'), createEnum('ENUM2'), createEnum('ENUM3')]);
+    const listEnumVariable = variable('listEnumVariable', '[Enum]', [createEnum('ENUM1'), createEnum('ENUM2'), createEnum('ENUM3')]);
     const listObjectVariable = variable('listObjectVariable', '[InputObject]', [{one: true, two: 2}, {one: false, two: 3}, {one: false, two: 4}]);
     const list2DFloatVariable = variable('list2DFloatVariable', '[[Float]]', [[0.1, 0.2, 0.3]]);
 
@@ -119,7 +119,7 @@ suite('Unit | Query Variables', () => {
     assert.equal(listStringVariable.toVariableDefinitionString(), '$listStringVariable:[String]=["1" "2" "3"]');
     assert.equal(listBooleanVariable.toVariableDefinitionString(), '$listBooleanVariable:[Boolean]=[true false true]');
     assert.equal(listFloatVariable.toVariableDefinitionString(), '$listFloatVariable:[Float]=[0.1 0.2 0.3]');
-    assert.equal(listEnumVariable.toVariableDefinitionString(), '$listEnumVariable:[FancyEnum]=[ENUM1 ENUM2 ENUM3]');
+    assert.equal(listEnumVariable.toVariableDefinitionString(), '$listEnumVariable:[Enum]=[ENUM1 ENUM2 ENUM3]');
     assert.equal(listObjectVariable.toVariableDefinitionString(), '$listObjectVariable:[InputObject]=[{one: true two: 2} {one: false two: 3} {one: false two: 4}]');
     assert.equal(list2DFloatVariable.toVariableDefinitionString(), '$list2DFloatVariable:[[Float]]=[[0.1 0.2 0.3]]');
   });

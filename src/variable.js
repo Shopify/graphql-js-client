@@ -1,5 +1,6 @@
 import formatInputValue from './format-input-value';
 import validateInputValue from './validate-input-value';
+import check from './check-js-type';
 
 export class VariableDefinition {
   constructor(name, type, defaultValue) {
@@ -18,8 +19,7 @@ export class VariableDefinition {
   }
 
   toVariableDefinitionString() {
-    // eslint-disable-next-line no-undefined
-    const defaultValueString = (this.defaultValue === undefined) ? '' : `=${formatInputValue(this.defaultValue)}`;
+    const defaultValueString = check.isUndefined(this.defaultValue) ? '' : `=${formatInputValue(this.defaultValue)}`;
 
     return `$${this.name}:${this.type}${defaultValueString}`;
   }

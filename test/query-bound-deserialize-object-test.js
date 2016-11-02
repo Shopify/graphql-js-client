@@ -73,21 +73,4 @@ suite('Integration | Query bound object graph', () => {
     assert.equal(graph.shop.products[0].ancestry.selectionSet, boundProducts);
     assert.equal(graph.shop.products[0].images[0].ancestry.selectionSet, boundImages);
   });
-
-  test('it identifies objects that are nodes', () => {
-    assert.equal(graph.ancestry.isNode, false, 'the root is not a node');
-    assert.equal(graph.shop.ancestry.isNode, false, 'shop is not a node');
-    assert.equal(graph.shop.products[0].ancestry.isNode, true, 'products are nodes');
-    assert.equal(graph.shop.products[0].images[0].ancestry.isNode, false, 'images are not nodes');
-  });
-
-  test('it identifies the nearest parent Node', () => {
-    assert.equal(graph.ancestry.nearestNode, null, 'query root has no nearest parent Node');
-    assert.equal(graph.shop.ancestry.nearestNode, null, 'shop has no nearest parent Node');
-    assert.equal(graph.shop.products[0].ancestry.nearestNode, null, 'products have no nearest parent node');
-    assert.deepEqual(graph.shop.products[0].images[0].ancestry.ancestralNode, {
-      id: productId,
-      selectionSet: boundProducts
-    }, 'image has a nearest node of the parent product');
-  });
 });

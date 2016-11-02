@@ -15,12 +15,13 @@ function selectionSetForNode(connectionsSelectionSet) {
     return null;
   }
 
-  return connectionsSelectionSet.selections
-                                .find((field) => field.name === 'edges')
-                                .selectionSet
-                                .selections
-                                .find((field) => field.name === 'node')
-                                .selectionSet;
+  return connectionsSelectionSet
+    .selections
+    .find((field) => field.name === 'edges')
+    .selectionSet
+    .selections
+    .find((field) => field.name === 'node')
+    .selectionSet;
 }
 
 function deserializeConnection(typeBundle, value, baseTypeName, registry, connectionsSelectionSet, ancestralNode) {
@@ -50,11 +51,11 @@ function deserializeValue(typeBundle, value, baseTypeName, registry, valuesSelec
 }
 
 class Ancestry {
-  constructor(selectionSet, isNode, ancestralNode) {
+  constructor(selectionSet, isNode, nearestNode) {
     Object.assign(this, {
       selectionSet,
       isNode,
-      ancestralNode
+      nearestNode
     });
   }
 }

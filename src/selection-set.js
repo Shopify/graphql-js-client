@@ -131,10 +131,17 @@ export default class SelectionSet {
     });
   }
 
-  addInlineFragmentOn(typeName, fieldTypeCb = noop) {
-    const selectionSet = new SelectionSet(this.typeBundle, schemaForType(this.typeBundle, typeName));
+  addInlineFragmentOn(typeName, callbackOrSelectionSet = noop) {
+    let selectionSet;
 
-    fieldTypeCb(selectionSet);
+    if (SelectionSet.prototype.isPrototypeOf(callbackOrSelectionSet)) {
+      selectionSet = callbackOrSelectionSet;
+    } else {
+      selectionSet = new SelectionSet(this.typeBundle, schemaForType(this.typeBundle, typeName));
+
+      callbackOrSelectionSet(selectionSet);
+    }
+
     this.selections.push(new InlineFragment(typeName, selectionSet));
   }
 }

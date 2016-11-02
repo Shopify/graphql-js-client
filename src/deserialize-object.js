@@ -1,6 +1,7 @@
 import ClassRegistry from './class-registry';
 import schemaForType from './schema-for-type';
 import {Field} from './selection-set';
+import Query from './query';
 
 function serializedAsObject(type) {
   return type.kind === 'OBJECT' || type.kind === 'INTERFACE' || type.kind === 'UNION';
@@ -108,6 +109,19 @@ export default function deserializeObject(typeBundle, objectGraph, typeName, reg
 
   if (selectionSet) {
     attrs.ancestry = new Ancestry(selectionSet, objectType.implementsNode, ancestralNode);
+
+    if (objectType.implementsNode) {
+      attrs.refetchQuery = function() {
+        return new Query(typeBundle, (root) => {
+          root.addInlineFragmentOn('Node', (node) => {
+            node.addField('id');
+          });
+          root.addField('node', {id: attrs.id}, (node) => {
+            node.addInlineFragmentOn(objectType.name, selectionSet);
+          });
+        });
+      };
+    }
   }
 
   return new (registry.classForType(typeName))(attrs);

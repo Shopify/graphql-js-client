@@ -1,5 +1,4 @@
-import check from './check-js-type';
-import {Enum} from './enum';
+import checkJSType from './check-js-type';
 
 function isFloat(floatValue) {
   const valueString = floatValue.toString().toLowerCase();
@@ -7,31 +6,20 @@ function isFloat(floatValue) {
   return valueString.includes('.') || valueString.includes('e');
 }
 
-export default (value, type) => {
-  switch (type) {
-    case 'String':
-      return check.isString(value);
+export default {
+  isString: (value) => {
+    return checkJSType.isString(value);
+  },
 
-    case 'Boolean':
-      return check.isBoolean(value);
+  isBoolean: (value) => {
+    return checkJSType.isBoolean(value);
+  },
 
-    case 'Int':
-      return check.isNumber(value) && !isFloat(value);
+  isInt: (value) => {
+    return checkJSType.isNumber(value) && !isFloat(value);
+  },
 
-    case 'Float':
-      return check.isNumber(value);
-
-    default:
-      // Replace with correct checking for lists
-      if (type.includes('[') && type.includes(']')) {
-        return check.isArray(value);
-      // Replace these with comparing types from the typeBundle
-      } else if (type.includes('Enum')) {
-        return check.is(value, Enum);
-      } else if (type === 'InputObject') {
-        return true;
-      }
-
-      return false;
+  isFloat: (value) => {
+    return checkJSType.isNumber(value);
   }
 };

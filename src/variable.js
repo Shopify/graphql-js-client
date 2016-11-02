@@ -1,4 +1,4 @@
-import {formatValue} from './format-input-value';
+import formatInputValue from './format-input-value';
 import validateInputValue from './validate-input-value';
 
 export class VariableDefinition {
@@ -19,7 +19,7 @@ export class VariableDefinition {
 
   toVariableDefinitionString() {
     // eslint-disable-next-line no-undefined
-    const defaultValueString = (this.defaultValue === undefined) ? '' : `=${formatValue(this.defaultValue)}`;
+    const defaultValueString = (this.defaultValue === undefined) ? '' : `=${formatInputValue(this.defaultValue)}`;
 
     return `$${this.name}:${this.type}${defaultValueString}`;
   }

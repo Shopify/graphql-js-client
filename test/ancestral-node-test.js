@@ -78,6 +78,14 @@ suite('Integration | Ancestral Nodes', () => {
     assert.equal(graph.shop.collections[0].products[0].options[0].ancestry.isNode, false, 'options are not nodes');
   });
 
+  test('it identifies parents in the ancestry chain', () => {
+    assert.equal(graph.ancestry.parent, null, 'root node has a null parent');
+    assert.equal(graph.shop.ancestry.parent, graph.ancestry, 'shop\'s parent is the root node');
+    assert.equal(graph.shop.collections[0].ancestry.parent, graph.shop.ancestry, 'collection\'s parent is the shop');
+    assert.equal(graph.shop.collections[0].products[0].ancestry.parent, graph.shop.collections[0].ancestry, 'product\'s parent is the collection');
+    assert.equal(graph.shop.collections[0].products[0].options[0].ancestry.parent, graph.shop.collections[0].products[0].ancestry, 'option\'s parent is the product');
+  });
+
   test('it identifies the nearest parent Node', () => {
     assert.equal(graph.ancestry.nearestNode, null, 'query root has no nearest parent Node');
     assert.equal(graph.shop.ancestry.nearestNode, null, 'shop has no nearest parent Node');

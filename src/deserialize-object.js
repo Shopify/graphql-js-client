@@ -25,38 +25,41 @@ function selectionSetForNode(connectionsSelectionSet) {
     .selectionSet;
 }
 
-function deserializeConnection(typeBundle, value, baseTypeName, registry, connectionsSelectionSet, ancestralNode) {
+function deserializeConnection(typeBundle, value, baseTypeName, registry, connectionsSelectionSet, ancestralNode, parent) {
   const connectionType = schemaForType(typeBundle, baseTypeName);
   const edgeType = schemaForType(typeBundle, connectionType.fieldBaseTypes.edges);
   const nodeType = schemaForType(typeBundle, edgeType.fieldBaseTypes.node);
 
   const nodesSelectionSet = selectionSetForNode(connectionsSelectionSet);
 
-  return value.edges.map((edge) => deserializeValue(typeBundle, edge.node, nodeType.name, registry, nodesSelectionSet, ancestralNode));
+  return value.edges.map((edge) => deserializeValue(typeBundle, edge.node, nodeType.name, registry, nodesSelectionSet, ancestralNode, parent));
 }
 
-function deserializeValue(typeBundle, value, baseTypeName, registry, valuesSelectionSet, ancestralNode) {
+function deserializeValue(typeBundle, value, baseTypeName, registry, valuesSelectionSet, ancestralNode, parent) {
   const baseType = schemaForType(typeBundle, baseTypeName);
 
   if (Array.isArray(value)) {
-    return value.map((item) => deserializeValue(typeBundle, item, baseTypeName, registry, valuesSelectionSet, ancestralNode));
+    return value.map((item) => deserializeValue(typeBundle, item, baseTypeName, registry, valuesSelectionSet, ancestralNode, parent));
   } else if (value === null) {
     return null;
   } else if (isConnection(baseType)) {
-    return deserializeConnection(typeBundle, value, baseTypeName, registry, valuesSelectionSet, ancestralNode);
+    const connection = deserializeConnection(typeBundle, value, baseTypeName, registry, valuesSelectionSet, ancestralNode, parent);
+
+    return connection;
   } else if (serializedAsObject(baseType)) {
-    return deserializeObject(typeBundle, value, baseTypeName, registry, valuesSelectionSet, ancestralNode);
+    return deserializeObject(typeBundle, value, baseTypeName, registry, valuesSelectionSet, ancestralNode, parent);
   } else {
     return value;
   }
 }
 
 class Ancestry {
-  constructor(selectionSet, isNode, nearestNode) {
+  constructor(selectionSet, isNode, nearestNode, parent) {
     Object.assign(this, {
       selectionSet,
       isNode,
-      nearestNode
+      nearestNode,
+      parent
     });
   }
 }
@@ -80,12 +83,13 @@ function selectionSetForField(fieldName, selectionSet) {
 }
 
 
-export default function deserializeObject(typeBundle, objectGraph, typeName, registry = new ClassRegistry(), selectionSet, ancestralNode) {
+export default function deserializeObject(typeBundle, objectGraph, typeName, registry = new ClassRegistry(), selectionSet, ancestralNode, parent) {
   if (selectionSet && selectionSet.typeSchema.name !== typeName) {
     throw new Error(`selectionSet for type "${selectionSet.typeSchema.name}" does not match typeName "${typeName}"`);
   }
 
   const objectType = schemaForType(typeBundle, typeName);
+  const ancestry = new Ancestry(selectionSet, objectType.implementsNode, ancestralNode, parent);
 
   let thisNode;
 
@@ -96,19 +100,20 @@ export default function deserializeObject(typeBundle, objectGraph, typeName, reg
     };
   }
 
+
   const attrs = Object.keys(objectGraph).reduce((acc, fieldName) => {
     const baseTypeName = objectType.fieldBaseTypes[fieldName];
     const value = objectGraph[fieldName];
 
     const valuesSelectionSet = selectionSetForField(fieldName, selectionSet);
 
-    acc[fieldName] = deserializeValue(typeBundle, value, baseTypeName, registry, valuesSelectionSet, thisNode);
+    acc[fieldName] = deserializeValue(typeBundle, value, baseTypeName, registry, valuesSelectionSet, thisNode, ancestry); // ancestry represents the parent
 
     return acc;
   }, {});
 
   if (selectionSet) {
-    attrs.ancestry = new Ancestry(selectionSet, objectType.implementsNode, ancestralNode);
+    attrs.ancestry = ancestry;
 
     if (objectType.implementsNode) {
       attrs.refetchQuery = function() {

@@ -54,13 +54,26 @@ function deserializeValue(typeBundle, value, baseTypeName, registry, valuesSelec
 }
 
 class Ancestry {
-  constructor(selectionSet, isNode, nearestNode, parent) {
+  constructor(selectionSet, parent, nodeId = null) {
     Object.assign(this, {
       selectionSet,
-      isNode,
-      nearestNode,
-      parent
+      parent,
+      nodeId
     });
+  }
+
+  get isNode() {
+    return this.selectionSet.typeSchema.implementsNode;
+  }
+
+  get nearestNode() {
+    if (!this.parent) {
+      return null;
+    } else if (this.parent.isNode) {
+      return this.parent;
+    }
+
+    return this.parent.nearestNode;
   }
 }
 
@@ -89,7 +102,7 @@ export default function deserializeObject(typeBundle, objectGraph, typeName, reg
   }
 
   const objectType = schemaForType(typeBundle, typeName);
-  const ancestry = new Ancestry(selectionSet, objectType.implementsNode, ancestralNode, parent);
+  const ancestry = new Ancestry(selectionSet, parent, objectGraph.id);
 
   let thisNode;
 

@@ -90,14 +90,8 @@ suite('Integration | Ancestral Nodes', () => {
     assert.equal(graph.ancestry.nearestNode, null, 'query root has no nearest parent Node');
     assert.equal(graph.shop.ancestry.nearestNode, null, 'shop has no nearest parent Node');
     assert.equal(graph.shop.collections[0].ancestry.nearestNode, null, 'collections have no nearest parent node');
-    assert.deepEqual(graph.shop.collections[0].products[0].ancestry.nearestNode, {
-      id: collectionId,
-      selectionSet: collectionsSelectionSet
-    }, 'product has a nearest node of the parent collection');
-    assert.deepEqual(graph.shop.collections[0].products[0].options[0].ancestry.nearestNode, {
-      id: productId,
-      selectionSet: productsSelectionSet
-    }, 'option has a nearest node of the parent product');
+    assert.deepEqual(graph.shop.collections[0].products[0].ancestry.nearestNode, graph.shop.collections[0].ancestry, 'product has a nearest node of the parent collection');
+    assert.deepEqual(graph.shop.collections[0].products[0].options[0].ancestry.nearestNode, graph.shop.collections[0].products[0].ancestry, 'option has a nearest node of the parent product');
   });
 });
 

@@ -1,6 +1,7 @@
 import assert from 'assert';
 import Mutation from '../src/mutation';
 import typeBundle from '../fixtures/types'; // eslint-disable-line import/no-unresolved
+import variable from '../src/variable';
 
 suite('Unit | Mutation', () => {
   const querySplitter = /[\s,]+/;
@@ -9,12 +10,14 @@ suite('Unit | Mutation', () => {
     return query.split(querySplitter).filter((token) => Boolean(token));
   }
 
-  function buildMutation(root) {
+  function buildMutation(root, variables) {
+    const {clientMutationId = '1234', email = 'some@email.com', password = 'some-password'} = variables || {};
+
     const fieldArgs = {
       input: {
-        clientMutationId: '1234',
-        email: 'some@email.com',
-        password: 'some-password'
+        clientMutationId,
+        email,
+        password
       }
     };
 
@@ -33,9 +36,7 @@ suite('Unit | Mutation', () => {
   }
 
   test('constructor takes a typeBundle and a callback which is called with the query\'s SelectionSet', () => {
-    // let rootType = null;
     const query = new Mutation(typeBundle, (root) => {
-      // rootType = root.typeSchema;
       buildMutation(root);
     });
 
@@ -58,15 +59,63 @@ suite('Unit | Mutation', () => {
   });
 
   test('constructor takes a typeBundle, a name, and a callback rendering a named query', () => {
-    // let rootType = null;
     const query = new Mutation(typeBundle, 'myMutation', (root) => {
-      // rootType = root.typeSchema;
       buildMutation(root);
     });
 
     assert.deepEqual(tokens(query.toString()), tokens(`
       mutation myMutation { 
         apiCustomerAccessTokenCreate (input: {clientMutationId: "1234" email: "some@email.com" password: "some-password"}) { 
+          clientMutationId,
+          userErrors {
+            message,
+            field
+          },
+          apiCustomerAccessToken {
+            id,
+            expiresAt,
+            accessToken
+          } 
+        }
+      }
+    `));
+  });
+
+  test('constructor takes a typeBundle, query variables, and a callback which is called with the query\'s SelectionSet', () => {
+    const emailVariable = variable('email', 'String');
+
+    const query = new Mutation(typeBundle, [emailVariable], (root) => {
+      buildMutation(root, {email: emailVariable});
+    });
+
+    assert.deepEqual(tokens(query.toString()), tokens(`
+      mutation ($email:String) { 
+        apiCustomerAccessTokenCreate (input: {clientMutationId: "1234" email: $email password: "some-password"}) { 
+          clientMutationId,
+          userErrors {
+            message,
+            field
+          },
+          apiCustomerAccessToken {
+            id,
+            expiresAt,
+            accessToken
+          } 
+        }
+      }
+    `));
+  });
+
+  test('constructor takes a typeBundle, name, query variables, and a callback which is called with the query\'s SelectionSet', () => {
+    const emailVariable = variable('email', 'String');
+
+    const query = new Mutation(typeBundle, 'myMutation', [emailVariable], (root) => {
+      buildMutation(root, {email: emailVariable});
+    });
+
+    assert.deepEqual(tokens(query.toString()), tokens(`
+      mutation myMutation ($email:String) { 
+        apiCustomerAccessTokenCreate (input: {clientMutationId: "1234" email: $email password: "some-password"}) { 
           clientMutationId,
           userErrors {
             message,

@@ -43,20 +43,15 @@ suite('Integration | Ancestral Nodes', () => {
 
   let graph;
   let baseQuery;
-  let collectionsSelectionSet;
-  let productsSelectionSet;
 
   setup(() => {
     baseQuery = new Query(typeBundle, (root) => {
-      root.addInlineFragmentOn('Node', (node) => {
-        node.addField('id');
-      });
       root.addField('shop', (shop) => {
         shop.addConnection('collections', {first: 1}, (collections) => {
-          collectionsSelectionSet = collections;
+          collections.addField('id');
           collections.addField('handle');
           collections.addConnection('products', {first: 1}, (products) => {
-            productsSelectionSet = products;
+            products.addField('id');
             products.addField('handle');
             products.addField('options', (options) => {
               options.addField('name');
@@ -67,7 +62,7 @@ suite('Integration | Ancestral Nodes', () => {
     });
 
     // eslint-disable-next-line no-undefined
-    graph = deserializeObject(typeBundle, graphFixture.data, 'QueryRoot', undefined, baseQuery.selectionSet);
+    graph = deserializeObject(graphFixture.data, baseQuery.selectionSet);
   });
 
   test('it identifies objects that are nodes', () => {
@@ -76,6 +71,14 @@ suite('Integration | Ancestral Nodes', () => {
     assert.equal(graph.shop.collections[0].ancestry.isNode, true, 'collections are nodes');
     assert.equal(graph.shop.collections[0].products[0].ancestry.isNode, true, 'products are nodes');
     assert.equal(graph.shop.collections[0].products[0].options[0].ancestry.isNode, false, 'options are not nodes');
+  });
+
+  test('it retains the ids of objects that are nodes', () => {
+    assert.equal(graph.ancestry.nodeId, null, 'the root is not a node');
+    assert.equal(graph.shop.ancestry.nodeId, null, 'shop is not a node');
+    assert.equal(graph.shop.collections[0].ancestry.nodeId, collectionId, 'collections are nodes');
+    assert.equal(graph.shop.collections[0].products[0].ancestry.nodeId, productId, 'products are nodes');
+    assert.equal(graph.shop.collections[0].products[0].options[0].ancestry.nodeId, null, 'options are not nodes');
   });
 
   test('it identifies parents in the ancestry chain', () => {

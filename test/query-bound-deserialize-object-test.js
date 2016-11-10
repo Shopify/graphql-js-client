@@ -47,16 +47,15 @@ suite('Integration | Query bound object graph', () => {
   setup(() => {
     baseQuery = new Query(typeBundle, (root) => {
       boundRoot = root;
-      root.addInlineFragmentOn('Node', (node) => {
-        node.addField('id');
-      });
       root.addField('shop', (shop) => {
         boundShop = shop;
         shop.addConnection('products', {first: 1}, (products) => {
           boundProducts = products;
+          products.addField('id');
           products.addField('handle');
           products.addConnection('images', {first: 1}, (images) => {
             boundImages = images;
+            images.addField('id');
             images.addField('src');
           });
         });
@@ -64,7 +63,7 @@ suite('Integration | Query bound object graph', () => {
     });
 
     // eslint-disable-next-line no-undefined
-    graph = deserializeObject(typeBundle, graphFixture.data, 'QueryRoot', undefined, baseQuery.selectionSet);
+    graph = deserializeObject(graphFixture.data, baseQuery.selectionSet);
   });
 
   test('it binds SelectionSets through ancestry', () => {

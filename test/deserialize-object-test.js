@@ -2,6 +2,7 @@ import assert from 'assert';
 import GraphModel from '../src/graph-model';
 import deserializeObject from '../src/deserialize-object';
 import ClassRegistry from '../src/class-registry';
+import Query from '../src/query';
 import typeBundle from '../fixtures/types'; // eslint-disable-line import/no-unresolved
 
 
@@ -39,10 +40,20 @@ const graphFixture = {
   }
 };
 
+const graphQuery = new Query(typeBundle, (root) => {
+  root.addField('shop', (shop) => {
+    shop.addField('name');
+    shop.addConnection('products', (products) => {
+      products.addField('handle');
+    });
+  });
+});
+
+const productId = 'gid://shopify/Product/3677189889';
 const productFixture = {
   data: {
     product: {
-      id: 'gid://shopify/Product/3677189889',
+      id: productId,
       handle: 'aluminum-pole',
       options: [
         {
@@ -70,42 +81,51 @@ const productFixture = {
   }
 };
 
+const productQuery = new Query(typeBundle, (root) => {
+  root.addField('product', {id: productId}, (product) => {
+    product.addField('id');
+    product.addField('handle');
+    product.addField('options', (options) => {
+      options.addField('name');
+    });
+    product.addConnection('images', (images) => {
+      images.addField('src');
+    });
+  });
+});
+
 suite('deserialize-object-test', () => {
   test('it creates a GraphModel from the root type', () => {
-
-    const graph = deserializeObject(typeBundle, graphFixture.data, 'QueryRoot');
+    const graph = deserializeObject(graphFixture.data, graphQuery.selectionSet);
 
     assert.ok(GraphModel.prototype.isPrototypeOf(graph), 'root type is a graph model');
   });
 
   test('it instantiates a model with relationship fields', () => {
-
-    const graph = deserializeObject(typeBundle, graphFixture.data, 'QueryRoot');
+    const graph = deserializeObject(graphFixture.data, graphQuery.selectionSet);
 
     assert.ok(GraphModel.prototype.isPrototypeOf(graph.shop), 'shop relationship is a graph model');
     assert.equal(graph.shop.attrs.name, 'buckets-o-stuff', 'shop model contains scalar attrs');
     assert.deepEqual(
-      graph.shop.attrs.products.map((product) => product.attrs),
+      graph.shop.attrs.products.map((product) => product.attrs).map((attrs) => attrs.handle),
       [
-        {handle: 'aluminum-pole'},
-        {handle: 'electricity-socket-with-jam'},
-        {handle: 'borktown'}
+        'aluminum-pole',
+        'electricity-socket-with-jam',
+        'borktown'
       ],
       'shop model contains connection attrs'
     );
   });
 
   test('it creates an array from lists of paginated relationships', () => {
-
-    const graph = deserializeObject(typeBundle, graphFixture.data, 'QueryRoot');
+    const graph = deserializeObject(graphFixture.data, graphQuery.selectionSet);
 
     assert.ok(Array.isArray(graph.shop.products), 'shops products are in an array');
     assert.equal(graph.shop.products.length, 3, 'there are three products');
   });
 
   test('it instantiates paginated list members as models', () => {
-
-    const graph = deserializeObject(typeBundle, graphFixture.data, 'QueryRoot');
+    const graph = deserializeObject(graphFixture.data, graphQuery.selectionSet);
 
     graphFixture.data.shop.products.edges.forEach((product, index) => {
       assert.ok(GraphModel.prototype.isPrototypeOf(graph.shop.products[index]), 'products are graph models');
@@ -114,16 +134,14 @@ suite('deserialize-object-test', () => {
   });
 
   test('it creates an array from lists of non-paginated relationships', () => {
-
-    const graph = deserializeObject(typeBundle, productFixture.data, 'QueryRoot');
+    const graph = deserializeObject(productFixture.data, productQuery.selectionSet);
 
     assert.ok(Array.isArray(graph.product.options), 'products images are in an array');
     assert.equal(graph.product.options.length, 2, 'there are two options');
   });
 
   test('it instantiates basic list members as models', () => {
-
-    const graph = deserializeObject(typeBundle, productFixture.data, 'QueryRoot');
+    const graph = deserializeObject(productFixture.data, productQuery.selectionSet);
 
     assert.ok(GraphModel.prototype.isPrototypeOf(graph.product.options[0]));
     assert.equal(graph.product.options[0].name, productFixture.data.product.options[0].name);
@@ -139,9 +157,11 @@ suite('deserialize-object-test', () => {
     registry.registerClassForType(ShopModel, 'Shop');
     registry.registerClassForType(ProductModel, 'Product');
 
-    const graph = deserializeObject(typeBundle, graphFixture.data, 'QueryRoot', registry);
+    const graph = deserializeObject(graphFixture.data, graphQuery.selectionSet, registry);
 
     assert.ok(ShopModel.prototype.isPrototypeOf(graph.shop), 'shop node is a shop model');
     assert.ok(ProductModel.prototype.isPrototypeOf(graph.shop.products[0]), 'product node is a product model');
   });
 });
+
+// TODO: Add a test to deserialize a request with node, and an inline fragment for type

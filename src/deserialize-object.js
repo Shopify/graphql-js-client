@@ -1,10 +1,13 @@
 import ClassRegistry from './class-registry';
-import schemaForType from './schema-for-type';
 import {Field} from './selection-set';
 import Query from './query';
 
 function serializedAsObject(type) {
   return type.kind === 'OBJECT' || type.kind === 'INTERFACE' || type.kind === 'UNION';
+}
+
+function serializedAsScalar(type) {
+  return type.kind === 'SCALAR';
 }
 
 function isConnection(type) {
@@ -25,31 +28,29 @@ function selectionSetForNode(connectionsSelectionSet) {
     .selectionSet;
 }
 
-function deserializeConnection(typeBundle, value, baseTypeName, registry, connectionsSelectionSet, ancestralNode, parent) {
-  const connectionType = schemaForType(typeBundle, baseTypeName);
-  const edgeType = schemaForType(typeBundle, connectionType.fieldBaseTypes.edges);
-  const nodeType = schemaForType(typeBundle, edgeType.fieldBaseTypes.node);
-
+function deserializeConnection(value, connectionsSelectionSet, registry, parent) {
   const nodesSelectionSet = selectionSetForNode(connectionsSelectionSet);
 
-  return value.edges.map((edge) => deserializeValue(typeBundle, edge.node, nodeType.name, registry, nodesSelectionSet, ancestralNode, parent));
+  return value.edges.map((edge) => deserializeValue(edge.node, nodesSelectionSet, registry, parent));
 }
 
-function deserializeValue(typeBundle, value, baseTypeName, registry, valuesSelectionSet, ancestralNode, parent) {
-  const baseType = schemaForType(typeBundle, baseTypeName);
+function deserializeValue(value, selectionSetSet, registry, parent) {
+  const baseType = selectionSetSet.typeSchema;
 
   if (Array.isArray(value)) {
-    return value.map((item) => deserializeValue(typeBundle, item, baseTypeName, registry, valuesSelectionSet, ancestralNode, parent));
+    return value.map((item) => deserializeValue(item, selectionSetSet, registry, parent));
   } else if (value === null) {
     return null;
   } else if (isConnection(baseType)) {
-    const connection = deserializeConnection(typeBundle, value, baseTypeName, registry, valuesSelectionSet, ancestralNode, parent);
+    const connection = deserializeConnection(value, selectionSetSet, registry, parent);
 
     return connection;
   } else if (serializedAsObject(baseType)) {
-    return deserializeObject(typeBundle, value, baseTypeName, registry, valuesSelectionSet, ancestralNode, parent);
-  } else {
+    return deserializeObject(value, selectionSetSet, registry, parent);
+  } else if (serializedAsScalar(baseType)) {
     return value;
+  } else {
+    throw new Error(`Unknown value type ${baseType.kind}:${baseType.name}.`);
   }
 }
 
@@ -96,31 +97,15 @@ function selectionSetForField(fieldName, selectionSet) {
 }
 
 
-export default function deserializeObject(typeBundle, objectGraph, typeName, registry = new ClassRegistry(), selectionSet, ancestralNode, parent) {
-  if (selectionSet && selectionSet.typeSchema.name !== typeName) {
-    throw new Error(`selectionSet for type "${selectionSet.typeSchema.name}" does not match typeName "${typeName}"`);
-  }
+export default function deserializeObject(data, selectionSet, registry = new ClassRegistry(), parent) {
+  const ancestry = new Ancestry(selectionSet, parent, data.id);
 
-  const objectType = schemaForType(typeBundle, typeName);
-  const ancestry = new Ancestry(selectionSet, parent, objectGraph.id);
-
-  let thisNode;
-
-  if (objectType.implementsNode) {
-    thisNode = {
-      id: objectGraph.id,
-      selectionSet
-    };
-  }
-
-
-  const attrs = Object.keys(objectGraph).reduce((acc, fieldName) => {
-    const baseTypeName = objectType.fieldBaseTypes[fieldName];
-    const value = objectGraph[fieldName];
+  const attrs = Object.keys(data).reduce((acc, fieldName) => {
+    const value = data[fieldName];
 
     const valuesSelectionSet = selectionSetForField(fieldName, selectionSet);
 
-    acc[fieldName] = deserializeValue(typeBundle, value, baseTypeName, registry, valuesSelectionSet, thisNode, ancestry); // ancestry represents the parent
+    acc[fieldName] = deserializeValue(value, valuesSelectionSet, registry, ancestry); // ancestry represents the parent
 
     return acc;
   }, {});
@@ -128,19 +113,16 @@ export default function deserializeObject(typeBundle, objectGraph, typeName, reg
   if (selectionSet) {
     attrs.ancestry = ancestry;
 
-    if (objectType.implementsNode) {
+    if (ancestry.isNode) {
       attrs.refetchQuery = function() {
-        return new Query(typeBundle, (root) => {
-          root.addInlineFragmentOn('Node', (node) => {
-            node.addField('id');
-          });
-          root.addField('node', {id: attrs.id}, (node) => {
-            node.addInlineFragmentOn(objectType.name, selectionSet);
+        return new Query(selectionSet.typeBundle, (root) => {
+          root.addField('node', {id: this.ancestry.nodeId}, (node) => {
+            node.addInlineFragmentOn(this.ancestry.selectionSet.typeSchema.name, this.ancestry.selectionSet);
           });
         });
       };
     }
   }
 
-  return new (registry.classForType(typeName))(attrs);
+  return new (registry.classForType(selectionSet.typeSchema.name))(attrs);
 }

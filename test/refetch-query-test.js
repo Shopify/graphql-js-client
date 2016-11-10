@@ -37,29 +37,25 @@ suite('Integration | Node based query generation', () => {
 
   setup(() => {
     baseQuery = new Query(typeBundle, (root) => {
-      root.addInlineFragmentOn('Node', (node) => {
-        node.addField('id');
-      });
       root.addField('shop', (shop) => {
         shop.addConnection('collections', {first: 1}, (collections) => {
+          collections.addField('id');
           collections.addField('handle');
         });
       });
     });
 
     // eslint-disable-next-line no-undefined
-    graph = deserializeObject(typeBundle, graphFixture.data, 'QueryRoot', undefined, baseQuery.selectionSet, undefined, baseQuery.selectionSet);
+    graph = deserializeObject(graphFixture.data, baseQuery.selectionSet);
   });
 
   test('Nodes can generate a query to refetch themselves', () => {
     const refetchQuery = graph.shop.collections[0].refetchQuery();
 
     assert.deepEqual(tokens(refetchQuery.toString()), tokens(`query {
-      ... on Node {
-        id
-      }
       node (id: "${collectionId}") {
         ... on Collection {
+          id
           handle
         }
       }
@@ -70,9 +66,6 @@ suite('Integration | Node based query generation', () => {
     const nextPageQuery = graph.shop.collections.nextPageQuery();
 
     assert.deepEqual(tokens(nextPageQuery.toString()), tokens(`query {
-      ... on Node {
-        id
-      }
       shop {
         collections (first: 1, after: ${collectionCursor}) {
           pageInfo {
@@ -82,6 +75,7 @@ suite('Integration | Node based query generation', () => {
           edges {
             cursor
             node {
+              id
               handle
             }
           }

@@ -45,9 +45,6 @@ function deserializeValue(value, selectionSet, registry, parent) {
     const connection = deserializeConnection(value, selectionSet, registry, parent);
 
     connection.nextPageQuery = function() {
-      const chain = parent.selectionSetsFromRoot;
-      const existingRoot = chain.shift();
-
       function addNextFieldTo(selection, setToAdd, fieldSource, rest) {
         const fieldReference = fieldSource.find((field) => {
           return field.selectionSet === setToAdd;
@@ -78,6 +75,9 @@ function deserializeValue(value, selectionSet, registry, parent) {
           }
         });
       }
+
+      const chain = parent.selectionSetsFromRoot;
+      const existingRoot = chain.shift();
 
       return new Query(selectionSet.typeBundle, (root) => {
         addNextFieldTo(root, chain.shift(), existingRoot.selections, chain);

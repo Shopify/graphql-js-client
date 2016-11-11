@@ -126,7 +126,7 @@ export default class SelectionSet {
       });
       connection.addField('edges', {}, (edges) => {
         edges.addField('cursor');
-        edges.addField('node', {}, (selectionSet || callback));
+        edges.addField('node', {}, (selectionSet || callback)); // This is bad. Don't do this
       });
     });
   }

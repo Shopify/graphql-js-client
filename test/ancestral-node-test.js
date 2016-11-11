@@ -97,4 +97,3 @@ suite('Integration | Ancestral Nodes', () => {
     assert.deepEqual(graph.shop.collections[0].products[0].options[0].ancestry.nearestNode, graph.shop.collections[0].products[0].ancestry, 'option has a nearest node of the parent product');
   });
 });
-

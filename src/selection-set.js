@@ -117,7 +117,7 @@ export default class SelectionSet {
    *                                                         SelectionSet. Or pass an existing SelectionSet.
    */
   addConnection(name, ...creationArgs) {
-    const {args, callback} = parseFieldCreationArgs(creationArgs);
+    const {args, callback, selectionSet} = parseFieldCreationArgs(creationArgs);
 
     this.addField(name, args, (connection) => {
       connection.addField('pageInfo', {}, (pageInfo) => {
@@ -126,7 +126,7 @@ export default class SelectionSet {
       });
       connection.addField('edges', {}, (edges) => {
         edges.addField('cursor');
-        edges.addField('node', {}, callback);
+        edges.addField('node', {}, (selectionSet || callback));
       });
     });
   }

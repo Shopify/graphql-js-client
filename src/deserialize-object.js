@@ -34,19 +34,59 @@ function deserializeConnection(value, connectionsSelectionSet, registry, parent)
   return value.edges.map((edge) => deserializeValue(edge.node, nodesSelectionSet, registry, parent));
 }
 
-function deserializeValue(value, selectionSetSet, registry, parent) {
-  const baseType = selectionSetSet.typeSchema;
+function deserializeValue(value, selectionSet, registry, parent) {
+  const baseType = selectionSet.typeSchema;
 
   if (Array.isArray(value)) {
-    return value.map((item) => deserializeValue(item, selectionSetSet, registry, parent));
+    return value.map((item) => deserializeValue(item, selectionSet, registry, parent));
   } else if (value === null) {
     return null;
   } else if (isConnection(baseType)) {
-    const connection = deserializeConnection(value, selectionSetSet, registry, parent);
+    const connection = deserializeConnection(value, selectionSet, registry, parent);
+
+    connection.nextPageQuery = function() {
+      const chain = parent.selectionSetsFromRoot;
+      const existingRoot = chain.shift();
+
+      function addNextFieldTo(selection, setToAdd, fieldSource, rest) {
+        const fieldReference = fieldSource.find((field) => {
+          return field.selectionSet === setToAdd;
+        });
+
+        const fieldName = fieldReference.name;
+        const args = Object.assign({}, fieldReference.args);
+
+        selection.addField(fieldName, args, (newSelection) => {
+          if (rest && rest.length) {
+            addNextFieldTo(newSelection, rest.shift(), setToAdd.selections, rest);
+          } else {
+            const connectionField = setToAdd.selections.find((field) => {
+              return field.selectionSet === selectionSet;
+            });
+            const edgesField = connectionField.selectionSet.selections.find((field) => {
+              return field.name === 'edges';
+            });
+            const nodeField = edgesField.selectionSet.selections.find((field) => {
+              return field.name === 'node';
+            });
+
+            newSelection.addConnection(
+              connectionField.name,
+              Object.assign({}, connectionField.args, {after: value.edges[value.edges.length - 1].cursor}),
+              nodeField.selectionSet
+            );
+          }
+        });
+      }
+
+      return new Query(selectionSet.typeBundle, (root) => {
+        addNextFieldTo(root, chain.shift(), existingRoot.selections, chain);
+      });
+    };
 
     return connection;
   } else if (serializedAsObject(baseType)) {
-    return deserializeObject(value, selectionSetSet, registry, parent);
+    return deserializeObject(value, selectionSet, registry, parent);
   } else if (serializedAsScalar(baseType)) {
     return value;
   } else {
@@ -67,6 +107,14 @@ class Ancestry {
     return this.selectionSet.typeSchema.implementsNode;
   }
 
+  get selectionSetsFromRoot() {
+    if (this.parent) {
+      return this.parent.selectionSetsFromRoot.concat(this.selectionSet);
+    }
+
+    return [this.selectionSet];
+  }
+
   get nearestNode() {
     if (!this.parent) {
       return null;
@@ -83,6 +131,7 @@ function selectionSetForField(fieldName, selectionSet) {
     return null;
   }
 
+  // Search fragments for the type. God.
   const valuesField = selectionSet.selections.filter((fieldOrFragment) => {
     return Field.prototype.isPrototypeOf(fieldOrFragment);
   }).find((field) => {

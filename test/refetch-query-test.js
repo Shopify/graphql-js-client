@@ -10,6 +10,7 @@ suite('Integration | Node based query generation', () => {
   const graphFixture = {
     data: {
       shop: {
+        name: 'my-shop',
         collections: {
           pageInfo: {
             hasNextPage: true
@@ -19,6 +20,18 @@ suite('Integration | Node based query generation', () => {
             node: {
               id: collectionId,
               handle: 'fancy-poles'
+            }
+          }]
+        },
+        products: {
+          pageInfo: {
+            hasNextPage: true
+          },
+          edges: [{
+            cursor: 'product-cursor',
+            node: {
+              id: 'product-id',
+              handle: 'some-product'
             }
           }]
         }
@@ -38,7 +51,12 @@ suite('Integration | Node based query generation', () => {
   setup(() => {
     baseQuery = new Query(typeBundle, (root) => {
       root.addField('shop', (shop) => {
+        shop.addField('name');
         shop.addConnection('collections', {first: 1}, (collections) => {
+          collections.addField('id');
+          collections.addField('handle');
+        });
+        shop.addConnection('products', {first: 1}, (collections) => {
           collections.addField('id');
           collections.addField('handle');
         });
@@ -67,7 +85,7 @@ suite('Integration | Node based query generation', () => {
 
     assert.deepEqual(tokens(nextPageQuery.toString()), tokens(`query {
       shop {
-        collections (first: 1, after: ${collectionCursor}) {
+        collections (first: 1, after: "${collectionCursor}") {
           pageInfo {
             hasNextPage
             hasPreviousPage

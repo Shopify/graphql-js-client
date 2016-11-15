@@ -7,6 +7,8 @@ import Query from '../src/query';
 suite('Integration | Node based query generation', () => {
   const collectionId = 'gid://shopify/Collection/67890';
   const collectionCursor = 'collection-cursor';
+  const productId = 'gid://shopify/Product/72727';
+  const variantsCursor = 'variants-cursor';
   const graphFixture = {
     data: {
       shop: {
@@ -30,8 +32,20 @@ suite('Integration | Node based query generation', () => {
           edges: [{
             cursor: 'product-cursor',
             node: {
-              id: 'product-id',
-              handle: 'some-product'
+              id: productId,
+              handle: 'some-product',
+              variants: {
+                pageInfo: {
+                  hasNextPage: true
+                },
+                edges: [{
+                  cursor: variantsCursor,
+                  node: {
+                    id: 'gid://shopify/Product/72727',
+                    title: 'large'
+                  }
+                }]
+              }
             }
           }]
         }
@@ -56,9 +70,13 @@ suite('Integration | Node based query generation', () => {
           collections.addField('id');
           collections.addField('handle');
         });
-        shop.addConnection('products', {first: 1}, (collections) => {
-          collections.addField('id');
-          collections.addField('handle');
+        shop.addConnection('products', {first: 1}, (products) => {
+          products.addField('id');
+          products.addField('handle');
+          products.addConnection('variants', {first: 1}, (variants) => {
+            variants.addField('id');
+            variants.addField('title');
+          });
         });
       });
     });
@@ -95,6 +113,32 @@ suite('Integration | Node based query generation', () => {
             node {
               id
               handle
+            }
+          }
+        }
+      }
+    }`));
+  });
+
+  test('Arrays of Nodes nested under a truncated query to fetch their next page', () => {
+    const nextPageQuery = graph.shop.products[0].variants.nextPageQuery();
+
+    assert.deepEqual(tokens(nextPageQuery.toString()), tokens(`query {
+      node (id: "${productId}") {
+        id
+        ... on Product {
+          id
+          variants (first: 1, after: "${variantsCursor}") {
+            pageInfo {
+              hasNextPage
+              hasPreviousPage
+            }
+            edges {
+              cursor
+              node {
+                id
+                title
+              }
             }
           }
         }

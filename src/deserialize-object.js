@@ -44,45 +44,82 @@ function deserializeValue(value, selectionSet, registry, parent) {
   } else if (isConnection(baseType)) {
     const connection = deserializeConnection(value, selectionSet, registry, parent);
 
-    connection.nextPageQuery = function() {
-      function addNextFieldTo(selection, setToAdd, fieldSource, rest) {
-        const fieldReference = fieldSource.find((field) => {
-          return field.selectionSet === setToAdd;
-        });
-
-        const fieldName = fieldReference.name;
-        const args = Object.assign({}, fieldReference.args);
-
-        selection.addField(fieldName, args, (newSelection) => {
-          if (rest && rest.length) {
-            addNextFieldTo(newSelection, rest.shift(), setToAdd.selections, rest);
-          } else {
-            const connectionField = setToAdd.selections.find((field) => {
-              return field.selectionSet === selectionSet;
-            });
-            const edgesField = connectionField.selectionSet.selections.find((field) => {
-              return field.name === 'edges';
-            });
-            const nodeField = edgesField.selectionSet.selections.find((field) => {
-              return field.name === 'node';
-            });
-
-            newSelection.addConnection(
-              connectionField.name,
-              Object.assign({}, connectionField.args, {after: value.edges[value.edges.length - 1].cursor}),
-              nodeField.selectionSet
-            );
-          }
-        });
-      }
-
-      const chain = parent.selectionSetsFromRoot;
-      const existingRoot = chain.shift();
-
-      return new Query(selectionSet.typeBundle, (root) => {
-        addNextFieldTo(root, chain.shift(), existingRoot.selections, chain);
+    function addNextFieldTo(selection, setToAdd, fieldSource, rest) {
+      const fieldReference = fieldSource.find((field) => {
+        return field.selectionSet === setToAdd;
       });
-    };
+
+      const fieldName = fieldReference.name;
+      const args = Object.assign({}, fieldReference.args);
+
+      selection.addField(fieldName, args, (newSelection) => {
+        if (rest && rest.length) {
+          addNextFieldTo(newSelection, rest.shift(), setToAdd.selections, rest);
+        } else {
+          const connectionField = setToAdd.selections.find((field) => {
+            return field.selectionSet === selectionSet;
+          });
+          const edgesField = connectionField.selectionSet.selections.find((field) => {
+            return field.name === 'edges';
+          });
+          const nodeField = edgesField.selectionSet.selections.find((field) => {
+            return field.name === 'node';
+          });
+
+          newSelection.addConnection(
+            connectionField.name,
+            Object.assign({}, connectionField.args, {after: value.edges[value.edges.length - 1].cursor}),
+            nodeField.selectionSet
+          );
+        }
+      });
+    }
+
+    if (parent.isNode || parent.nearestNode) {
+      connection.nextPageQuery = function() {
+        return new Query(selectionSet.typeBundle, (root) => {
+          const chain = parent.selectionSetsFromNearestNode;
+          const rootNodeId = parent.nearestNodeId;
+          const rootNodesSelectionSet = chain.shift();
+
+          root.addField('node', {id: rootNodeId}, (node) => {
+            node.addField('id');
+            node.addInlineFragmentOn(rootNodesSelectionSet.typeSchema.name, (rootNode) => {
+              if (chain.length) {
+                addNextFieldTo(rootNode, chain.unshift(), rootNodesSelectionSet.selections, chain);
+              } else {
+                const fieldReference = rootNodesSelectionSet.selections.find((field) => {
+                  return field.selectionSet === selectionSet;
+                });
+
+                const fieldName = fieldReference.name;
+                const args = Object.assign({}, fieldReference.args, {after: value.edges[value.edges.length - 1].cursor});
+
+                const edgesField = selectionSet.selections.find((field) => {
+                  return field.name === 'edges';
+                });
+                const nodeField = edgesField.selectionSet.selections.find((field) => {
+                  return field.name === 'node';
+                });
+
+                // Traverse the sets. This is the connection's set
+                rootNode.addField('id');
+                rootNode.addConnection(fieldName, args, nodeField.selectionSet);
+              }
+            });
+          });
+        });
+      };
+    } else {
+      connection.nextPageQuery = function() {
+        const chain = parent.selectionSetsFromRoot;
+        const existingRoot = chain.shift();
+
+        return new Query(selectionSet.typeBundle, (root) => {
+          addNextFieldTo(root, chain.shift(), existingRoot.selections, chain);
+        });
+      };
+    }
 
     return connection;
   } else if (serializedAsObject(baseType)) {
@@ -113,6 +150,27 @@ class Ancestry {
     }
 
     return [this.selectionSet];
+  }
+
+  get selectionSetsFromNearestNode() {
+    if (this.isNode) {
+      return [this.selectionSet]; // This is our escape condition.
+    } else if (!this.nearestNode) {
+      return null; // This is our "We don't have a parent Node" condition.
+    }
+
+    // This is where we recurse and append (default)
+    return this.parent.selectionSetsFromNearestNode.concat(this.selectionSet);
+  }
+
+  get nearestNodeId() {
+    if (this.isNode) {
+      return this.nodeId;
+    } else if (!this.nearestNode) {
+      return null;
+    }
+
+    return this.parent.nearestNodeId;
   }
 
   get nearestNode() {

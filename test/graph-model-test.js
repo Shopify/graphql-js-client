@@ -1,7 +1,7 @@
 import assert from 'assert';
 import GraphModel from '../src/graph-model';
 
-suite('Unit | GraphModel', () => {
+suite('graph-model-test', () => {
   const attrs = {
     beans: true,
     beanType: 'kidney'

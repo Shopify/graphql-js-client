@@ -70,7 +70,7 @@ const productFixture = {
   }
 };
 
-suite('Unit | deserializeObject', () => {
+suite('deserialize-object-test', () => {
   test('it creates a GraphModel from the root type', () => {
 
     const graph = deserializeObject(typeBundle, graphFixture.data, 'QueryRoot');

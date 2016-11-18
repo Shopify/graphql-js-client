@@ -145,4 +145,72 @@ suite('Integration | Node based query generation', () => {
       }
     }`));
   });
+
+  test('it can generate a query off of a node with intermediate objects', () => {
+    const nestedObjectsQuery = new Query(typeBundle, (root) => {
+      root.addField('arbitraryViewer', (viewer) => {
+        viewer.addField('aNode', (node) => {
+          node.addField('id');
+          node.addField('hostObject', (host) => {
+            host.addField('anotherHost', (anotherHost) => {
+              anotherHost.addConnection('products', {first: 1}, (products) => {
+                products.addField('id');
+                products.addField('handle');
+              });
+            });
+          });
+        });
+      });
+    });
+    const productCursor = 'product-cursor';
+    const data = {
+      arbitraryViewer: {
+        aNode: {
+          id: 'gid://shopify/ArbitraryNode/12345',
+          hostObject: {
+            anotherHost: {
+              products: {
+                edges: [{
+                  cursor: productCursor,
+                  node: {
+                    id: productId,
+                    handle: 'some-product'
+                  }
+                }]
+              }
+            }
+          }
+        }
+      }
+    };
+
+    const nestedGraph = deserializeObject(data, nestedObjectsQuery.selectionSet);
+
+    const nextPageQuery = nestedGraph.arbitraryViewer.aNode.hostObject.anotherHost.products.nextPageQuery();
+
+    assert.deepEqual(tokens(nextPageQuery.toString()), tokens(`query {
+      node (id: "gid://shopify/ArbitraryNode/12345") {
+        id
+        ... on ArbitraryNode {
+          hostObject {
+            anotherHost {
+              products (first: 1, after: "${productCursor}") {
+                pageInfo {
+                  hasNextPage
+                  hasPreviousPage
+                }
+                edges {
+                  cursor
+                  node {
+                    id
+                    handle
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }`));
+  });
 });

@@ -86,7 +86,7 @@ function deserializeValue(value, selectionSet, registry, parent) {
             node.addField('id');
             node.addInlineFragmentOn(rootNodesSelectionSet.typeSchema.name, (rootNode) => {
               if (chain.length) {
-                addNextFieldTo(rootNode, chain.unshift(), rootNodesSelectionSet.selections, chain);
+                addNextFieldTo(rootNode, chain.shift(), rootNodesSelectionSet.selections, chain);
               } else {
                 const fieldReference = rootNodesSelectionSet.selections.find((field) => {
                   return field.selectionSet === selectionSet;

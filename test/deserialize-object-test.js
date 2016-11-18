@@ -163,5 +163,3 @@ suite('deserialize-object-test', () => {
     assert.ok(ProductModel.prototype.isPrototypeOf(graph.shop.products[0]), 'product node is a product model');
   });
 });
-
-// TODO: Add a test to deserialize a request with node, and an inline fragment for type

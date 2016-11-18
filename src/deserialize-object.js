@@ -44,6 +44,7 @@ function deserializeValue(value, selectionSet, registry, parent) {
   } else if (isConnection(baseType)) {
     const connection = deserializeConnection(value, selectionSet, registry, parent);
 
+    // eslint-disable-next-line no-inner-declarations
     function addNextFieldTo(selection, setToAdd, fieldSource, rest) {
       const fieldReference = fieldSource.find((field) => {
         return field.selectionSet === setToAdd;

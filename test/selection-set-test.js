@@ -33,7 +33,7 @@ suite('selection-set-test', () => {
     });
   });
 
-  test('it doesn\'t require field args when using addField or addConnection', () => {
+  test('it doesn\'t require field args when using addField', () => {
     const set = new SelectionSet(typeBundle, 'QueryRoot');
     let addFieldCalledCallBack = false;
 
@@ -182,6 +182,77 @@ suite('selection-set-test', () => {
           hasNextPage
           hasPreviousPage
         }
+      }
+    }`));
+  });
+
+  test('it can add basic fields using shorthand add', () => {
+    const set = new SelectionSet(typeBundle, 'Shop');
+
+    set.add('name');
+
+    assert.deepEqual(tokens(set.toString()), tokens(` {
+      name
+    }`));
+  });
+
+  test('it yields another instance of SelectionSet when using add', () => {
+    const set = new SelectionSet(typeBundle, 'Shop');
+    let returnedSet;
+
+    set.add('billingAddress', (billingAddress) => {
+      returnedSet = billingAddress;
+    });
+
+    assert.ok(SelectionSet.prototype.isPrototypeOf(returnedSet));
+    assert.equal(typeBundle.Address, returnedSet.typeSchema);
+  });
+
+  test('it yields a SelectionSet representing a node when add is used on a connection', () => {
+    const set = new SelectionSet(typeBundle, 'Shop');
+    let returnedSet;
+
+    set.add('products', (products) => {
+      returnedSet = products;
+    });
+
+    assert.ok(SelectionSet.prototype.isPrototypeOf(returnedSet));
+    assert.equal(typeBundle.Product, returnedSet.typeSchema);
+  });
+
+  test('it can use use field args when using add', () => {
+    const set = new SelectionSet(typeBundle, 'Shop');
+
+    set.add('products', {first: 33}, (products) => {
+      products.addField('title');
+    });
+
+    assert.deepEqual(tokens(set.toString()), tokens(`{
+      products (first: 33) {
+        pageInfo {
+          hasNextPage
+          hasPreviousPage
+        }
+        edges {
+          cursor,
+          node {
+            title
+          }
+        }
+      }
+    }`));
+  });
+
+  test('it can use an existing SelectionSet when adding a field using add', () => {
+    const set = new SelectionSet(typeBundle, 'Shop');
+    const addressSet = new SelectionSet(typeBundle, 'Address');
+
+    addressSet.addField('city');
+    set.add('billingAddress', addressSet);
+
+    assert.deepEqual(tokens(set.toString()), tokens(`{
+      billingAddress {
+        city
       }
     }`));
   });

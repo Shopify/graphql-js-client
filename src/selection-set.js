@@ -2,6 +2,7 @@ import join from './join';
 import schemaForType from './schema-for-type';
 import formatArgs from './format-args';
 import noop from './noop';
+import isConnection from './is-connection';
 
 function parseFieldCreationArgs(creationArgs) {
   let callback = noop;
@@ -82,11 +83,28 @@ export default class SelectionSet {
   }
 
   /**
-   * will add a field to be queried to the current query node.
+   * will add a field or connection to be queried to the current query node.
    *
    * @param {String}    name The name of the field to add to the query
    * @param {Object}    [args] Arguments for the field to query
    * @param {Function}  [callback] Callback which will return a new query node for the field added
+   */
+  add(name, ...creationArgs) {
+    const fieldBaseType = schemaForType(this.typeBundle, this.typeSchema.fieldBaseTypes[name]);
+
+    if (isConnection(fieldBaseType)) {
+      this.addConnection(name, ...creationArgs);
+    } else {
+      this.addField(name, ...creationArgs);
+    }
+  }
+
+  /**
+   * will add a field to be queried to the current query node.
+   *
+   * @param {String}    name The name of the field to add to the query
+   * @param {Object}    [args] Arguments for the field to query
+   * @param {Function}  [callback] Callback which will return a new SelectionSet node for the field added
    */
   addField(name, ...creationArgs) {
     if (this.hasSelectionWithName(name)) {

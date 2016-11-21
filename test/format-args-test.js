@@ -2,7 +2,7 @@ import assert from 'assert';
 import formatArgs from '../src/format-args';
 import _enum from '../src/enum';
 
-suite('Unit | format arguments', () => {
+suite('format-args-test', () => {
   test('it formats args with only scalars', () => {
     const result = formatArgs({int: 1, float: 0.1, string: 'two', boolean: true});
 

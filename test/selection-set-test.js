@@ -2,7 +2,7 @@ import assert from 'assert';
 import SelectionSet from '../src/selection-set';
 import typeBundle from '../fixtures/types'; // eslint-disable-line import/no-unresolved
 
-suite('Unit | SelectionSet', () => {
+suite('selection-set-test', () => {
   const querySplitter = /[\s,]+/;
 
   function tokens(query) {

@@ -3,7 +3,7 @@ import Query from '../src/query';
 import Document from '../src/document';
 import typeBundle from '../fixtures/types'; // eslint-disable-line import/no-unresolved
 
-suite('Unit | Document', () => {
+suite('document-test', () => {
   const querySplitter = /[\s,]+/;
 
   function tokens(query) {

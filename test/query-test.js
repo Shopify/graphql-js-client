@@ -2,7 +2,7 @@ import assert from 'assert';
 import Query from '../src/query';
 import typeBundle from '../fixtures/types'; // eslint-disable-line import/no-unresolved
 
-suite('Unit | Query', () => {
+suite('query-test', () => {
   const querySplitter = /[\s,]+/;
 
   function splitQuery(query) {

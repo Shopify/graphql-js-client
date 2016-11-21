@@ -3,7 +3,7 @@ import Query from '../src/query';
 import variable, {VariableDefinition} from '../src/variable';
 import typeBundle from '../fixtures/types'; // eslint-disable-line import/no-unresolved
 
-suite('Unit | Query Variables', () => {
+suite('query-variables-test', () => {
   const querySplitter = /[\s,]+/;
 
   function tokens(query) {

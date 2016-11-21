@@ -86,7 +86,8 @@ export default class SelectionSet {
    *
    * @param {String}    name The name of the field to add to the query
    * @param {Object}    [args] Arguments for the field to query
-   * @param {Function}  [callback] Callback which will return a new query node for the field added
+   * @param {Function|SelectionSet}  [callback|selectionSet] Either pass a callback which will return a new
+   *                                                         SelectionSet. Or pass an existing SelectionSet.
    */
   addField(name, ...creationArgs) {
     if (this.hasSelectionWithName(name)) {
@@ -114,19 +115,25 @@ export default class SelectionSet {
    * @param {String}    name The name of the connection to add to the query
    * @param {Object}    [args] Arguments for the connection query eg. { first: 10 }
    * @param {Function|SelectionSet}  [callback|selectionSet] Either pass a callback which will return a new
-   *                                                         SelectionSet. Or pass an existing SelectionSet.
+   *                                                         SelectionSet. Or pass an existing SelectionSet
+   *                                                         representing node.
    */
   addConnection(name, ...creationArgs) {
-    const {args, callback} = parseFieldCreationArgs(creationArgs);
+    const {args, callback, selectionSet} = parseFieldCreationArgs(creationArgs);
 
     this.addField(name, args, (connection) => {
-      connection.addField('pageInfo', {}, (pageInfo) => {
+      connection.addField('pageInfo', (pageInfo) => {
         pageInfo.addField('hasNextPage');
         pageInfo.addField('hasPreviousPage');
       });
       connection.addField('edges', {}, (edges) => {
         edges.addField('cursor');
-        edges.addField('node', {}, callback);
+
+        if (selectionSet) {
+          edges.addField('node', selectionSet);
+        } else {
+          edges.addField('node', callback);
+        }
       });
     });
   }

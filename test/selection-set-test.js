@@ -185,4 +185,27 @@ suite('selection-set-test', () => {
       }
     }`));
   });
+
+  test('it can add a connection with an existing SelectionSet', () => {
+    const set = new SelectionSet(typeBundle, 'Shop');
+    const productsSet = new SelectionSet(typeBundle, 'Product');
+
+    productsSet.addField('title');
+    set.addConnection('products', {first: 10}, productsSet);
+
+    assert.deepEqual(tokens(set.toString()), tokens(`{
+      products (first: 10) {
+        pageInfo {
+          hasNextPage
+          hasPreviousPage
+        }
+        edges {
+          cursor,
+          node {
+            title
+          }
+        }
+      }
+    }`));
+  });
 });

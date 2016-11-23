@@ -19,29 +19,29 @@ suite('selection-set-test', () => {
   test('it can add basic fields', () => {
     const set = new SelectionSet(typeBundle, 'Shop');
 
-    set.addField('name');
+    set.add('name');
 
     assert.deepEqual(tokens(set.toString()), tokens(' { name }'));
   });
 
-  test('addField yields another instance of SelectionSet representing the type of the field', () => {
+  test('add yields another instance of SelectionSet representing the type of the field', () => {
     const set = new SelectionSet(typeBundle, 'QueryRoot');
 
-    set.addField('shop', {}, (shop) => {
+    set.add('shop', {}, (shop) => {
       assert.equal(typeBundle.Shop, shop.typeSchema);
       assert.ok(SelectionSet.prototype.isPrototypeOf(shop));
     });
   });
 
-  test('it doesn\'t require field args when using addField or addConnection', () => {
+  test('it doesn\'t require field args when using add or addConnection', () => {
     const set = new SelectionSet(typeBundle, 'QueryRoot');
-    let addFieldCalledCallBack = false;
+    let addCalledCallBack = false;
 
-    set.addField('shop', () => {
-      addFieldCalledCallBack = true;
+    set.add('shop', () => {
+      addCalledCallBack = true;
     });
 
-    assert.ok(addFieldCalledCallBack, 'addField called callback even if args wasn\'t passed');
+    assert.ok(addCalledCallBack, 'add called callback even if args wasn\'t passed');
   });
 
   test('it doesn\'t require query args when using addConnection', () => {
@@ -58,8 +58,8 @@ suite('selection-set-test', () => {
   test('it composes nested querys', () => {
     const set = new SelectionSet(typeBundle, 'QueryRoot');
 
-    set.addField('shop', {}, (shop) => {
-      shop.addField('name');
+    set.add('shop', {}, (shop) => {
+      shop.add('name');
     });
 
     assert.deepEqual(tokens(set.toString()), tokens(' { shop { name } }'));
@@ -68,8 +68,8 @@ suite('selection-set-test', () => {
   test('it can attach args to nested nodes', () => {
     const set = new SelectionSet(typeBundle, 'QueryRoot');
 
-    set.addField('product', {id: '1'}, (product) => {
-      product.addField('title');
+    set.add('product', {id: '1'}, (product) => {
+      product.add('title');
     });
 
     assert.deepEqual(tokens(set.toString()), tokens(' { product (id: "1") { title } }'));
@@ -78,10 +78,10 @@ suite('selection-set-test', () => {
   test('it adds connections with pagination info', () => {
     const set = new SelectionSet(typeBundle, 'QueryRoot');
 
-    set.addField('shop', {}, (shop) => {
-      shop.addField('name');
+    set.add('shop', {}, (shop) => {
+      shop.add('name');
       shop.addConnection('products', {first: 10}, (product) => {
-        product.addField('handle');
+        product.add('handle');
       });
     });
 
@@ -107,9 +107,9 @@ suite('selection-set-test', () => {
   test('it adds inline fragments', () => {
     const set = new SelectionSet(typeBundle, 'QueryRoot');
 
-    set.addField('shop', {}, (shop) => {
+    set.add('shop', {}, (shop) => {
       shop.addInlineFragmentOn('Shop', (fragment) => {
-        fragment.addField('name');
+        fragment.add('name');
       });
     });
 
@@ -127,9 +127,9 @@ suite('selection-set-test', () => {
       () => {
         const set = new SelectionSet(typeBundle, 'QueryRoot');
 
-        set.addField('shop', (shop) => {
-          shop.addField('name');
-          shop.addField('name');
+        set.add('shop', (shop) => {
+          shop.add('name');
+          shop.add('name');
         });
       },
       /The field 'name' has already been added/
@@ -140,12 +140,12 @@ suite('selection-set-test', () => {
     const shop = new SelectionSet(typeBundle, 'Shop');
     const set = new SelectionSet(typeBundle, 'QueryRoot');
 
-    shop.addField('name');
+    shop.add('name');
     shop.addConnection('products', {first: 10}, (products) => {
-      products.addField('handle');
+      products.add('handle');
     });
 
-    set.addField('shop', shop);
+    set.add('shop', shop);
 
     assert.deepEqual(tokens(set.toString()), tokens(` {
       shop {
@@ -170,11 +170,11 @@ suite('selection-set-test', () => {
     const set = new SelectionSet(typeBundle, 'Shop');
     const productConnection = new SelectionSet(typeBundle, 'ProductConnection');
 
-    productConnection.addField('pageInfo', (pageInfo) => {
-      pageInfo.addField('hasNextPage');
-      pageInfo.addField('hasPreviousPage');
+    productConnection.add('pageInfo', (pageInfo) => {
+      pageInfo.add('hasNextPage');
+      pageInfo.add('hasPreviousPage');
     });
-    set.addField('products', {first: 10}, productConnection);
+    set.add('products', {first: 10}, productConnection);
 
     assert.deepEqual(tokens(set.toString()), tokens(` {
       products (first: 10) {

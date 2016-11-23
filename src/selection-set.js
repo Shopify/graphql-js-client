@@ -141,13 +141,13 @@ export default class SelectionSet {
   addConnection(name, ...creationArgs) {
     const {args, callback, selectionSet} = parseFieldCreationArgs(creationArgs);
 
-    this.addField(name, args, (connection) => {
-      connection.addField('pageInfo', {}, (pageInfo) => {
-        pageInfo.addField('hasNextPage');
-        pageInfo.addField('hasPreviousPage');
+    this.add(name, args, (connection) => {
+      connection.add('pageInfo', {}, (pageInfo) => {
+        pageInfo.add('hasNextPage');
+        pageInfo.add('hasPreviousPage');
       });
-      connection.addField('edges', {}, (edges) => {
-        edges.addField('cursor');
+      connection.add('edges', {}, (edges) => {
+        edges.add('cursor');
         edges.addField('node', {}, (selectionSet || callback)); // This is bad. Don't do this
       });
     });

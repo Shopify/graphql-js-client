@@ -80,8 +80,10 @@ export default class SelectionSet {
       return ` { ${commaDelimitedSelections} }`;
     }
   }
-
-  add(selection) {
+  add(selection, ...rest) {
+    if (Object.prototype.toString.call(selection) === '[object String]') {
+      selection = this.field(selection, ...rest);
+    }
     if (selection.name && this.hasSelectionWithName(selection.name)) {
       throw new Error(`The field '${selection.name}' has already been added`);
     }
@@ -125,7 +127,7 @@ export default class SelectionSet {
    * @param {Function}  [callback] Callback which will return a new query node for the field added
    */
   addField(name, ...creationArgs) {
-    this.add(this.field(name, ...creationArgs));
+    this.add(name, ...creationArgs);
   }
 
   /**

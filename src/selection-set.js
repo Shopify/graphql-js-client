@@ -81,18 +81,14 @@ export default class SelectionSet {
     }
   }
 
-  /**
-   * will add a field to be queried to the current query node.
-   *
-   * @param {String}    name The name of the field to add to the query
-   * @param {Object}    [args] Arguments for the field to query
-   * @param {Function}  [callback] Callback which will return a new query node for the field added
-   */
-  addField(name, ...creationArgs) {
-    if (this.hasSelectionWithName(name)) {
-      throw new Error(`The field '${name}' has already been added`);
+  add(selection) {
+    if (selection.name && this.hasSelectionWithName(selection.name)) {
+      throw new Error(`The field '${selection.name}' has already been added`);
     }
+    this.selections.push(selection);
+  }
 
+  field(name, ...creationArgs) {
     const parsedArgs = parseFieldCreationArgs(creationArgs);
     const {args, callback} = parsedArgs;
     let {selectionSet} = parsedArgs;
@@ -101,11 +97,35 @@ export default class SelectionSet {
       const fieldBaseType = schemaForType(this.typeBundle, this.typeSchema.fieldBaseTypes[name]);
 
       selectionSet = new SelectionSet(this.typeBundle, fieldBaseType);
-
       callback(selectionSet);
     }
 
-    this.selections.push(new Field(name, args, selectionSet));
+    return new Field(name, args, selectionSet);
+  }
+
+  inlineFragmentOn(typeName, callbackOrSelectionSet = noop) {
+    let selectionSet;
+
+    if (SelectionSet.prototype.isPrototypeOf(callbackOrSelectionSet)) {
+      selectionSet = callbackOrSelectionSet;
+    } else {
+      selectionSet = new SelectionSet(this.typeBundle, schemaForType(this.typeBundle, typeName));
+
+      callbackOrSelectionSet(selectionSet);
+    }
+
+    return new InlineFragment(typeName, selectionSet);
+  }
+
+  /**
+   * will add a field to be queried to the current query node.
+   *
+   * @param {String}    name The name of the field to add to the query
+   * @param {Object}    [args] Arguments for the field to query
+   * @param {Function}  [callback] Callback which will return a new query node for the field added
+   */
+  addField(name, ...creationArgs) {
+    this.add(this.field(name, ...creationArgs));
   }
 
   /**
@@ -131,17 +151,7 @@ export default class SelectionSet {
     });
   }
 
-  addInlineFragmentOn(typeName, callbackOrSelectionSet = noop) {
-    let selectionSet;
-
-    if (SelectionSet.prototype.isPrototypeOf(callbackOrSelectionSet)) {
-      selectionSet = callbackOrSelectionSet;
-    } else {
-      selectionSet = new SelectionSet(this.typeBundle, schemaForType(this.typeBundle, typeName));
-
-      callbackOrSelectionSet(selectionSet);
-    }
-
-    this.selections.push(new InlineFragment(typeName, selectionSet));
+  addInlineFragmentOn(typeName, fieldTypeCb = noop) {
+    this.add(this.inlineFragmentOn(typeName, fieldTypeCb));
   }
 }

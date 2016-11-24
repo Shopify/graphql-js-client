@@ -25,6 +25,16 @@ suite('selection-set-test', () => {
     assert.deepEqual(tokens(set.toString()), tokens(' { name }'));
   });
 
+  test('add can take Field or InlineFragment objects directly', () => {
+    const set = new SelectionSet(typeBundle, 'Shop', (shop) => {
+      shop.add(shop.inlineFragmentOn('Shop', (fragment) => {
+        fragment.add(shop.field('name'));
+      }));
+    });
+
+    assert.deepEqual(tokens(set.toString()), tokens(' { ... on Shop { name } }'));
+  });
+
   test('add yields an instance of SelectionSetBuilder representing the type of the field', () => {
     let shopBuilder = null;
 

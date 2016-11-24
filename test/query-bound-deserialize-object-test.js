@@ -66,10 +66,10 @@ suite('Integration | Query bound object graph', () => {
     graph = deserializeObject(graphFixture.data, baseQuery.selectionSet);
   });
 
-  test('it binds SelectionSets through ancestry', () => {
-    assert.equal(graph.ancestry.selectionSet, boundRoot);
-    assert.equal(graph.shop.ancestry.selectionSet, boundShop);
-    assert.equal(graph.shop.products[0].ancestry.selectionSet, boundProducts);
-    assert.equal(graph.shop.products[0].images[0].ancestry.selectionSet, boundImages);
+  test('it binds selections through ancestry', () => {
+    assert.deepEqual(graph.ancestry.selectionSet.selections, boundRoot.selections);
+    assert.deepEqual(graph.shop.ancestry.selectionSet.selections, boundShop.selections);
+    assert.deepEqual(graph.shop.products[0].ancestry.selectionSet.selections, boundProducts.selections);
+    assert.deepEqual(graph.shop.products[0].images[0].ancestry.selectionSet.selections, boundImages.selections);
   });
 });

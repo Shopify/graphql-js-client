@@ -51,9 +51,8 @@ class InlineFragment {
   }
 }
 
-
 export default class SelectionSet {
-  constructor(typeBundle, type) {
+  constructor(typeBundle, type, builderFunction) {
     if (typeof type === 'string') {
       this.typeSchema = schemaForType(typeBundle, type);
     } else {
@@ -61,12 +60,10 @@ export default class SelectionSet {
     }
     this.typeBundle = typeBundle;
     this.selections = [];
-  }
-
-  hasSelectionWithName(name) {
-    return this.selections.some((field) => {
-      return field.name === name;
-    });
+    if (builderFunction) {
+      // eslint-disable-next-line no-use-before-define
+      builderFunction(new SelectionSetBuilder(this.typeBundle, this.typeSchema, this.selections));
+    }
   }
 
   toString() {
@@ -80,7 +77,24 @@ export default class SelectionSet {
       return ` { ${commaDelimitedSelections} }`;
     }
   }
-  add(selection, ...rest) {
+}
+
+class SelectionSetBuilder {
+  constructor(typeBundle, typeSchema, selections) {
+    this.typeBundle = typeBundle;
+    this.typeSchema = typeSchema;
+    this.selections = selections;
+  }
+
+  hasSelectionWithName(name) {
+    return this.selections.some((field) => {
+      return field.name === name;
+    });
+  }
+
+  add(selectionOrFieldName, ...rest) {
+    let selection = selectionOrFieldName;
+
     if (Object.prototype.toString.call(selection) === '[object String]') {
       selection = this.field(selection, ...rest);
     }
@@ -98,22 +112,23 @@ export default class SelectionSet {
     if (!selectionSet) {
       const fieldBaseType = schemaForType(this.typeBundle, this.typeSchema.fieldBaseTypes[name]);
 
-      selectionSet = new SelectionSet(this.typeBundle, fieldBaseType);
-      callback(selectionSet);
+      selectionSet = new SelectionSet(this.typeBundle, fieldBaseType, callback);
     }
 
     return new Field(name, args, selectionSet);
   }
 
-  inlineFragmentOn(typeName, callbackOrSelectionSet = noop) {
+  inlineFragmentOn(typeName, builderFunctionOrSelectionSet = noop) {
     let selectionSet;
 
-    if (SelectionSet.prototype.isPrototypeOf(callbackOrSelectionSet)) {
-      selectionSet = callbackOrSelectionSet;
+    if (SelectionSet.prototype.isPrototypeOf(builderFunctionOrSelectionSet)) {
+      selectionSet = builderFunctionOrSelectionSet;
     } else {
-      selectionSet = new SelectionSet(this.typeBundle, schemaForType(this.typeBundle, typeName));
-
-      callbackOrSelectionSet(selectionSet);
+      selectionSet = new SelectionSet(
+        this.typeBundle,
+        schemaForType(this.typeBundle, typeName),
+        builderFunctionOrSelectionSet
+      );
     }
 
     return new InlineFragment(typeName, selectionSet);

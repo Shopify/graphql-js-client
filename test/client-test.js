@@ -9,6 +9,25 @@ import GraphModel from '../src/graph-model';
 suite('client-test', () => {
   const client = new Client(typeBundle, '/graphql');
 
+  test('it sends args to static defaultFetcher method to construct a fetcher function', () => {
+    let defaultFetcherArgs = null;
+
+    function uselessFetcher() {
+      return Promise.resolve({});
+    }
+    class MockClient extends Client {
+      static defaultFetcher(...args) {
+        defaultFetcherArgs = args;
+
+        return uselessFetcher;
+      }
+    }
+    const mockClient = new MockClient(typeBundle, '/graphql', {mode: 'cors'});
+
+    assert.deepEqual(defaultFetcherArgs, ['/graphql', {mode: 'cors'}]);
+    assert.equal(mockClient.fetcher, uselessFetcher);
+  });
+
   test('it has a type bundle', () => {
     assert.deepEqual(client.typeBundle, typeBundle);
   });

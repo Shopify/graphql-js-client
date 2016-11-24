@@ -3,7 +3,7 @@ import Query from './query';
 import deserializeObject from './deserialize-object';
 
 export default class Client {
-  static defaultFetcher(url) {
+  static defaultFetcher(url, fetchOptionOverrides = null) {
     return function fetcher(graphQLParams) {
       return fetch(url, { // eslint-disable-line no-undef
         method: 'POST',
@@ -11,17 +11,18 @@ export default class Client {
           'Content-Type': 'application/json',
           Accept: 'application/json'
         },
-        body: JSON.stringify(graphQLParams)
+        body: JSON.stringify(graphQLParams),
+        ...fetchOptionOverrides
       }).then((response) => response.json());
     };
   }
 
-  constructor(typeBundle, urlOrFetcherFunction) {
+  constructor(typeBundle, urlOrFetcherFunction, ...rest) {
     this.typeBundle = typeBundle;
     if (Object.prototype.toString.call(urlOrFetcherFunction) === '[object Function]') {
       this.fetcher = urlOrFetcherFunction;
     } else {
-      this.fetcher = this.constructor.defaultFetcher(urlOrFetcherFunction);
+      this.fetcher = this.constructor.defaultFetcher(urlOrFetcherFunction, ...rest);
     }
   }
 

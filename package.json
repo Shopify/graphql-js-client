@@ -50,7 +50,7 @@
     "test:build-dist": "cross-env BABEL_ENV='tdd' node scripts/test-build-once.js dist/tests.js",
     "test:livereload-server": "node scripts/livereload.js",
     "prepublish": "babel -d lib/ src/",
-    "mocha": "npm run types-fixture:build && cross-env BABEL_ENV='development' mocha --compilers js:babel-register -u tdd $(npm run -s mocha:reporter-args) test/**/*.js",
+    "mocha": "npm run types-fixture:build && cross-env mocha --compilers js:babel-register -u tdd $(npm run -s mocha:reporter-args) test/**/*.js",
     "mocha:reporter-args": "[ -n \"${CI}\" ] && echo --reporter xunit --reporter-options output=$CIRCLE_TEST_REPORTS/junit/mocha.xml",
     "lint": "eslint --max-warnings 0 -c .eslintrc.json $(npm run -s lint:reporter-args) src/ test/",
     "lint:reporter-args": "[ -n \"${CI}\" ] && echo -o $CIRCLE_TEST_REPORTS/junit/eslint.xml -f junit",

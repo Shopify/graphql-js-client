@@ -35,8 +35,8 @@ export default class Client {
     return new Query(this.typeBundle, ...args);
   }
 
-  send(queryOrDocument, variableValues = null, otherProperties = null) {
-    const graphQLParams = {query: queryOrDocument.toString()};
+  send(query, variableValues = null, otherProperties = null) {
+    const graphQLParams = {query: query.toString()};
 
     if (variableValues) {
       graphQLParams.variables = variableValues;
@@ -45,7 +45,7 @@ export default class Client {
 
     return this.fetcher(graphQLParams).then((response) => {
       if (response.data) {
-        response.model = deserializeObject(this.typeBundle, response.data, 'QueryRoot');
+        response.model = deserializeObject(response.data, query.selectionSet);
       }
 
       return response;

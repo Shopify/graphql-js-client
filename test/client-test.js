@@ -70,10 +70,9 @@ suite('client-test', () => {
 
     return mockingClient.send(query).then((response) => {
       assert.deepEqual(fetcherParams, {query: query.toString()});
-      assert.deepEqual(response, {
-        data: {shop: {name: 'Snowdevil'}},
-        model: new GraphModel({shop: new GraphModel({name: 'Snowdevil'})})
-      });
+      assert.deepEqual(response.data, {shop: {name: 'Snowdevil'}});
+      assert.equal(response.model.shop.name, 'Snowdevil');
+      assert.ok(response.model instanceof GraphModel);
     });
   });
 });

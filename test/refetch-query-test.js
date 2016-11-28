@@ -41,7 +41,7 @@ suite('Integration | Node based query generation', () => {
                 edges: [{
                   cursor: variantsCursor,
                   node: {
-                    id: 'gid://shopify/Product/72727',
+                    id: 'gid://shopify/ProductVariant/72727',
                     title: 'large'
                   }
                 }]

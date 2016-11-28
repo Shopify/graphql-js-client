@@ -30,7 +30,7 @@ function parseFieldCreationArgs(creationArgs) {
   return {args, selectionSet, callback};
 }
 
-class Field {
+export class Field {
   constructor(name, args, selectionSet) {
     this.name = name;
     this.args = args;
@@ -117,7 +117,7 @@ export default class SelectionSet {
    *                                                         SelectionSet. Or pass an existing SelectionSet.
    */
   addConnection(name, ...creationArgs) {
-    const {args, callback} = parseFieldCreationArgs(creationArgs);
+    const {args, callback, selectionSet} = parseFieldCreationArgs(creationArgs);
 
     this.addField(name, args, (connection) => {
       connection.addField('pageInfo', {}, (pageInfo) => {
@@ -126,15 +126,22 @@ export default class SelectionSet {
       });
       connection.addField('edges', {}, (edges) => {
         edges.addField('cursor');
-        edges.addField('node', {}, callback);
+        edges.addField('node', {}, (selectionSet || callback)); // This is bad. Don't do this
       });
     });
   }
 
-  addInlineFragmentOn(typeName, fieldTypeCb = noop) {
-    const selectionSet = new SelectionSet(this.typeBundle, schemaForType(this.typeBundle, typeName));
+  addInlineFragmentOn(typeName, callbackOrSelectionSet = noop) {
+    let selectionSet;
 
-    fieldTypeCb(selectionSet);
+    if (SelectionSet.prototype.isPrototypeOf(callbackOrSelectionSet)) {
+      selectionSet = callbackOrSelectionSet;
+    } else {
+      selectionSet = new SelectionSet(this.typeBundle, schemaForType(this.typeBundle, typeName));
+
+      callbackOrSelectionSet(selectionSet);
+    }
+
     this.selections.push(new InlineFragment(typeName, selectionSet));
   }
 }

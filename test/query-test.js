@@ -10,8 +10,8 @@ suite('query-test', () => {
   }
 
   function buildQuery(root) {
-    root.addField('shop', (shop) => {
-      shop.addField('name');
+    root.add('shop', (shop) => {
+      shop.add('name');
     });
   }
 

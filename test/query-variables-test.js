@@ -20,8 +20,8 @@ suite('query-variables-test', () => {
     const variableId = variable('id', 'ID!');
 
     const query = new Query(typeBundle, [variableId], (root) => {
-      root.addField('product', {id: variableId}, (product) => {
-        product.addField('title');
+      root.add('product', {id: variableId}, (product) => {
+        product.add('title');
       });
     });
 
@@ -36,8 +36,8 @@ suite('query-variables-test', () => {
     const variableId = variable('id', 'ID!');
 
     const query = new Query(typeBundle, 'bestQueryEver', [variableId], (root) => {
-      root.addField('product', {id: variableId}, (product) => {
-        product.addField('title');
+      root.add('product', {id: variableId}, (product) => {
+        product.add('title');
       });
     });
 
@@ -53,9 +53,9 @@ suite('query-variables-test', () => {
     const variableAfter = variable('after', 'String');
 
     const query = new Query(typeBundle, [variableCount, variableAfter], (root) => {
-      root.addField('shop', (shop) => {
+      root.add('shop', (shop) => {
         shop.addConnection('products', {first: variableCount, after: variableAfter}, (product) => {
-          product.addField('title');
+          product.add('title');
         });
       });
     });

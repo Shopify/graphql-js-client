@@ -51,9 +51,8 @@ class InlineFragment {
   }
 }
 
-
 export default class SelectionSet {
-  constructor(typeBundle, type) {
+  constructor(typeBundle, type, builderFunction) {
     if (typeof type === 'string') {
       this.typeSchema = schemaForType(typeBundle, type);
     } else {
@@ -61,12 +60,10 @@ export default class SelectionSet {
     }
     this.typeBundle = typeBundle;
     this.selections = [];
-  }
-
-  hasSelectionWithName(name) {
-    return this.selections.some((field) => {
-      return field.name === name;
-    });
+    if (builderFunction) {
+      // eslint-disable-next-line no-use-before-define
+      builderFunction(new SelectionSetBuilder(this.typeBundle, this.typeSchema, this.selections));
+    }
   }
 
   toString() {
@@ -80,6 +77,62 @@ export default class SelectionSet {
       return ` { ${commaDelimitedSelections} }`;
     }
   }
+}
+
+class SelectionSetBuilder {
+  constructor(typeBundle, typeSchema, selections) {
+    this.typeBundle = typeBundle;
+    this.typeSchema = typeSchema;
+    this.selections = selections;
+  }
+
+  hasSelectionWithName(name) {
+    return this.selections.some((field) => {
+      return field.name === name;
+    });
+  }
+
+  add(selectionOrFieldName, ...rest) {
+    let selection = selectionOrFieldName;
+
+    if (Object.prototype.toString.call(selection) === '[object String]') {
+      selection = this.field(selection, ...rest);
+    }
+    if (selection.name && this.hasSelectionWithName(selection.name)) {
+      throw new Error(`The field '${selection.name}' has already been added`);
+    }
+    this.selections.push(selection);
+  }
+
+  field(name, ...creationArgs) {
+    const parsedArgs = parseFieldCreationArgs(creationArgs);
+    const {args, callback} = parsedArgs;
+    let {selectionSet} = parsedArgs;
+
+    if (!selectionSet) {
+      const fieldBaseType = schemaForType(this.typeBundle, this.typeSchema.fieldBaseTypes[name]);
+
+      selectionSet = new SelectionSet(this.typeBundle, fieldBaseType, callback);
+    }
+
+    return new Field(name, args, selectionSet);
+  }
+
+  inlineFragmentOn(typeName, builderFunctionOrSelectionSet = noop) {
+    let selectionSet;
+
+    if (SelectionSet.prototype.isPrototypeOf(builderFunctionOrSelectionSet)) {
+      selectionSet = builderFunctionOrSelectionSet;
+    } else {
+      selectionSet = new SelectionSet(
+        this.typeBundle,
+        schemaForType(this.typeBundle, typeName),
+        builderFunctionOrSelectionSet
+      );
+    }
+
+    return new InlineFragment(typeName, selectionSet);
+  }
 
   /**
    * will add a field to be queried to the current query node.
@@ -89,23 +142,7 @@ export default class SelectionSet {
    * @param {Function}  [callback] Callback which will return a new query node for the field added
    */
   addField(name, ...creationArgs) {
-    if (this.hasSelectionWithName(name)) {
-      throw new Error(`The field '${name}' has already been added`);
-    }
-
-    const parsedArgs = parseFieldCreationArgs(creationArgs);
-    const {args, callback} = parsedArgs;
-    let {selectionSet} = parsedArgs;
-
-    if (!selectionSet) {
-      const fieldBaseType = schemaForType(this.typeBundle, this.typeSchema.fieldBaseTypes[name]);
-
-      selectionSet = new SelectionSet(this.typeBundle, fieldBaseType);
-
-      callback(selectionSet);
-    }
-
-    this.selections.push(new Field(name, args, selectionSet));
+    this.add(name, ...creationArgs);
   }
 
   /**
@@ -119,29 +156,19 @@ export default class SelectionSet {
   addConnection(name, ...creationArgs) {
     const {args, callback, selectionSet} = parseFieldCreationArgs(creationArgs);
 
-    this.addField(name, args, (connection) => {
-      connection.addField('pageInfo', {}, (pageInfo) => {
-        pageInfo.addField('hasNextPage');
-        pageInfo.addField('hasPreviousPage');
+    this.add(name, args, (connection) => {
+      connection.add('pageInfo', {}, (pageInfo) => {
+        pageInfo.add('hasNextPage');
+        pageInfo.add('hasPreviousPage');
       });
-      connection.addField('edges', {}, (edges) => {
-        edges.addField('cursor');
+      connection.add('edges', {}, (edges) => {
+        edges.add('cursor');
         edges.addField('node', {}, (selectionSet || callback)); // This is bad. Don't do this
       });
     });
   }
 
-  addInlineFragmentOn(typeName, callbackOrSelectionSet = noop) {
-    let selectionSet;
-
-    if (SelectionSet.prototype.isPrototypeOf(callbackOrSelectionSet)) {
-      selectionSet = callbackOrSelectionSet;
-    } else {
-      selectionSet = new SelectionSet(this.typeBundle, schemaForType(this.typeBundle, typeName));
-
-      callbackOrSelectionSet(selectionSet);
-    }
-
-    this.selections.push(new InlineFragment(typeName, selectionSet));
+  addInlineFragmentOn(typeName, fieldTypeCb = noop) {
+    this.add(this.inlineFragmentOn(typeName, fieldTypeCb));
   }
 }

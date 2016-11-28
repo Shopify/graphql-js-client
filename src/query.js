@@ -49,10 +49,9 @@ export default class Query {
     const {name, variables, selectionSetCallback} = parseArgs(args);
 
     this.typeBundle = typeBundle;
-    this.selectionSet = new SelectionSet(typeBundle, 'QueryRoot');
     this.name = name;
     this.variableDefinitions = new VariableDefinitions(variables);
-    selectionSetCallback(this.selectionSet);
+    this.selectionSet = new SelectionSet(typeBundle, 'QueryRoot', selectionSetCallback);
   }
 
   get isAnonymous() {

@@ -125,7 +125,6 @@ suite('Integration | Node based query generation', () => {
 
     assert.deepEqual(tokens(nextPageQuery.toString()), tokens(`query {
       node (id: "${productId}") {
-        id
         ... on Product {
           id
           variants (first: 1, after: "${variantsCursor}") {
@@ -190,8 +189,8 @@ suite('Integration | Node based query generation', () => {
 
     assert.deepEqual(tokens(nextPageQuery.toString()), tokens(`query {
       node (id: "gid://shopify/ArbitraryNode/12345") {
-        id
         ... on ArbitraryNode {
+          id
           hostObject {
             anotherHost {
               products (first: 1, after: "${productCursor}") {

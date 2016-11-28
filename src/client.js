@@ -11,6 +11,7 @@ export default class Client {
           'Content-Type': 'application/json',
           Accept: 'application/json'
         },
+        mode: 'cors',
         body: JSON.stringify(graphQLParams),
         ...fetchOptionOverrides
       }).then((response) => response.json());

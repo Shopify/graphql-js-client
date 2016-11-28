@@ -22,9 +22,9 @@ suite('client-test', () => {
         return uselessFetcher;
       }
     }
-    const mockClient = new MockClient(typeBundle, '/graphql', {mode: 'cors'});
+    const mockClient = new MockClient(typeBundle, '/graphql', {mode: 'no-cors'});
 
-    assert.deepEqual(defaultFetcherArgs, ['/graphql', {mode: 'cors'}]);
+    assert.deepEqual(defaultFetcherArgs, ['/graphql', {mode: 'no-cors'}]);
     assert.equal(mockClient.fetcher, uselessFetcher);
   });
 

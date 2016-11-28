@@ -5,7 +5,7 @@ import deserializeObject from './deserialize-object';
 export default class Client {
   static defaultFetcher(url, fetchOptionOverrides = null) {
     return function fetcher(graphQLParams) {
-      return fetch(url, { // eslint-disable-line no-undef
+      return fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

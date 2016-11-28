@@ -1,4 +1,5 @@
 import Query from './query';
+import Mutation from './mutation';
 import join from './join';
 
 function isAnonymous(query) {
@@ -25,12 +26,26 @@ function extractQuery(typeBundle, ...args) {
   return new Query(typeBundle, ...args);
 }
 
+function extractMutation(typeBundle, ...args) {
+  if (Mutation.prototype.isPrototypeOf(args[0])) {
+    return args[0];
+  }
+
+  return new Mutation(typeBundle, ...args);
+}
+
 function isInvalidQueryCombination(queries) {
   if (queries.length === 1) {
     return false;
   }
 
   return hasAnonymousQueries(queries) || hasDuplicateQueryNames(queries);
+}
+
+function validateQueries(queries) {
+  if (isInvalidQueryCombination(queries)) {
+    throw new Error('All queries must be named with unique names in a multi-query document');
+  }
 }
 
 export default class Document {
@@ -55,9 +70,15 @@ export default class Document {
   addQuery(...args) {
     const query = extractQuery(this.typeBundle, ...args);
 
-    if (isInvalidQueryCombination(this.queries.concat(query))) {
-      throw new Error('All queries must be named on a multi-query document');
-    }
+    validateQueries(this.queries.concat(query));
+
+    this.queries.push(query);
+  }
+
+  addMutation(...args) {
+    const query = extractMutation(this.typeBundle, ...args);
+
+    validateQueries(this.queries.concat(query));
 
     this.queries.push(query);
   }

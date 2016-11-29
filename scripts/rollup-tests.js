@@ -1,3 +1,4 @@
+/* eslint-env node */
 const rollup = require('rollup');
 const commonjs = require('rollup-plugin-commonjs');
 const nodeResolve = require('rollup-plugin-node-resolve');
@@ -10,6 +11,16 @@ function rollupTests(dest, cache) {
   return rollup.rollup({
     entry: 'test/**/*.js',
     plugins: [
+      {
+        name: 'lint-tests',
+        resolveId(importee) {
+          if (importee === 'lint-tests') {
+            return '.tmp/lints/results.js';
+          }
+
+          return null;
+        }
+      },
       globals(),
       builtins(),
       nodeResolve({
@@ -34,9 +45,9 @@ function rollupTests(dest, cache) {
     }).then(() => {
       return bundle;
     });
-  }).catch((e) => {
-    console.error(e);
-    throw e;
+  }).catch((error) => {
+    console.error(error); // eslint-disable-line no-console
+    throw error;
   });
 }
 

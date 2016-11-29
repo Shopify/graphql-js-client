@@ -13,7 +13,7 @@
     "babel-cli": "6.18.0",
     "babel-core": "6.18.0",
     "babel-plugin-add-shopify-header": "1.0.6",
-    "babel-plugin-eslint-test-generator": "1.0.2",
+    "eslint-test-generator": "1.0.5",
     "babel-plugin-external-helpers": "6.18.0",
     "babel-preset-es2015-rollup": "1.2.0",
     "babel-preset-shopify": "15.0.1",
@@ -42,7 +42,7 @@
   "scripts": {
     "start": "npm run clean && npm run setup-paths && concurrently 'npm run test:tdd-deps' 'npm run test:livereload-server' 'npm run test:watch' 'http-server -p 4200 .tmp/test' 'npm run -s print-start-message'",
     "clean": "rimraf .tmp dist",
-    "setup-paths": "mkdir -p dist .tmp/test",
+    "setup-paths": "mkdir -p dist .tmp/test .tmp/lints",
     "test": "npm run lint && npm run mocha",
     "test:tdd-deps": "concurrently 'npm run test:copy-deps' 'npm run types-fixture:build'",
     "test:copy-deps": "cp test/index.html node_modules/mocha/mocha.* node_modules/jquery/dist/jquery.slim.min.js .tmp/test/ && cp node_modules/expect.js/index.js .tmp/test/expect.js",

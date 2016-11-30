@@ -6,21 +6,18 @@ const multyEntry = require('rollup-plugin-multi-entry');
 const builtins = require('rollup-plugin-node-builtins');
 const globals = require('rollup-plugin-node-globals');
 const babel = require('rollup-plugin-babel');
+const eslintTestGenerator = require('./rollup-plugin-eslint-test-generator');
 
 function rollupTests(dest, cache) {
   return rollup.rollup({
     entry: 'test/**/*.js',
     plugins: [
-      {
-        name: 'lint-tests',
-        resolveId(importee) {
-          if (importee === 'lint-tests') {
-            return '.tmp/lints/results.js';
-          }
-
-          return null;
-        }
-      },
+      eslintTestGenerator({
+        paths: [
+          'src',
+          'test'
+        ]
+      }),
       globals(),
       builtins(),
       nodeResolve({

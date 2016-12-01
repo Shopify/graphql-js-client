@@ -1,3 +1,4 @@
+/* eslint-env node */
 const rollup = require('rollup');
 const commonjs = require('rollup-plugin-commonjs');
 const nodeResolve = require('rollup-plugin-node-resolve');
@@ -5,11 +6,18 @@ const multyEntry = require('rollup-plugin-multi-entry');
 const builtins = require('rollup-plugin-node-builtins');
 const globals = require('rollup-plugin-node-globals');
 const babel = require('rollup-plugin-babel');
+const eslintTestGenerator = require('./rollup-plugin-eslint-test-generator');
 
 function rollupTests(dest, cache) {
   return rollup.rollup({
     entry: 'test/**/*.js',
     plugins: [
+      eslintTestGenerator({
+        paths: [
+          'src',
+          'test'
+        ]
+      }),
       globals(),
       builtins(),
       nodeResolve({
@@ -34,9 +42,9 @@ function rollupTests(dest, cache) {
     }).then(() => {
       return bundle;
     });
-  }).catch((e) => {
-    console.error(e);
-    throw e;
+  }).catch((error) => {
+    console.error(error); // eslint-disable-line no-console
+    throw error;
   });
 }
 

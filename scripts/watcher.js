@@ -73,7 +73,7 @@ function createSubscriptions(client, dirsAndExtensions) {
           ['not', 'empty'],
           ['suffix', extension]
         ],
-        fields: ['name']
+        fields: ['name', 'mtime_ms', 'exists']
       }], handleSubscriptionCreation)
     });
   });

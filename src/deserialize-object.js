@@ -53,7 +53,7 @@ function deserializeValue(value, selectionSet, registry, parent) {
       const fieldName = fieldReference.name;
       const args = Object.assign({}, fieldReference.args);
 
-      selection.addField(fieldName, args, (newSelection) => {
+      selection.add(fieldName, args, (newSelection) => {
         if (rest && rest.length) {
           addNextFieldTo(newSelection, rest.shift(), setToAdd.selections, rest);
         } else {
@@ -83,7 +83,7 @@ function deserializeValue(value, selectionSet, registry, parent) {
           const rootNodeId = parent.nearestNodeId;
           const rootNodesSelectionSet = chain.shift();
 
-          root.addField('node', {id: rootNodeId}, (node) => {
+          root.add('node', {id: rootNodeId}, (node) => {
             node.addInlineFragmentOn(rootNodesSelectionSet.typeSchema.name, (rootNode) => {
               if (chain.length) {
                 addNextFieldTo(rootNode, chain.shift(), rootNodesSelectionSet.selections, chain);

@@ -51,6 +51,18 @@ class InlineFragment {
   }
 }
 
+function selectionsHaveIdField(selections) {
+  return selections.some((fieldOrFragment) => {
+    if (Field.prototype.isPrototypeOf(fieldOrFragment)) {
+      return fieldOrFragment.name === 'id';
+    } else if (InlineFragment.prototype.isPrototypeOf(fieldOrFragment) && fieldOrFragment.selectionSet.typeSchema.implementsNode) {
+      return selectionsHaveIdField(fieldOrFragment.selectionSet.selections);
+    }
+
+    return false;
+  });
+}
+
 export default class SelectionSet {
   constructor(typeBundle, type, builderFunction) {
     if (typeof type === 'string') {
@@ -63,6 +75,12 @@ export default class SelectionSet {
     if (builderFunction) {
       // eslint-disable-next-line no-use-before-define
       builderFunction(new SelectionSetBuilder(this.typeBundle, this.typeSchema, this.selections));
+    }
+
+    if (this.typeSchema.implementsNode || this.typeSchema.name === 'Node') {
+      if (!selectionsHaveIdField(this.selections)) {
+        this.selections.unshift(new Field('id', {}, new SelectionSet(typeBundle, 'ID')));
+      }
     }
   }
 

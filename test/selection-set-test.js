@@ -88,7 +88,7 @@ suite('selection-set-test', () => {
       });
     });
 
-    assert.deepEqual(tokens(set.toString()), tokens(' { product (id: "1") { title } }'));
+    assert.deepEqual(tokens(set.toString()), tokens(' { product (id: "1") { id, title } }'));
   });
 
   test('it adds connections with pagination info', () => {
@@ -112,6 +112,7 @@ suite('selection-set-test', () => {
           edges {
             cursor,
             node {
+              id
               handle
             }
           }
@@ -174,6 +175,7 @@ suite('selection-set-test', () => {
           edges {
             cursor,
             node {
+              id
               handle
             }
           }

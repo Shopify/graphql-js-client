@@ -27,6 +27,7 @@ suite('query-variables-test', () => {
 
     assert.deepEqual(tokens(query.toString()), tokens(`query ($id:ID!) {
       product (id: $id) {
+        id
         title
       }
     }`));
@@ -43,6 +44,7 @@ suite('query-variables-test', () => {
 
     assert.deepEqual(tokens(query.toString()), tokens(`query bestQueryEver ($id:ID!) {
       product (id: $id) {
+        id
         title
       }
     }`));
@@ -70,6 +72,7 @@ suite('query-variables-test', () => {
           edges {
             cursor
             node {
+              id
               title
             }
           }

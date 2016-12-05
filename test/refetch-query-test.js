@@ -67,14 +67,11 @@ suite('Integration | Node based query generation', () => {
       root.addField('shop', (shop) => {
         shop.addField('name');
         shop.addConnection('collections', {first: 1}, (collections) => {
-          collections.addField('id');
           collections.addField('handle');
         });
         shop.addConnection('products', {first: 1}, (products) => {
-          products.addField('id');
           products.addField('handle');
           products.addConnection('variants', {first: 1}, (variants) => {
-            variants.addField('id');
             variants.addField('title');
           });
         });
@@ -149,11 +146,9 @@ suite('Integration | Node based query generation', () => {
     const nestedObjectsQuery = new Query(typeBundle, (root) => {
       root.addField('arbitraryViewer', (viewer) => {
         viewer.addField('aNode', (node) => {
-          node.addField('id');
           node.addField('hostObject', (host) => {
             host.addField('anotherHost', (anotherHost) => {
               anotherHost.addConnection('products', {first: 1}, (products) => {
-                products.addField('id');
                 products.addField('handle');
               });
             });

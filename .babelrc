@@ -15,6 +15,14 @@
         }],
         "es2015-rollup"
       ]
+    },
+    "cli-tdd": {
+      "presets": [
+        ["shopify/node", {
+          "modules": false
+        }],
+        "es2015-rollup"
+      ]
     }
   }
 }

@@ -1,6 +1,4 @@
 machine:
-  environment:
-    BABEL_ENV: development
   node:
     version: v6.7.0
 dependencies:

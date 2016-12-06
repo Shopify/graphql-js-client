@@ -2,18 +2,22 @@
   "plugins": [
     ["add-shopify-header", {"files": [ "src/index.js" ]}],
   ],
+  "presets": [
+    "es2015-rollup"
+  ],
   "env": {
-    "development": {
-      "presets": [
-        "shopify"
-      ]
-    },
-    "tdd": {
+    "browser": {
       "presets": [
         ["shopify/web", {
           "modules": false
-        }],
-        "es2015-rollup"
+        }]
+      ]
+    },
+    "node": {
+      "presets": [
+        ["shopify/node", {
+          "modules": false
+        }]
       ]
     }
   }

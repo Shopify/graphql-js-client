@@ -8,36 +8,51 @@ const globals = require('rollup-plugin-node-globals');
 const babel = require('rollup-plugin-babel');
 const eslintTestGenerator = require('./rollup-plugin-eslint-test-generator');
 
-function rollupTests(dest, cache) {
+function envRollupInfo({browser}) {
+  const format = (browser) ? 'iife' : 'cjs';
+  const plugins = [
+    eslintTestGenerator({
+      paths: [
+        'src',
+        'test'
+      ]
+    }),
+    nodeResolve({
+      jsnext: true,
+      main: true
+    }),
+    commonjs({
+      include: 'node_modules/**',
+      sourceMap: false
+    }),
+    multyEntry({
+      exports: false
+    }),
+    babel()
+  ];
+  const external = [];
+
+  if (browser) {
+    plugins.unshift(globals(), builtins());
+  } else {
+    external.push('fs', 'assert');
+  }
+
+  return {plugins, external, format};
+}
+
+function rollupTests({dest, cache, browser}) {
+  const {plugins, external, format} = envRollupInfo({browser});
+
   return rollup.rollup({
     entry: 'test/**/*.js',
-    plugins: [
-      eslintTestGenerator({
-        paths: [
-          'src',
-          'test'
-        ]
-      }),
-      globals(),
-      builtins(),
-      nodeResolve({
-        jsnext: true,
-        main: true
-      }),
-      commonjs({
-        include: 'node_modules/**',
-        sourceMap: false
-      }),
-      multyEntry({
-        exports: false
-      }),
-      babel()
-    ],
+    plugins,
+    external,
     cache
   }).then((bundle) => {
     return bundle.write({
       dest,
-      format: 'iife',
+      format,
       sourceMap: 'inline'
     }).then(() => {
       return bundle;

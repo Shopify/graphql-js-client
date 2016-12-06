@@ -6,17 +6,17 @@ const livereloadPort = require('../package.json').livereloadPort;
 
 let bundle;
 
-const testDestination = process.argv[2];
+const dest = process.argv[2];
 const reloadUri = `http://localhost:${livereloadPort}/changed?files=tests.js,index.html`;
 
 function notifyReload() {
   fetch(reloadUri);
 }
 
-watcher([['src', 'js'], ['test', 'js']], (response) => {
+watcher([['src', 'js'], ['test', 'js']], () => {
   const start = Date.now();
 
-  rollupTests(testDestination, bundle).then((newBundle) => {
+  rollupTests({dest, cache: bundle, browser: true}).then((newBundle) => {
     notifyReload();
     watcher.logInfo(`rebuilt bundle in ${Date.now() - start}ms`);
 

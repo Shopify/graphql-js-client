@@ -1,7 +1,9 @@
+import deepFreezeCopyExcept from './deep-freeze-copy-except';
 import join from './join';
 import schemaForType from './schema-for-type';
 import formatArgs from './format-args';
 import noop from './noop';
+import {isVariable} from './variable';
 
 function parseFieldCreationArgs(creationArgs) {
   let callback = noop;
@@ -33,8 +35,9 @@ function parseFieldCreationArgs(creationArgs) {
 export class Field {
   constructor(name, args, selectionSet) {
     this.name = name;
-    this.args = args;
+    this.args = deepFreezeCopyExcept(isVariable, args);
     this.selectionSet = selectionSet;
+    Object.freeze(this);
   }
   toString() {
     return `${this.name}${formatArgs(this.args)}${this.selectionSet.toString()}`;
@@ -45,6 +48,7 @@ class InlineFragment {
   constructor(typeName, selectionSet) {
     this.typeName = typeName;
     this.selectionSet = selectionSet;
+    Object.freeze(this);
   }
   toString() {
     return `... on ${this.typeName}${this.selectionSet.toString()}`;
@@ -82,6 +86,8 @@ export default class SelectionSet {
         this.selections.unshift(new Field('id', {}, new SelectionSet(typeBundle, 'ID')));
       }
     }
+    Object.freeze(this.selections);
+    Object.freeze(this);
   }
 
   toString() {

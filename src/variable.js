@@ -2,6 +2,7 @@ export class VariableDefinition {
   constructor(name, type) {
     this.name = name;
     this.type = type;
+    Object.freeze(this);
   }
 
   toInputValueString() {
@@ -11,6 +12,10 @@ export class VariableDefinition {
   toVariableDefinitionString() {
     return `$${this.name}:${this.type}`;
   }
+}
+
+export function isVariable(value) {
+  return value instanceof VariableDefinition;
 }
 
 export default function variable(name, type) {

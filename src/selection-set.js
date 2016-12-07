@@ -4,6 +4,7 @@ import schemaForType from './schema-for-type';
 import formatArgs from './format-args';
 import noop from './noop';
 import {isVariable} from './variable';
+import typeProfiler from './type-profiler';
 
 function parseFieldCreationArgs(creationArgs) {
   let callback = noop;
@@ -69,11 +70,15 @@ function selectionsHaveIdField(selections) {
 
 export default class SelectionSet {
   constructor(typeBundle, type, builderFunction) {
+
     if (typeof type === 'string') {
       this.typeSchema = schemaForType(typeBundle, type);
     } else {
       this.typeSchema = type;
     }
+
+    typeProfiler(this.typeSchema.name);
+
     this.typeBundle = typeBundle;
     this.selections = [];
     if (builderFunction) {

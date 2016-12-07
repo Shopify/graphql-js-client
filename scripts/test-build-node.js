@@ -1,5 +1,7 @@
 /* eslint-env node */
-const dest = process.argv[2];
 const rollupTests = require('./rollup-tests');
+const parseBuildArgs = require('./parse-build-args');
 
-rollupTests({dest, browser: false});
+const {dest, withProfiler} = parseBuildArgs();
+
+rollupTests({dest, withProfiler, browser: false});

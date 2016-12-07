@@ -9,7 +9,7 @@ const babel = require('rollup-plugin-babel');
 const eslintTestGenerator = require('./rollup-plugin-eslint-test-generator');
 const remap = require('./rollup-plugin-remap');
 
-function envRollupInfo({browser}) {
+function envRollupInfo({browser, withProfiler}) {
   const format = (browser) ? 'iife' : 'cjs';
   const plugins = [
     eslintTestGenerator({
@@ -34,7 +34,7 @@ function envRollupInfo({browser}) {
   const external = [];
 
   // eslint-disable-next-line no-process-env
-  if (!process.env.PROFILE_TYPE_USAGE) {
+  if (!withProfiler) {
     plugins.unshift(remap({
       originalPath: './src/type-profiler',
       targetPath: './src/noop'
@@ -50,8 +50,8 @@ function envRollupInfo({browser}) {
   return {plugins, external, format};
 }
 
-function rollupTests({dest, cache, browser}) {
-  const {plugins, external, format} = envRollupInfo({browser});
+function rollupTests({dest, withProfiler, cache, browser}) {
+  const {plugins, external, format} = envRollupInfo({withProfiler, browser});
 
   return rollup.rollup({
     entry: 'test/**/*.js',

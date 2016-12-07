@@ -70,6 +70,7 @@ function selectionsHaveIdField(selections) {
 
 export default class SelectionSet {
   constructor(typeBundle, type, builderFunction) {
+
     if (typeof type === 'string') {
       this.typeSchema = schemaForType(typeBundle, type);
     } else {

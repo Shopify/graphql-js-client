@@ -99,6 +99,21 @@ suite('type-profiler-test', () => {
     assert.deepEqual(profiledTypes(), []);
   });
 
+  test('it stops profiling when `resetTypes` is called (returning the profiler to it\'s initial state.', () => {
+    startProfiling();
+
+    resetProfiler();
+
+    // eslint-disable-next-line no-new
+    new Query(typeBundle, (root) => {
+      root.add('shop', (shop) => {
+        shop.add('name');
+      });
+    });
+
+    assert.deepEqual(profiledTypes(), []);
+  });
+
   test('it logs the profiled types when `printTypes` is called', () => {
     startProfiling();
 
@@ -112,16 +127,22 @@ suite('type-profiler-test', () => {
     let loggedTypes;
 
     // eslint-disable-next-line
+    const originalLog = console.log;
+
+    // eslint-disable-next-line
     console.log = function (types) {
       loggedTypes = types;
     };
 
     printTypes();
 
+    // eslint-disable-next-line
+    console.log = originalLog;
+
     assert.deepEqual(loggedTypes, [
       'QueryRoot',
       'Shop',
       'String'
-    ]);
+    ].join());
   });
 });

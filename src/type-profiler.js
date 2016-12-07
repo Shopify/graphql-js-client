@@ -28,5 +28,5 @@ export function profiledTypes() {
 
 export function printTypes() {
   // eslint-disable-next-line
-  console.log(types.sort());
+  console.log(profiledTypes().join());
 }

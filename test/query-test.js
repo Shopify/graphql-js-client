@@ -22,7 +22,7 @@ suite('query-test', () => {
       buildQuery(root);
     });
 
-    assert.deepEqual(typeBundle.QueryRoot, rootType);
+    assert.deepEqual(typeBundle.types.QueryRoot, rootType);
     assert.deepEqual(splitQuery(query.toString()), splitQuery('query { shop { name } }'));
   });
 
@@ -33,7 +33,7 @@ suite('query-test', () => {
       buildQuery(root);
     });
 
-    assert.deepEqual(typeBundle.QueryRoot, rootType);
+    assert.deepEqual(typeBundle.types.QueryRoot, rootType);
     assert.deepEqual(splitQuery(query.toString()), splitQuery('query myQuery { shop { name } }'));
   });
 

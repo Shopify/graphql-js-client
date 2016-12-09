@@ -24,7 +24,7 @@ suite('document-test', () => {
       rootType = root.typeSchema;
     });
 
-    assert.deepEqual(typeBundle.QueryRoot, rootType);
+    assert.deepEqual(typeBundle.types.QueryRoot, rootType);
   });
 
   test('it can stringify a single query document', () => {

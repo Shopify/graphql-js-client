@@ -13,7 +13,7 @@ suite('selection-set-test', () => {
   test('it builds sets using the passed type', () => {
     const set = new SelectionSet(typeBundle, 'Shop');
 
-    assert.deepEqual(typeBundle.Shop, set.typeSchema);
+    assert.deepEqual(typeBundle.types.Shop, set.typeSchema);
     assert.deepEqual(tokens(set.toString()), tokens(' { }'));
   });
 
@@ -44,7 +44,7 @@ suite('selection-set-test', () => {
       });
     });
     assert.equal(typeBundle, shopBuilder.typeBundle);
-    assert.equal(typeBundle.Shop, shopBuilder.typeSchema);
+    assert.equal(typeBundle.types.Shop, shopBuilder.typeSchema);
   });
 
   test('it doesn\'t require field args when using add or addConnection', () => {

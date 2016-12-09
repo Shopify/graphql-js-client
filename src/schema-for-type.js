@@ -1,5 +1,5 @@
 export default function schemaForType(typeBundle, typeName) {
-  const type = typeBundle[typeName];
+  const type = typeBundle.types[typeName];
 
   if (type) {
     return type;

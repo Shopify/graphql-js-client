@@ -183,7 +183,7 @@ class Ancestry {
   }
 }
 
-function selectionSetForField(fieldName, selectionSet) {
+function selectionSetForField(responseKey, selectionSet) {
   if (!selectionSet) {
     return null;
   }
@@ -192,7 +192,7 @@ function selectionSetForField(fieldName, selectionSet) {
   const valuesField = selectionSet.selections.filter((fieldOrFragment) => {
     return Field.prototype.isPrototypeOf(fieldOrFragment);
   }).find((field) => {
-    return field.name === fieldName;
+    return field.responseKey === responseKey;
   });
 
   if (!valuesField) {
@@ -206,12 +206,12 @@ function selectionSetForField(fieldName, selectionSet) {
 export default function deserializeObject(data, selectionSet, registry = new ClassRegistry(), parent) {
   const ancestry = new Ancestry(selectionSet, parent, data.id);
 
-  const attrs = Object.keys(data).reduce((acc, fieldName) => {
-    const value = data[fieldName];
+  const attrs = Object.keys(data).reduce((acc, key) => {
+    const value = data[key];
 
-    const valuesSelectionSet = selectionSetForField(fieldName, selectionSet);
+    const valuesSelectionSet = selectionSetForField(key, selectionSet);
 
-    acc[fieldName] = deserializeValue(value, valuesSelectionSet, registry, ancestry); // ancestry represents the parent
+    acc[key] = deserializeValue(value, valuesSelectionSet, registry, ancestry); // ancestry represents the parent
 
     return acc;
   }, {});

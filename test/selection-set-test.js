@@ -207,6 +207,30 @@ suite('selection-set-test', () => {
     }`));
   });
 
+  test('it can add a field with an alias', () => {
+    const set = new SelectionSet(typeBundle, 'Shop', (shop) => {
+      shop.add('name', {alias: 'theNameOfTheShop'});
+    });
+
+    assert.deepEqual(tokens(set.toString()), tokens('{ theNameOfTheShop: name }'));
+  });
+
+  test('field.responseKey === field.alias when alias is present', () => {
+    const set = new SelectionSet(typeBundle, 'Shop', (shop) => {
+      shop.add('name', {alias: 'theNameOfTheShop'});
+    });
+
+    assert.equal(set.selections[0].responseKey, 'theNameOfTheShop');
+  });
+
+  test('field.responseKey === field.name when alias is not present', () => {
+    const set = new SelectionSet(typeBundle, 'Shop', (shop) => {
+      shop.add('name');
+    });
+
+    assert.equal(set.selections[0].responseKey, 'name');
+  });
+
   test('selection sets are deeply frozen once they\'ve been built', () => {
     const set = new SelectionSet(typeBundle, 'QueryRoot', (root) => {
       root.add('node', {args: {id: variable('productId', 'ID!')}}, (node) => {

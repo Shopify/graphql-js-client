@@ -37,12 +37,16 @@ const emptyArgs = Object.freeze({});
 export class Field {
   constructor(name, options, selectionSet) {
     this.name = name;
+    this.alias = options.alias || null;
+    this.responseKey = this.alias || this.name;
     this.args = (options.args ? deepFreezeCopyExcept(isVariable, options.args) : emptyArgs);
     this.selectionSet = selectionSet;
     Object.freeze(this);
   }
   toString() {
-    return `${this.name}${formatArgs(this.args)}${this.selectionSet.toString()}`;
+    const aliasPrefix = this.alias ? `${this.alias}: ` : '';
+
+    return `${aliasPrefix}${this.name}${formatArgs(this.args)}${this.selectionSet.toString()}`;
   }
 }
 

@@ -63,7 +63,7 @@ const productFixture = {
           name: 'Size'
         }
       ],
-      images: {
+      imagesAlias: {
         edges: [
           {
             node: {
@@ -88,7 +88,7 @@ const productQuery = new Query(typeBundle, (root) => {
     product.addField('options', (options) => {
       options.addField('name');
     });
-    product.addConnection('images', (images) => {
+    product.addConnection('images', {alias: 'imagesAlias'}, (images) => {
       images.addField('src');
     });
   });

@@ -82,7 +82,7 @@ const productFixture = {
 };
 
 const productQuery = new Query(typeBundle, (root) => {
-  root.addField('product', {id: productId}, (product) => {
+  root.addField('product', {args: {id: productId}}, (product) => {
     product.addField('id');
     product.addField('handle');
     product.addField('options', (options) => {

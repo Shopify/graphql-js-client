@@ -11,7 +11,7 @@ suite('adds-id-field-test', () => {
 
   test('it adds ID fields to nodes', () => {
     const relayQuery = new Query(typeBundle, (root) => {
-      root.add('product', {id: 'gid://shopify/Product/12345'}, (product) => {
+      root.add('product', {args: {id: 'gid://shopify/Product/12345'}}, (product) => {
         product.add('handle');
       });
     });
@@ -26,7 +26,7 @@ suite('adds-id-field-test', () => {
 
   test('it doesn\'t complain or duplicate if you manually add IDs', () => {
     const relayQuery = new Query(typeBundle, (root) => {
-      root.add('product', {id: 'gid://shopify/Product/12345'}, (product) => {
+      root.add('product', {args: {id: 'gid://shopify/Product/12345'}}, (product) => {
         product.add('id');
         product.add('handle');
       });
@@ -99,7 +99,7 @@ suite('adds-id-field-test', () => {
 
   test('it adds the ID field to the interface "Node"', () => {
     const relayQuery = new Query(typeBundle, (root) => {
-      root.add('node', {id: 'gid://shopify/Product/12345'});
+      root.add('node', {args: {id: 'gid://shopify/Product/12345'}});
     });
 
     assert.deepEqual(tokens(relayQuery.toString()), tokens(`query {
@@ -111,7 +111,7 @@ suite('adds-id-field-test', () => {
 
   test('it doesn\'t duplicate the ID field if it exists in an inline fragment on "node"', () => {
     const relayQuery = new Query(typeBundle, (root) => {
-      root.add('node', {id: 'gid://shopify/Product/12345'}, (node) => {
+      root.add('node', {args: {id: 'gid://shopify/Product/12345'}}, (node) => {
         node.addInlineFragmentOn('Product', (product) => {
           product.add('id');
           product.add('handle');
@@ -131,7 +131,7 @@ suite('adds-id-field-test', () => {
 
   test('it doesn\'t duplicate the ID field if it exists in an inline fragment on a resource that implements node', () => {
     const relayQuery = new Query(typeBundle, (root) => {
-      root.add('product', {id: 'gid://shopify/Product/12345'}, (product) => {
+      root.add('product', {args: {id: 'gid://shopify/Product/12345'}}, (product) => {
         product.add('handle');
         product.addInlineFragmentOn('Product', (productFragment) => {
           productFragment.add('id');
@@ -151,7 +151,7 @@ suite('adds-id-field-test', () => {
 
   test('it doesn\'t duplicate the ID field if it exists in a nested inline fragment', () => {
     const relayQuery = new Query(typeBundle, (root) => {
-      root.add('node', {id: 'gid://shopify/Product/12345'}, (node) => {
+      root.add('node', {args: {id: 'gid://shopify/Product/12345'}}, (node) => {
         node.addInlineFragmentOn('Product', (product) => {
           product.add('handle');
           product.addInlineFragmentOn('Product', (nestedFragment) => {

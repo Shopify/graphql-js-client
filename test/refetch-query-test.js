@@ -66,12 +66,12 @@ suite('Integration | Node based query generation', () => {
     baseQuery = new Query(typeBundle, (root) => {
       root.addField('shop', (shop) => {
         shop.addField('name');
-        shop.addConnection('collections', {first: 1}, (collections) => {
+        shop.addConnection('collections', {args: {first: 1}}, (collections) => {
           collections.addField('handle');
         });
-        shop.addConnection('products', {first: 1}, (products) => {
+        shop.addConnection('products', {args: {first: 1}}, (products) => {
           products.addField('handle');
-          products.addConnection('variants', {first: 1}, (variants) => {
+          products.addConnection('variants', {args: {first: 1}}, (variants) => {
             variants.addField('title');
           });
         });
@@ -148,7 +148,7 @@ suite('Integration | Node based query generation', () => {
         viewer.addField('aNode', (node) => {
           node.addField('hostObject', (host) => {
             host.addField('anotherHost', (anotherHost) => {
-              anotherHost.addConnection('products', {first: 1}, (products) => {
+              anotherHost.addConnection('products', {args: {first: 1}}, (products) => {
                 products.addField('handle');
               });
             });

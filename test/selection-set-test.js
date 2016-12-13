@@ -41,7 +41,7 @@ suite('selection-set-test', () => {
     let shopBuilder = null;
 
     new SelectionSet(typeBundle, 'QueryRoot', (root) => {
-      root.add('shop', {}, (shop) => {
+      root.add('shop', (shop) => {
         shopBuilder = shop;
       });
     });
@@ -75,7 +75,7 @@ suite('selection-set-test', () => {
 
   test('it composes nested querys', () => {
     const set = new SelectionSet(typeBundle, 'QueryRoot', (root) => {
-      root.add('shop', {}, (shop) => {
+      root.add('shop', (shop) => {
         shop.add('name');
       });
     });
@@ -85,7 +85,7 @@ suite('selection-set-test', () => {
 
   test('it can attach args to nested nodes', () => {
     const set = new SelectionSet(typeBundle, 'QueryRoot', (root) => {
-      root.add('product', {id: '1'}, (product) => {
+      root.add('product', {args: {id: '1'}}, (product) => {
         product.add('title');
       });
     });
@@ -95,9 +95,9 @@ suite('selection-set-test', () => {
 
   test('it adds connections with pagination info', () => {
     const set = new SelectionSet(typeBundle, 'QueryRoot', (root) => {
-      root.add('shop', {}, (shop) => {
+      root.add('shop', (shop) => {
         shop.add('name');
-        shop.addConnection('products', {first: 10}, (product) => {
+        shop.addConnection('products', {args: {first: 10}}, (product) => {
           product.add('handle');
         });
       });
@@ -125,7 +125,7 @@ suite('selection-set-test', () => {
 
   test('it adds inline fragments', () => {
     const set = new SelectionSet(typeBundle, 'QueryRoot', (root) => {
-      root.add('shop', {}, (shop) => {
+      root.add('shop', (shop) => {
         shop.addInlineFragmentOn('Shop', (fragment) => {
           fragment.add('name');
         });
@@ -158,7 +158,7 @@ suite('selection-set-test', () => {
   test('it can add a field with SelectionSet', () => {
     const shopSelectionSet = new SelectionSet(typeBundle, 'Shop', (shop) => {
       shop.add('name');
-      shop.addConnection('products', {first: 10}, (products) => {
+      shop.addConnection('products', {args: {first: 10}}, (products) => {
         products.add('handle');
       });
     });
@@ -194,7 +194,7 @@ suite('selection-set-test', () => {
       });
     });
     const set = new SelectionSet(typeBundle, 'Shop', (shop) => {
-      shop.add('products', {first: 10}, productConnection);
+      shop.add('products', {args: {first: 10}}, productConnection);
     });
 
     assert.deepEqual(tokens(set.toString()), tokens(` {
@@ -209,7 +209,7 @@ suite('selection-set-test', () => {
 
   test('selection sets are deeply frozen once they\'ve been built', () => {
     const set = new SelectionSet(typeBundle, 'QueryRoot', (root) => {
-      root.add('node', {id: variable('productId', 'ID!')}, (node) => {
+      root.add('node', {args: {id: variable('productId', 'ID!')}}, (node) => {
         node.addInlineFragmentOn('Product', (product) => {
           product.add('title');
         });
@@ -222,7 +222,7 @@ suite('selection-set-test', () => {
   test('adding field arguments defensively copies the arguments, except for the variables which are re-used', () => {
     const args = {fakeArg: {nestedVariable: variable('foo', 'String')}};
     const set = new SelectionSet(typeBundle, 'QueryRoot', (root) => {
-      root.add('product', args);
+      root.add('product', {args});
     });
 
     assert.deepEqual(set.selections[0].args, args);

@@ -53,7 +53,7 @@ function deserializeValue(value, selectionSet, registry, parent) {
       const fieldName = fieldReference.name;
       const args = Object.assign({}, fieldReference.args);
 
-      selection.add(fieldName, args, (newSelection) => {
+      selection.add(fieldName, {args}, (newSelection) => {
         if (rest && rest.length) {
           addNextFieldTo(newSelection, rest.shift(), setToAdd.selections, rest);
         } else {
@@ -69,7 +69,7 @@ function deserializeValue(value, selectionSet, registry, parent) {
 
           newSelection.addConnection(
             connectionField.name,
-            Object.assign({}, connectionField.args, {after: value.edges[value.edges.length - 1].cursor}),
+            {args: Object.assign({}, connectionField.args, {after: value.edges[value.edges.length - 1].cursor})},
             nodeField.selectionSet
           );
         }
@@ -83,7 +83,7 @@ function deserializeValue(value, selectionSet, registry, parent) {
           const rootNodeId = parent.nearestNodeId;
           const rootNodesSelectionSet = chain.shift();
 
-          root.add('node', {id: rootNodeId}, (node) => {
+          root.add('node', {args: {id: rootNodeId}}, (node) => {
             node.addInlineFragmentOn(rootNodesSelectionSet.typeSchema.name, (rootNode) => {
               if (chain.length) {
                 addNextFieldTo(rootNode, chain.shift(), rootNodesSelectionSet.selections, chain);
@@ -103,7 +103,7 @@ function deserializeValue(value, selectionSet, registry, parent) {
                 });
 
                 // Traverse the sets. This is the connection's set
-                rootNode.addConnection(fieldName, args, nodeField.selectionSet);
+                rootNode.addConnection(fieldName, {args}, nodeField.selectionSet);
               }
             });
           });
@@ -222,7 +222,7 @@ export default function deserializeObject(data, selectionSet, registry = new Cla
     if (ancestry.isNode) {
       attrs.refetchQuery = function() {
         return new Query(selectionSet.typeBundle, (root) => {
-          root.add('node', {id: this.ancestry.nodeId}, (node) => {
+          root.add('node', {args: {id: this.ancestry.nodeId}}, (node) => {
             node.addInlineFragmentOn(this.ancestry.selectionSet.typeSchema.name, this.ancestry.selectionSet);
           });
         });

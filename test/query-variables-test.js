@@ -1,6 +1,6 @@
 import assert from 'assert';
 import Query from '../src/query';
-import variable, {VariableDefinition} from '../src/variable';
+import variable, {isVariable, VariableDefinition} from '../src/variable';
 import typeBundle from '../fixtures/types'; // eslint-disable-line import/no-unresolved
 
 suite('query-variables-test', () => {
@@ -14,6 +14,13 @@ suite('query-variables-test', () => {
     const variableId = variable('id', 'ID!');
 
     assert.ok(VariableDefinition.prototype.isPrototypeOf(variableId));
+  });
+
+  test('isVariable returns true for variables', () => {
+    const variableId = variable('id', 'ID!');
+
+    assert.equal(isVariable(variableId), true);
+    assert.equal(isVariable(Object.assign({}, variableId)), false);
   });
 
   test('it can use variables with fields', () => {
@@ -79,5 +86,9 @@ suite('query-variables-test', () => {
         }
       }
     }`));
+  });
+
+  test('variables are always frozen', () => {
+    assert.ok(Object.isFrozen(variable('foo', 'String')));
   });
 });

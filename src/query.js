@@ -28,7 +28,9 @@ function parseArgs(args) {
 
 class VariableDefinitions {
   constructor(variableDefinitions) {
-    this.variableDefinitions = variableDefinitions || [];
+    this.variableDefinitions = variableDefinitions ? [...variableDefinitions] : [];
+    Object.freeze(this.variableDefinitions);
+    Object.freeze(this);
   }
 
   toString() {
@@ -52,6 +54,7 @@ export default class Query {
     this.name = name;
     this.variableDefinitions = new VariableDefinitions(variables);
     this.selectionSet = new SelectionSet(typeBundle, 'QueryRoot', selectionSetCallback);
+    Object.freeze(this);
   }
 
   get isAnonymous() {

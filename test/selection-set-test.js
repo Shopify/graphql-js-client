@@ -1,7 +1,9 @@
 /* eslint-disable no-new */
 import assert from 'assert';
+import assertDeeplyFrozen from './assert-deeply-frozen';
 import SelectionSet from '../src/selection-set';
 import typeBundle from '../fixtures/types'; // eslint-disable-line import/no-unresolved
+import variable from '../src/variable';
 
 suite('selection-set-test', () => {
   const querySplitter = /[\s,]+/;
@@ -203,5 +205,29 @@ suite('selection-set-test', () => {
         }
       }
     }`));
+  });
+
+  test('selection sets are deeply frozen once they\'ve been built', () => {
+    const set = new SelectionSet(typeBundle, 'QueryRoot', (root) => {
+      root.add('node', {id: variable('productId', 'ID!')}, (node) => {
+        node.addInlineFragmentOn('Product', (product) => {
+          product.add('title');
+        });
+      });
+    });
+
+    assertDeeplyFrozen(set);
+  });
+
+  test('adding field arguments defensively copies the arguments, except for the variables which are re-used', () => {
+    const args = {fakeArg: {nestedVariable: variable('foo', 'String')}};
+    const set = new SelectionSet(typeBundle, 'QueryRoot', (root) => {
+      root.add('product', args);
+    });
+
+    assert.deepEqual(set.selections[0].args, args);
+    assert.notEqual(set.selections[0].args, args);
+    assert.notEqual(set.selections[0].args.fakeArg, args.fakeArg);
+    assert.equal(set.selections[0].args.fakeArg.nestedVariable, args.fakeArg.nestedVariable);
   });
 });

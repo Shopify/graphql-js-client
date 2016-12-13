@@ -7,7 +7,7 @@
   "author": "Shopify Inc.",
   "dependencies": {},
   "devDependencies": {
-    "@shopify/graphql-js-schema": "0.2.2",
+    "@shopify/graphql-js-schema": "0.2.3",
     "babel": "6.5.2",
     "babel-cli": "6.18.0",
     "babel-core": "6.18.0",

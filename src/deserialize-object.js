@@ -51,9 +51,8 @@ function deserializeValue(value, selectionSet, registry, parent) {
       });
 
       const fieldName = fieldReference.name;
-      const args = Object.assign({}, fieldReference.args);
 
-      selection.add(fieldName, {args}, (newSelection) => {
+      selection.add(fieldName, {alias: fieldReference.alias, args: fieldReference.args}, (newSelection) => {
         if (rest && rest.length) {
           addNextFieldTo(newSelection, rest.shift(), setToAdd.selections, rest);
         } else {
@@ -66,10 +65,14 @@ function deserializeValue(value, selectionSet, registry, parent) {
           const nodeField = edgesField.selectionSet.selections.find((field) => {
             return field.name === 'node';
           });
+          const options = {
+            alias: connectionField.alias,
+            args: Object.assign({}, connectionField.args, {after: value.edges[value.edges.length - 1].cursor})
+          };
 
           newSelection.addConnection(
             connectionField.name,
-            {args: Object.assign({}, connectionField.args, {after: value.edges[value.edges.length - 1].cursor})},
+            options,
             nodeField.selectionSet
           );
         }

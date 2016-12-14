@@ -2,12 +2,12 @@
 const rollup = require('rollup');
 const commonjs = require('rollup-plugin-commonjs');
 const nodeResolve = require('rollup-plugin-node-resolve');
-const multyEntry = require('rollup-plugin-multi-entry');
+const multiEntry = require('rollup-plugin-multi-entry');
 const builtins = require('rollup-plugin-node-builtins');
 const globals = require('rollup-plugin-node-globals');
 const babel = require('rollup-plugin-babel');
+const remap = require('@shopify/rollup-plugin-remap').default;
 const eslintTestGenerator = require('./rollup-plugin-eslint-test-generator');
-const remap = require('./rollup-plugin-remap');
 
 function envRollupInfo({browser, withProfiler}) {
   const format = (browser) ? 'iife' : 'cjs';
@@ -26,7 +26,7 @@ function envRollupInfo({browser, withProfiler}) {
       include: 'node_modules/**',
       sourceMap: false
     }),
-    multyEntry({
+    multiEntry({
       exports: false
     }),
     babel()
@@ -44,7 +44,7 @@ function envRollupInfo({browser, withProfiler}) {
   if (browser) {
     plugins.unshift(globals(), builtins());
   } else {
-    external.push('fs', 'assert');
+    external.push('assert');
   }
 
   return {plugins, external, format};

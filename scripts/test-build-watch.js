@@ -24,6 +24,5 @@ watcher([['src', 'js'], ['test', 'js']], () => {
     bundle = newBundle;
   }).catch((error) => {
     watcher.logInfo(`Error during build ${error}`);
-    console.error(error); // eslint-disable-line no-console
   });
 });

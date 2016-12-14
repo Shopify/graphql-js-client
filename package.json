@@ -41,6 +41,9 @@
     "wait-on": "1.5.3"
   },
   "scripts": {
+    "prepublish": "concurrently 'npm run build:prod' 'npm run build:dev'",
+    "build:dev": "rollup -c --environment BABEL_ENV:node",
+    "build:prod": "rollup -c --environment BABEL_ENV:node,BUILD_MODE:production",
     "start": "npm run clean && npm run setup-paths && concurrently 'npm run test:web-deps' 'npm run test:livereload-server' 'npm run test:watch' 'http-server -p 4200 .tmp/test' 'npm run -s print-start-message'",
     "clean": "rimraf .tmp dist fixtures/types.js",
     "setup-paths": "mkdir -p dist .tmp/test",

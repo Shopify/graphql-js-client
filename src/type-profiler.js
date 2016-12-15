@@ -1,16 +1,16 @@
-let types = [];
+let types = {};
 let profiling = false;
 
 export default function typeProfiler(typeName) {
-  if (types.includes(typeName) || !profiling) {
+  if (!profiling) {
     return;
   }
 
-  types.push(typeName);
+  types[typeName] = true;
 }
 
 export function resetProfiler() {
-  types = [];
+  types = {};
   profiling = false;
 }
 
@@ -23,7 +23,7 @@ export function pauseProfiling() {
 }
 
 export function profiledTypes() {
-  return types.sort();
+  return Object.keys(types).sort();
 }
 
 export function printTypes() {

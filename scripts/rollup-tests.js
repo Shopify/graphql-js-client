@@ -2,13 +2,14 @@
 const rollup = require('rollup');
 const commonjs = require('rollup-plugin-commonjs');
 const nodeResolve = require('rollup-plugin-node-resolve');
-const multyEntry = require('rollup-plugin-multi-entry');
+const multiEntry = require('rollup-plugin-multi-entry');
 const builtins = require('rollup-plugin-node-builtins');
 const globals = require('rollup-plugin-node-globals');
 const babel = require('rollup-plugin-babel');
+const remap = require('@shopify/rollup-plugin-remap').default;
 const eslintTestGenerator = require('./rollup-plugin-eslint-test-generator');
 
-function envRollupInfo({browser}) {
+function envRollupInfo({browser, withProfiler}) {
   const format = (browser) ? 'iife' : 'cjs';
   const plugins = [
     eslintTestGenerator({
@@ -25,24 +26,32 @@ function envRollupInfo({browser}) {
       include: 'node_modules/**',
       sourceMap: false
     }),
-    multyEntry({
+    multiEntry({
       exports: false
     }),
     babel()
   ];
   const external = [];
 
+  // eslint-disable-next-line no-process-env
+  if (!withProfiler) {
+    plugins.unshift(remap({
+      originalPath: './src/type-profiler',
+      targetPath: './src/noop'
+    }));
+  }
+
   if (browser) {
     plugins.unshift(globals(), builtins());
   } else {
-    external.push('fs', 'assert');
+    external.push('assert');
   }
 
   return {plugins, external, format};
 }
 
-function rollupTests({dest, cache, browser}) {
-  const {plugins, external, format} = envRollupInfo({browser});
+function rollupTests({dest, withProfiler, cache, browser}) {
+  const {plugins, external, format} = envRollupInfo({withProfiler, browser});
 
   return rollup.rollup({
     entry: 'test/**/*.js',

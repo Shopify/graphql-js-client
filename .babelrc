@@ -1,7 +1,4 @@
 {
-  "plugins": [
-    ["add-shopify-header", {"files": [ "src/index.js" ]}],
-  ],
   "presets": [
     "es2015-rollup"
   ],

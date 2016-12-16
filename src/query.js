@@ -51,6 +51,7 @@ export default class Query {
     const {name, variables, selectionSetCallback} = parseArgs(args);
 
     this.typeBundle = typeBundle;
+    this.typeSchema = typeBundle.QueryRoot;
     this.name = name;
     this.variableDefinitions = new VariableDefinitions(variables);
     this.selectionSet = new SelectionSet(typeBundle, 'QueryRoot', selectionSetCallback);

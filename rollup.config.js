@@ -9,7 +9,7 @@ const targets = [];
 // eslint-disable-next-line no-process-env
 if (process.env.BUILD_MODE === 'production') {
   plugins.push(remap({
-    originalPath: './src/type-profiler',
+    originalPath: './src/track-type-dependency',
     targetPath: './src/noop'
   }));
 

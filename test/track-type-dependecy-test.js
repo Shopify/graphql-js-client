@@ -1,15 +1,15 @@
 import assert from 'assert';
 import Query from '../src/query';
 import typeBundle from '../fixtures/types'; // eslint-disable-line import/no-unresolved
-import {resetProfiler, startProfiling, pauseProfiling, profiledTypes, printTypes} from '../src/type-profiler';
+import {resetTracker, startTracking, pauseTracking, trackedTypes, printTypes} from '../src/track-type-dependency';
 
-suite('type-profiler-test', () => {
+suite('track-type-dependency-test', () => {
   setup(() => {
-    resetProfiler();
+    resetTracker();
   });
 
   test('it reports the types used in a query', () => {
-    startProfiling();
+    startTracking();
 
     // eslint-disable-next-line no-new
     new Query(typeBundle, (root) => {
@@ -24,7 +24,7 @@ suite('type-profiler-test', () => {
       });
     });
 
-    assert.deepEqual(profiledTypes(), [
+    assert.deepEqual(trackedTypes(), [
       'Boolean',
       'ID',
       'Money',
@@ -41,8 +41,8 @@ suite('type-profiler-test', () => {
     ]);
   });
 
-  test('it pauses profiling when `pauseProfiling` is called', () => {
-    startProfiling();
+  test('it pauses tracking when `pauseTracking` is called', () => {
+    startTracking();
 
     // eslint-disable-next-line no-new
     new Query(typeBundle, (root) => {
@@ -51,7 +51,7 @@ suite('type-profiler-test', () => {
       });
     });
 
-    pauseProfiling();
+    pauseTracking();
 
     // eslint-disable-next-line no-new
     new Query(typeBundle, (root) => {
@@ -66,7 +66,7 @@ suite('type-profiler-test', () => {
       });
     });
 
-    startProfiling();
+    startTracking();
 
     // eslint-disable-next-line no-new
     new Query(typeBundle, (root) => {
@@ -75,7 +75,7 @@ suite('type-profiler-test', () => {
       });
     });
 
-    assert.deepEqual(profiledTypes(), [
+    assert.deepEqual(trackedTypes(), [
       'ID',
       'Node',
       'QueryRoot',
@@ -84,8 +84,8 @@ suite('type-profiler-test', () => {
     ]);
   });
 
-  test('it clears the profiled types when `resetProfiler` is called', () => {
-    startProfiling();
+  test('it clears the tracked types when `resetTracker` is called', () => {
+    startTracking();
 
     // eslint-disable-next-line no-new
     new Query(typeBundle, (root) => {
@@ -94,15 +94,15 @@ suite('type-profiler-test', () => {
       });
     });
 
-    resetProfiler();
+    resetTracker();
 
-    assert.deepEqual(profiledTypes(), []);
+    assert.deepEqual(trackedTypes(), []);
   });
 
-  test('it stops profiling when `resetTypes` is called (returning the profiler to it\'s initial state.', () => {
-    startProfiling();
+  test('it stops tracking when `resetTypes` is called (returning the tracker to it\'s initial state.', () => {
+    startTracking();
 
-    resetProfiler();
+    resetTracker();
 
     // eslint-disable-next-line no-new
     new Query(typeBundle, (root) => {
@@ -111,11 +111,11 @@ suite('type-profiler-test', () => {
       });
     });
 
-    assert.deepEqual(profiledTypes(), []);
+    assert.deepEqual(trackedTypes(), []);
   });
 
-  test('it logs the profiled types when `printTypes` is called', () => {
-    startProfiling();
+  test('it logs the tracked types when `printTypes` is called', () => {
+    startTracking();
 
     // eslint-disable-next-line no-new
     new Query(typeBundle, (root) => {

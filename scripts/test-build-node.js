@@ -2,6 +2,6 @@
 const rollupTests = require('./rollup-tests');
 const parseBuildArgs = require('./parse-build-args');
 
-const {dest, withProfiler} = parseBuildArgs();
+const {dest, withDependencyTracking} = parseBuildArgs();
 
-rollupTests({dest, withProfiler, browser: false});
+rollupTests({dest, withDependencyTracking, browser: false});

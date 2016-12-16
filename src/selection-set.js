@@ -4,7 +4,7 @@ import schemaForType from './schema-for-type';
 import formatArgs from './format-args';
 import noop from './noop';
 import {isVariable} from './variable';
-import typeProfiler from './type-profiler';
+import trackTypeDependency from './track-type-dependency';
 
 function parseFieldCreationArgs(creationArgs) {
   let callback = noop;
@@ -77,7 +77,7 @@ export default class SelectionSet {
       this.typeSchema = type;
     }
 
-    typeProfiler(this.typeSchema.name);
+    trackTypeDependency(this.typeSchema.name);
 
     this.typeBundle = typeBundle;
     this.selections = [];

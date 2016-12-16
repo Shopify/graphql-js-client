@@ -9,7 +9,7 @@ const babel = require('rollup-plugin-babel');
 const remap = require('@shopify/rollup-plugin-remap').default;
 const eslintTestGenerator = require('./rollup-plugin-eslint-test-generator');
 
-function envRollupInfo({browser, withProfiler}) {
+function envRollupInfo({browser, withDependencyTracking}) {
   const format = (browser) ? 'iife' : 'cjs';
   const plugins = [
     eslintTestGenerator({
@@ -34,9 +34,9 @@ function envRollupInfo({browser, withProfiler}) {
   const external = [];
 
   // eslint-disable-next-line no-process-env
-  if (!withProfiler) {
+  if (!withDependencyTracking) {
     plugins.unshift(remap({
-      originalPath: './src/type-profiler',
+      originalPath: './src/track-type-dependency',
       targetPath: './src/noop'
     }));
   }
@@ -50,8 +50,8 @@ function envRollupInfo({browser, withProfiler}) {
   return {plugins, external, format};
 }
 
-function rollupTests({dest, withProfiler, cache, browser}) {
-  const {plugins, external, format} = envRollupInfo({withProfiler, browser});
+function rollupTests({dest, withDependencyTracking, cache, browser}) {
+  const {plugins, external, format} = envRollupInfo({withDependencyTracking, browser});
 
   return rollup.rollup({
     entry: 'test/**/*.js',

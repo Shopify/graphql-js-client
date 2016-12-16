@@ -3,14 +3,14 @@ const minimist = require('minimist');
 
 module.exports = function parseBuildArgs() {
   const args = minimist(process.argv.slice(2), {
-    boolean: 'with-profiler',
+    boolean: 'with-dependency-tracking',
     default: {
-      'with-profiler': false
+      'with-dependency-tracking': false
     }
   });
 
   const dest = args._[0];
-  const withProfiler = args['with-profiler'];
+  const withDependencyTracking = args['with-dependency-tracking'];
 
-  return {dest, withProfiler};
+  return {dest, withDependencyTracking};
 };

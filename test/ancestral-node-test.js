@@ -47,10 +47,10 @@ suite('Integration | Ancestral Nodes', () => {
   setup(() => {
     baseQuery = new Query(typeBundle, (root) => {
       root.addField('shop', (shop) => {
-        shop.addConnection('collections', {first: 1}, (collections) => {
+        shop.addConnection('collections', {args: {first: 1}}, (collections) => {
           collections.addField('id');
           collections.addField('handle');
-          collections.addConnection('products', {first: 1}, (products) => {
+          collections.addConnection('products', {args: {first: 1}}, (products) => {
             products.addField('id');
             products.addField('handle');
             products.addField('options', (options) => {

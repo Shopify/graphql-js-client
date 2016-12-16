@@ -66,12 +66,12 @@ suite('Integration | Node based query generation', () => {
     baseQuery = new Query(typeBundle, (root) => {
       root.addField('shop', (shop) => {
         shop.addField('name');
-        shop.addConnection('collections', {first: 1}, (collections) => {
+        shop.addConnection('collections', {args: {first: 1}}, (collections) => {
           collections.addField('handle');
         });
-        shop.addConnection('products', {first: 1}, (products) => {
+        shop.addConnection('products', {args: {first: 1}}, (products) => {
           products.addField('handle');
-          products.addConnection('variants', {first: 1}, (variants) => {
+          products.addConnection('variants', {args: {first: 1}}, (variants) => {
             variants.addField('title');
           });
         });
@@ -146,9 +146,9 @@ suite('Integration | Node based query generation', () => {
     const nestedObjectsQuery = new Query(typeBundle, (root) => {
       root.addField('arbitraryViewer', (viewer) => {
         viewer.addField('aNode', (node) => {
-          node.addField('hostObject', (host) => {
+          node.addField('hostObject', {alias: 'hostObjectAlias'}, (host) => {
             host.addField('anotherHost', (anotherHost) => {
-              anotherHost.addConnection('products', {first: 1}, (products) => {
+              anotherHost.addConnection('products', {alias: 'productsAlias', args: {first: 1}}, (products) => {
                 products.addField('handle');
               });
             });
@@ -161,9 +161,9 @@ suite('Integration | Node based query generation', () => {
       arbitraryViewer: {
         aNode: {
           id: 'gid://shopify/ArbitraryNode/12345',
-          hostObject: {
+          hostObjectAlias: {
             anotherHost: {
-              products: {
+              productsAlias: {
                 edges: [{
                   cursor: productCursor,
                   node: {
@@ -180,15 +180,15 @@ suite('Integration | Node based query generation', () => {
 
     const nestedGraph = deserializeObject(data, nestedObjectsQuery.selectionSet);
 
-    const nextPageQuery = nestedGraph.arbitraryViewer.aNode.hostObject.anotherHost.products.nextPageQuery();
+    const nextPageQuery = nestedGraph.arbitraryViewer.aNode.hostObjectAlias.anotherHost.productsAlias.nextPageQuery();
 
     assert.deepEqual(tokens(nextPageQuery.toString()), tokens(`query {
       node (id: "gid://shopify/ArbitraryNode/12345") {
         ... on ArbitraryNode {
           id
-          hostObject {
+          hostObjectAlias: hostObject {
             anotherHost {
-              products (first: 1, after: "${productCursor}") {
+              productsAlias: products (first: 1, after: "${productCursor}") {
                 pageInfo {
                   hasNextPage
                   hasPreviousPage

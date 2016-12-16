@@ -49,11 +49,11 @@ suite('Integration | Query bound object graph', () => {
       boundRoot = root;
       root.addField('shop', (shop) => {
         boundShop = shop;
-        shop.addConnection('products', {first: 1}, (products) => {
+        shop.addConnection('products', {args: {first: 1}}, (products) => {
           boundProducts = products;
           products.addField('id');
           products.addField('handle');
-          products.addConnection('images', {first: 1}, (images) => {
+          products.addConnection('images', {args: {first: 1}}, (images) => {
             boundImages = images;
             images.addField('id');
             images.addField('src');

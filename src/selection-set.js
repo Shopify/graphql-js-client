@@ -7,14 +7,14 @@ import {isVariable} from './variable';
 
 function parseFieldCreationArgs(creationArgs) {
   let callback = noop;
-  let args = {};
+  let options = {};
   let selectionSet = null;
 
   if (creationArgs.length === 2) {
     if (typeof creationArgs[1] === 'function') {
-      [args, callback] = creationArgs;
+      [options, callback] = creationArgs;
     } else {
-      [args, selectionSet] = creationArgs;
+      [options, selectionSet] = creationArgs;
     }
   } else if (creationArgs.length === 1) {
     // SelectionSet is defined before this function is called since it's
@@ -25,22 +25,28 @@ function parseFieldCreationArgs(creationArgs) {
     } else if (typeof creationArgs[0] === 'function') {
       callback = creationArgs[0];
     } else {
-      args = creationArgs[0];
+      options = creationArgs[0];
     }
   }
 
-  return {args, selectionSet, callback};
+  return {options, selectionSet, callback};
 }
 
+const emptyArgs = Object.freeze({});
+
 export class Field {
-  constructor(name, args, selectionSet) {
+  constructor(name, options, selectionSet) {
     this.name = name;
-    this.args = deepFreezeCopyExcept(isVariable, args);
+    this.alias = options.alias || null;
+    this.responseKey = this.alias || this.name;
+    this.args = (options.args ? deepFreezeCopyExcept(isVariable, options.args) : emptyArgs);
     this.selectionSet = selectionSet;
     Object.freeze(this);
   }
   toString() {
-    return `${this.name}${formatArgs(this.args)}${this.selectionSet.toString()}`;
+    const aliasPrefix = this.alias ? `${this.alias}: ` : '';
+
+    return `${aliasPrefix}${this.name}${formatArgs(this.args)}${this.selectionSet.toString()}`;
   }
 }
 
@@ -130,7 +136,7 @@ class SelectionSetBuilder {
 
   field(name, ...creationArgs) {
     const parsedArgs = parseFieldCreationArgs(creationArgs);
-    const {args, callback} = parsedArgs;
+    const {options, callback} = parsedArgs;
     let {selectionSet} = parsedArgs;
 
     if (!selectionSet) {
@@ -139,7 +145,7 @@ class SelectionSetBuilder {
       selectionSet = new SelectionSet(this.typeBundle, fieldBaseType, callback);
     }
 
-    return new Field(name, args, selectionSet);
+    return new Field(name, options, selectionSet);
   }
 
   inlineFragmentOn(typeName, builderFunctionOrSelectionSet = noop) {
@@ -178,9 +184,9 @@ class SelectionSetBuilder {
    *                                                         SelectionSet. Or pass an existing SelectionSet.
    */
   addConnection(name, ...creationArgs) {
-    const {args, callback, selectionSet} = parseFieldCreationArgs(creationArgs);
+    const {options, callback, selectionSet} = parseFieldCreationArgs(creationArgs);
 
-    this.add(name, args, (connection) => {
+    this.add(name, options, (connection) => {
       connection.add('pageInfo', {}, (pageInfo) => {
         pageInfo.add('hasNextPage');
         pageInfo.add('hasPreviousPage');

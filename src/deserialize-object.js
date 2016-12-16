@@ -51,9 +51,8 @@ function deserializeValue(value, selectionSet, registry, parent) {
       });
 
       const fieldName = fieldReference.name;
-      const args = Object.assign({}, fieldReference.args);
 
-      selection.add(fieldName, args, (newSelection) => {
+      selection.add(fieldName, {alias: fieldReference.alias, args: fieldReference.args}, (newSelection) => {
         if (rest && rest.length) {
           addNextFieldTo(newSelection, rest.shift(), setToAdd.selections, rest);
         } else {
@@ -66,10 +65,14 @@ function deserializeValue(value, selectionSet, registry, parent) {
           const nodeField = edgesField.selectionSet.selections.find((field) => {
             return field.name === 'node';
           });
+          const options = {
+            alias: connectionField.alias,
+            args: Object.assign({}, connectionField.args, {after: value.edges[value.edges.length - 1].cursor})
+          };
 
           newSelection.addConnection(
             connectionField.name,
-            Object.assign({}, connectionField.args, {after: value.edges[value.edges.length - 1].cursor}),
+            options,
             nodeField.selectionSet
           );
         }
@@ -83,7 +86,7 @@ function deserializeValue(value, selectionSet, registry, parent) {
           const rootNodeId = parent.nearestNodeId;
           const rootNodesSelectionSet = chain.shift();
 
-          root.add('node', {id: rootNodeId}, (node) => {
+          root.add('node', {args: {id: rootNodeId}}, (node) => {
             node.addInlineFragmentOn(rootNodesSelectionSet.typeSchema.name, (rootNode) => {
               if (chain.length) {
                 addNextFieldTo(rootNode, chain.shift(), rootNodesSelectionSet.selections, chain);
@@ -103,7 +106,7 @@ function deserializeValue(value, selectionSet, registry, parent) {
                 });
 
                 // Traverse the sets. This is the connection's set
-                rootNode.addConnection(fieldName, args, nodeField.selectionSet);
+                rootNode.addConnection(fieldName, {args}, nodeField.selectionSet);
               }
             });
           });
@@ -183,7 +186,7 @@ class Ancestry {
   }
 }
 
-function selectionSetForField(fieldName, selectionSet) {
+function selectionSetForField(responseKey, selectionSet) {
   if (!selectionSet) {
     return null;
   }
@@ -192,7 +195,7 @@ function selectionSetForField(fieldName, selectionSet) {
   const valuesField = selectionSet.selections.filter((fieldOrFragment) => {
     return Field.prototype.isPrototypeOf(fieldOrFragment);
   }).find((field) => {
-    return field.name === fieldName;
+    return field.responseKey === responseKey;
   });
 
   if (!valuesField) {
@@ -206,12 +209,12 @@ function selectionSetForField(fieldName, selectionSet) {
 export default function deserializeObject(data, selectionSet, registry = new ClassRegistry(), parent) {
   const ancestry = new Ancestry(selectionSet, parent, data.id);
 
-  const attrs = Object.keys(data).reduce((acc, fieldName) => {
-    const value = data[fieldName];
+  const attrs = Object.keys(data).reduce((acc, key) => {
+    const value = data[key];
 
-    const valuesSelectionSet = selectionSetForField(fieldName, selectionSet);
+    const valuesSelectionSet = selectionSetForField(key, selectionSet);
 
-    acc[fieldName] = deserializeValue(value, valuesSelectionSet, registry, ancestry); // ancestry represents the parent
+    acc[key] = deserializeValue(value, valuesSelectionSet, registry, ancestry); // ancestry represents the parent
 
     return acc;
   }, {});
@@ -222,7 +225,7 @@ export default function deserializeObject(data, selectionSet, registry = new Cla
     if (ancestry.isNode) {
       attrs.refetchQuery = function() {
         return new Query(selectionSet.typeBundle, (root) => {
-          root.add('node', {id: this.ancestry.nodeId}, (node) => {
+          root.add('node', {args: {id: this.ancestry.nodeId}}, (node) => {
             node.addInlineFragmentOn(this.ancestry.selectionSet.typeSchema.name, this.ancestry.selectionSet);
           });
         });

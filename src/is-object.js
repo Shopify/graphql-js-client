@@ -1,5 +1,3 @@
-const objectToString = Object.prototype.toString;
-
 export default function isObject(value) {
-  return objectToString.call(value) === '[object Object]';
+  return Object.prototype.toString.call(value) === '[object Object]';
 }

@@ -1,7 +1,10 @@
 /* eslint-disable no-warning-comments */
 import ClassRegistry from './class-registry';
 import {Field} from './selection-set';
-import Query from '../src/query';
+import Query from './query';
+import isObject from './is-object';
+import isNodeContext from './is-node-context';
+import transformConnections from './transform-connection';
 
 class DecodingContext {
   constructor(selection, responseData, parent = null) {
@@ -44,17 +47,11 @@ function decodeObjectValues(context, transformers) {
   }, {});
 }
 
-function isObject(value) {
-  return Object.prototype.toString.call(value) === '[object Object]';
-}
-
-
 function runTransformers(transformers, context, value) {
   return transformers.reduce((acc, transformer) => {
     return transformer(context, acc);
   }, value);
 }
-
 
 function decodeContext(context, transformers) {
   let value = context.responseData;
@@ -68,15 +65,11 @@ function decodeContext(context, transformers) {
   return runTransformers(transformers, context, value);
 }
 
-function isNode(context) {
-  return context.selection.selectionSet.typeSchema.implementsNode;
-}
-
 function generateRefetchQueries(context, value) {
-  if (isNode(context)) {
-    value.attrs.refetchQuery = function() {
+  if (isNodeContext(context)) {
+    value.refetchQuery = function() {
       return new Query(context.selection.selectionSet.typeBundle, (root) => {
-        root.add('node', {args: {id: context.data.id}}, (node) => {
+        root.add('node', {args: {id: context.responseData.id}}, (node) => {
           node.addInlineFragmentOn(context.selection.selectionSet.typeSchema.name, context.selection.selectionSet);
         });
       });
@@ -84,50 +77,6 @@ function generateRefetchQueries(context, value) {
   }
 
   return value;
-}
-
-function isConnection(context) {
-  return context.selection.selectionSet.typeSchema.name.endsWith('Connection');
-}
-
-function nearestNode(context) {
-  if (context == null) {
-    return null;
-  } else if (isNode(context)) {
-    return context;
-  } else {
-    return nearestNode(context.parent);
-  }
-}
-
-// eslint-disable-next-line no-unused-vars
-function nextPageQuery(context, value) {
-  const nearestNodeContext = nearestNode(context);
-
-  if (nearestNodeContext) {
-    return function() {
-      // eslint-disable-next-line no-unused-vars
-      return new Query(context.selection.selectionSet.typeBundle, (root) => {
-        // TODO
-      });
-    };
-  } else {
-    return function() {
-      // TODO
-    };
-  }
-}
-
-function transformConnections(context, value) {
-  if (isConnection(context)) {
-    const page = value.edges.map((edge) => edge.node);
-
-    page.nextPageQuery = nextPageQuery(context, value);
-
-    return page;
-  } else {
-    return value;
-  }
 }
 
 function transformPojosToClassesWithRegistry(classRegistry) {
@@ -142,20 +91,17 @@ function transformPojosToClassesWithRegistry(classRegistry) {
   };
 }
 
-function defaultTransformers(options) {
-  const classRegistry = options.classRegistry || new ClassRegistry();
-
+function defaultTransformers({classRegistry = new ClassRegistry()}) {
   return [
-    transformPojosToClassesWithRegistry(classRegistry),
     generateRefetchQueries,
-    transformConnections
+    transformConnections,
+    transformPojosToClassesWithRegistry(classRegistry)
   ];
 }
 
 export default function decode(selection, responseData, options = {}) {
   const transformers = options.transformers || defaultTransformers(options);
   const context = new DecodingContext(selection, responseData);
-
 
   return decodeContext(context, transformers);
 }

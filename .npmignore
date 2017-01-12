@@ -7,10 +7,6 @@ node_modules
 fixtures/types.js
 .tmp
 
-# build artifacts
-dev.*
-index.*
-
 # Package Source
 scripts
 src

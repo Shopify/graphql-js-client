@@ -1,12 +1,13 @@
-bower_components
-node_modules
+# CI/dev artifacts
 *.log
-.DS_Store
-bundle.js
-test/output
-lib/
-.tmp
 junit
+node_modules
 fixtures/types.js
+.tmp
+
+# build artifacts
 dev.*
 index.*
+
+# System junk
+.DS_Store

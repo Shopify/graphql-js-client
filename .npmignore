@@ -1,14 +1,29 @@
-bower_components
-node_modules
+# CI/dev artifacts
+.git/
+.tmp/
 *.log
-.DS_Store
-bundle.js
-test
-test.js
-demo/
-.npmignore
-LICENSE.md
-src/
 junit
-.tmp
+node_modules
 fixtures/types.js
+.tmp
+
+# build artifacts
+dev.*
+index.*
+
+# Package Source
+scripts
+src
+test
+.babelrc
+.eslintignore
+.eslintrc.json
+.gitignore
+.npmignore
+circle.yml
+package.json
+rollup.config.js
+schema.json
+
+# System junk
+.DS_Store

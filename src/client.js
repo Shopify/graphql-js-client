@@ -1,6 +1,6 @@
 import Document from './document';
 import Query from './query';
-import deserializeObject from './deserialize-object';
+import decode from './decode';
 
 export default class Client {
   static defaultFetcher(url, fetchOptionOverrides = null) {
@@ -45,7 +45,7 @@ export default class Client {
 
     return this.fetcher(graphQLParams).then((response) => {
       if (response.data) {
-        response.model = deserializeObject(response.data, query.selectionSet);
+        response.model = decode(query, response.data);
       }
 
       return response;

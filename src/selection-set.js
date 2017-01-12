@@ -74,6 +74,35 @@ function selectionsHaveIdField(selections) {
   });
 }
 
+function indexSelectionsByResponseKey(selections) {
+  function assignOrPush(obj, key, value) {
+    if (Array.isArray(obj[key])) {
+      obj[key].push(value);
+    } else {
+      obj[key] = [value];
+    }
+  }
+  const unfrozenObject = selections.reduce((acc, selection) => {
+    if (selection.responseKey) {
+      assignOrPush(acc, selection.responseKey, selection);
+    } else {
+      const responseKeys = Object.keys(selection.selectionSet.selectionsByResponseKey);
+
+      responseKeys.forEach((responseKey) => {
+        assignOrPush(acc, responseKey, selection);
+      });
+    }
+
+    return acc;
+  }, {});
+
+  Object.keys(unfrozenObject).forEach((key) => {
+    Object.freeze(unfrozenObject[key]);
+  });
+
+  return Object.freeze(unfrozenObject);
+}
+
 export default class SelectionSet {
   constructor(typeBundle, type, builderFunction) {
 
@@ -97,6 +126,7 @@ export default class SelectionSet {
         this.selections.unshift(new Field('id', {}, new SelectionSet(typeBundle, 'ID')));
       }
     }
+    this.selectionsByResponseKey = indexSelectionsByResponseKey(this.selections);
     Object.freeze(this.selections);
     Object.freeze(this);
   }

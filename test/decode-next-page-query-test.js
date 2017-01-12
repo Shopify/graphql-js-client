@@ -1,15 +1,14 @@
 import assert from 'assert';
-import deserializeObject from '../src/deserialize-object';
+import decode from '../src/decode';
 import typeBundle from '../fixtures/types'; // eslint-disable-line import/no-unresolved
 import Query from '../src/query';
 
-
-suite('Integration | Node based query generation', () => {
+suite('decode-next-page-query-test', () => {
   const collectionId = 'gid://shopify/Collection/67890';
   const collectionCursor = 'collection-cursor';
   const productId = 'gid://shopify/Product/72727';
   const variantsCursor = 'variants-cursor';
-  const graphFixture = {
+  const fixture = {
     data: {
       shop: {
         name: 'my-shop',
@@ -53,17 +52,17 @@ suite('Integration | Node based query generation', () => {
     }
   };
 
-  let graph;
-  let baseQuery;
+  let decoded;
+  let query;
 
   const querySplitter = /[\s,]+/;
 
-  function tokens(query) {
-    return query.split(querySplitter).filter((token) => Boolean(token));
+  function tokens(queryString) {
+    return queryString.split(querySplitter).filter((token) => Boolean(token));
   }
 
   setup(() => {
-    baseQuery = new Query(typeBundle, (root) => {
+    query = new Query(typeBundle, (root) => {
       root.addField('shop', (shop) => {
         shop.addField('name');
         shop.addConnection('collections', {args: {first: 1}}, (collections) => {
@@ -78,25 +77,11 @@ suite('Integration | Node based query generation', () => {
       });
     });
 
-    // eslint-disable-next-line no-undefined
-    graph = deserializeObject(graphFixture.data, baseQuery.selectionSet);
-  });
-
-  test('Nodes can generate a query to refetch themselves', () => {
-    const refetchQuery = graph.shop.collections[0].refetchQuery();
-
-    assert.deepEqual(tokens(refetchQuery.toString()), tokens(`query {
-      node (id: "${collectionId}") {
-        ... on Collection {
-          id
-          handle
-        }
-      }
-    }`));
+    decoded = decode(query, fixture.data);
   });
 
   test('Arrays of Nodes can generate a query to fetch the next page', () => {
-    const nextPageQuery = graph.shop.collections.nextPageQuery();
+    const nextPageQuery = decoded.shop.collections.nextPageQuery();
 
     assert.deepEqual(tokens(nextPageQuery.toString()), tokens(`query {
       shop {
@@ -118,7 +103,7 @@ suite('Integration | Node based query generation', () => {
   });
 
   test('Arrays of Nodes nested under a truncated query to fetch their next page', () => {
-    const nextPageQuery = graph.shop.products[0].variants.nextPageQuery();
+    const nextPageQuery = decoded.shop.products[0].variants.nextPageQuery();
 
     assert.deepEqual(tokens(nextPageQuery.toString()), tokens(`query {
       node (id: "${productId}") {
@@ -157,20 +142,22 @@ suite('Integration | Node based query generation', () => {
       });
     });
     const productCursor = 'product-cursor';
-    const data = {
-      arbitraryViewer: {
-        aNode: {
-          id: 'gid://shopify/ArbitraryNode/12345',
-          hostObjectAlias: {
-            anotherHost: {
-              productsAlias: {
-                edges: [{
-                  cursor: productCursor,
-                  node: {
-                    id: productId,
-                    handle: 'some-product'
-                  }
-                }]
+    const nestedObjectFixture = {
+      data: {
+        arbitraryViewer: {
+          aNode: {
+            id: 'gid://shopify/ArbitraryNode/12345',
+            hostObjectAlias: {
+              anotherHost: {
+                productsAlias: {
+                  edges: [{
+                    cursor: productCursor,
+                    node: {
+                      id: productId,
+                      handle: 'some-product'
+                    }
+                  }]
+                }
               }
             }
           }
@@ -178,9 +165,9 @@ suite('Integration | Node based query generation', () => {
       }
     };
 
-    const nestedGraph = deserializeObject(data, nestedObjectsQuery.selectionSet);
+    const decodedComplexChain = decode(nestedObjectsQuery, nestedObjectFixture.data);
 
-    const nextPageQuery = nestedGraph.arbitraryViewer.aNode.hostObjectAlias.anotherHost.productsAlias.nextPageQuery();
+    const nextPageQuery = decodedComplexChain.arbitraryViewer.aNode.hostObjectAlias.anotherHost.productsAlias.nextPageQuery();
 
     assert.deepEqual(tokens(nextPageQuery.toString()), tokens(`query {
       node (id: "gid://shopify/ArbitraryNode/12345") {

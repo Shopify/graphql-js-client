@@ -3,6 +3,7 @@ import typeBundle from '../fixtures/types'; // eslint-disable-line import/no-unr
 import Client from '../src/client';
 import Document from '../src/document';
 import Query from '../src/query';
+import ClassRegistry from '../src/class-registry';
 import GraphModel from '../src/graph-model';
 
 suite('client-test', () => {
@@ -107,6 +108,29 @@ suite('client-test', () => {
       assert.deepEqual(response.data, {shop: {name: 'Snowdevil'}});
       assert.equal(response.model.shop.name, 'Snowdevil');
       assert.ok(response.model instanceof GraphModel);
+    });
+  });
+
+  test('it decodes responses with ClassRegistry', () => {
+    class ShopModel extends GraphModel {}
+
+    const classRegistry = new ClassRegistry();
+
+    classRegistry.registerClassForType(ShopModel, 'Shop');
+
+    const mockingClient = new Client(typeBundle, {fetcher: () => {
+      return Promise.resolve({data: {shop: {name: 'Snowdevil'}}});
+    }, registry: classRegistry});
+
+    const query = mockingClient.query((root) => {
+      root.addField('shop', (shop) => {
+        shop.addField('name');
+      });
+    });
+
+    return mockingClient.send(query).then((response) => {
+      assert.ok(response.model instanceof GraphModel);
+      assert.ok(response.model.shop instanceof ShopModel);
     });
   });
 });

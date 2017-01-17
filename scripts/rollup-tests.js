@@ -6,6 +6,7 @@ const multiEntry = require('rollup-plugin-multi-entry');
 const builtins = require('rollup-plugin-node-builtins');
 const globals = require('rollup-plugin-node-globals');
 const babel = require('rollup-plugin-babel');
+const json = require('rollup-plugin-json');
 const remap = require('@shopify/rollup-plugin-remap').default;
 const eslintTestGenerator = require('./rollup-plugin-eslint-test-generator');
 
@@ -29,6 +30,7 @@ function envRollupInfo({browser, withDependencyTracking}) {
     multiEntry({
       exports: false
     }),
+    json(),
     babel()
   ];
   const external = [];

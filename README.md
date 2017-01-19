@@ -6,63 +6,74 @@ Feature light client library for fetching resources via GraphQL
 
 - [Installation](#installation)
 - [Examples](#examples)
-- [API](#api)
-    + [`const instance = graphqlJsClient([options])`](#const-instance-graphqljsclient-options)
-    + [`someFunction(variable, callback)`](#somefunction-variable-callback)
-    + [`anotherFunction()`](#anotherfunction)
+- [Contributing](#contributing)
 - [License](http://github.com/Shopify/graphql-js-client/blob/master/LICENSE.md)
 
 ## Installation
 ```bash
-$ npm install graphql-js-client
+$ yarn install graphql-js-client
 ```
 
 ## Examples
 
-#### Example 1
-
-Decribe Example 1. Stumptown selfies put a bird on it occupy, scenester ramps jean shorts next level kale chips seitan:
+#### Creating and sending a query
 
 ```javascript
-import graphqlJsClient from 'graphql-js-client';
+import GraphQLClient from 'graphql-js-client';
 
-/********************************/
-/********************************/
-/* -- PUT AN EXAMPLE IN HERE -- */
-/********************************/
-/********************************/
+// This is the generated type bundle from graphql-js-schema
+import types from './types.js';
+
+const client = new GraphQLClient(types, 'https://graphql.myshopify.com/api/graphql', {
+  headers: `Authorization: Basic ${btoa('some-storefront-access-token')}`
+});
+
+const products = [];
+
+client.send(client.query((root) => {
+  root.add('shop', (shop) => {
+    shop.add('name');
+    shop.addConnection('products', {args: {first: 10}}, (product) => {
+      product.add('title');
+    });
+  });
+}).then((shopModel) => {
+  console.log(shopModel);
+
+  if (shopModel.products.hasNextPage) {
+
+    products.push(...shopModel.products);
+
+    return client.send(shopModel.products.nextPageQuery());
+  };
+}).then((shopModel) => {
+  products.push(...shopModel.products); // Page two of products
+});
 ```
 
-#### Example 2
+## Contributing
 
-Decribe Example 1. Stumptown selfies put a bird on it occupy, scenester ramps jean shorts next level kale chips seitan:
+#### Setting up:
 
-```javascript
-import graphqlJsClient from 'graphql-js-client';
-
-/********************************/
-/********************************/
-/* -- PUT AN EXAMPLE IN HERE -- */
-/********************************/
-/********************************/
+```bash
+$ git clone git@github.com:Shopify/graphql-js-client.git
+$ cd graphql-js-client
+$ yarn install
 ```
 
-## API
+#### Running the tests in a browser
 
-#### `const instance = graphqlJsClient([options]);`
+```bash
+$ yarn start
+```
 
-Options you can pass `graphqlJsClient`:
-- `option1` - Replace with a description of option 1
-- `option2` - Replace with a description of option 2
-- `option3` - Replace with a description of option 2
+Then visit [http://localhost:4200](http://localhost:4200)
 
-#### `instance.someFunction(variable, callback);`
+#### Running the tests in node
 
-Replace with `someFunction` description. Hoodie post-ironic polaroid salvia, microdosing vice ethical etsy bushwick roof party swag. Farm-to-table humblebrag etsy neutra synth.
-
-#### `instance.anotherFunction();`
-
-Replace with `anotherFunction` description. Tacos polaroid cronut trust fund mumblecore biodiesel viral hella helvetica actually organic. Stumptown selfies put a bird on it occupy, scenester ramps jean shorts next level kale chips seitan.
+```bash
+$ yarn test
+```
 
 ## License
 

@@ -5,34 +5,57 @@ import Document from '../src/document';
 import Query from '../src/query';
 import GraphModel from '../src/graph-model';
 
-
 suite('client-test', () => {
-  const client = new Client(typeBundle, '/graphql');
-
-  test('it sends args to static defaultFetcher method to construct a fetcher function', () => {
-    let defaultFetcherArgs = null;
-
-    function uselessFetcher() {
-      return Promise.resolve({});
-    }
-    class MockClient extends Client {
-      static defaultFetcher(...args) {
-        defaultFetcherArgs = args;
-
-        return uselessFetcher;
-      }
-    }
-    const mockClient = new MockClient(typeBundle, '/graphql', {mode: 'no-cors'});
-
-    assert.deepEqual(defaultFetcherArgs, ['/graphql', {mode: 'no-cors'}]);
-    assert.equal(mockClient.fetcher, uselessFetcher);
-  });
-
   test('it has a type bundle', () => {
+    const client = new Client(typeBundle, {url: '/graphql'});
+
     assert.deepEqual(client.typeBundle, typeBundle);
   });
 
+  test('it builds a client with url and fetcherOptions', () => {
+    const client = new Client(typeBundle, {url: '/graphql', fetcherOptions: {mode: 'no-cors'}});
+
+    assert.ok(client instanceof Client);
+  });
+
+  test('it builds a client with fetcher', () => {
+    function fetcher(url) { return url; }
+
+    const client = new Client(typeBundle, {fetcher});
+
+    assert.ok(client instanceof Client);
+  });
+
+  test('it throws an error if both url and fetcher are set', () => {
+    function fetcher(url) { return url; }
+
+    function createClient() {
+      return new Client(typeBundle, {url: '/graphql', fetcher});
+    }
+
+    assert.throws(createClient, Error);
+  });
+
+  test('it throws an error if neither url or fetcher are set', () => {
+    function createClient() {
+      return new Client(typeBundle);
+    }
+
+    assert.throws(createClient, Error);
+  });
+
+  test('it throws an error if fetcher and fetcherOptions are set', () => {
+    function fetcher(url) { return url; }
+
+    function createClient() {
+      return new Client(typeBundle, {fetcher, fetcherOptions: {}});
+    }
+
+    assert.throws(createClient, Error);
+  });
+
   test('it builds documents', () => {
+    const client = new Client(typeBundle, {url: '/graphql'});
     const clientDocument = client.document();
     const expectedDocument = new Document(typeBundle);
 
@@ -40,6 +63,7 @@ suite('client-test', () => {
   });
 
   test('it builds queries', () => {
+    const client = new Client(typeBundle, {url: '/graphql'});
     const clientQuery = client.query('myQuery', (root) => {
       root.addField('shop', (shop) => {
         shop.addField('name');
@@ -55,21 +79,31 @@ suite('client-test', () => {
   });
 
   test('it sends queries', () => {
-    let fetcherParams = null;
-    const mockingClient = new Client(typeBundle, (graphQLParams) => {
-      fetcherParams = graphQLParams;
+    let fetcherGraphQLParams = null;
+    let fetcherURL = null;
 
-      return Promise.resolve({data: {shop: {name: 'Snowdevil'}}});
-    });
+    function mockFetcher(url) {
+      fetcherURL = url;
 
-    const query = mockingClient.query((root) => {
+      return function fetcher(graphQLParams) {
+        fetcherGraphQLParams = graphQLParams;
+
+        return Promise.resolve({data: {shop: {name: 'Snowdevil'}}});
+      };
+    }
+
+    const fetcher = mockFetcher('https://graphql.example.com');
+    const mockClient = new Client(typeBundle, {fetcher});
+
+    const query = mockClient.query((root) => {
       root.addField('shop', (shop) => {
         shop.addField('name');
       });
     });
 
-    return mockingClient.send(query).then((response) => {
-      assert.deepEqual(fetcherParams, {query: query.toString()});
+    return mockClient.send(query).then((response) => {
+      assert.equal(fetcherURL, 'https://graphql.example.com');
+      assert.deepEqual(fetcherGraphQLParams, {query: query.toString()});
       assert.deepEqual(response.data, {shop: {name: 'Snowdevil'}});
       assert.equal(response.model.shop.name, 'Snowdevil');
       assert.ok(response.model instanceof GraphModel);

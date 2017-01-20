@@ -1,0 +1,8 @@
+{
+  "rules": {
+    "no-unused-vars": ["error", { "varsIgnorePattern": "^_" }]
+  },
+  "extends": [
+    "plugin:shopify/mocha"
+  ]
+}

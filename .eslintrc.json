@@ -1,4 +1,5 @@
 {
+  "root": true,
   "rules": {
     "newline-before-return": ["error"],
     "newline-after-var": ["error", "always"],
@@ -6,8 +7,7 @@
     "promise/always-return": 0
   },
   "extends": [
-    "plugin:shopify/esnext",
-    "plugin:shopify/mocha"
+    "plugin:shopify/esnext"
   ],
   "globals": {
     "fetch": true

@@ -27,8 +27,11 @@ import GraphQLClient from 'graphql-js-client';
 // This is the generated type bundle from graphql-js-schema
 import types from './types.js';
 
-const client = new GraphQLClient(types, 'https://graphql.myshopify.com/api/graphql', {
-  headers: `Authorization: Basic ${btoa('some-storefront-access-token')}`
+const client = new GraphQLClient(types, {
+  url: 'https://graphql.myshopify.com/api/graphql',
+  fetcherOptions: {
+    headers: `Authorization: Basic ${btoa('some-storefront-access-token')}`
+  }
 });
 
 const products = [];
@@ -44,7 +47,6 @@ client.send(client.query((root) => {
   console.log(shopModel);
 
   if (shopModel.products.hasNextPage) {
-
     products.push(...shopModel.products);
 
     return client.send(shopModel.products.nextPageQuery());

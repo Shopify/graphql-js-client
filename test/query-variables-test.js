@@ -1,6 +1,6 @@
 import assert from 'assert';
 import Query from '../src/query';
-import variable, {isVariable, VariableDefinition} from '../src/variable';
+import variable from '../src/variable';
 import typeBundle from '../fixtures/types'; // eslint-disable-line import/no-unresolved
 
 suite('query-variables-test', () => {
@@ -9,19 +9,6 @@ suite('query-variables-test', () => {
   function tokens(query) {
     return query.split(querySplitter);
   }
-
-  test('it can create variables', () => {
-    const variableId = variable('id', 'ID!');
-
-    assert.ok(VariableDefinition.prototype.isPrototypeOf(variableId));
-  });
-
-  test('isVariable returns true for variables', () => {
-    const variableId = variable('id', 'ID!');
-
-    assert.equal(isVariable(variableId), true);
-    assert.equal(isVariable(Object.assign({}, variableId)), false);
-  });
 
   test('it can use variables with fields', () => {
     const variableId = variable('id', 'ID!');
@@ -33,6 +20,23 @@ suite('query-variables-test', () => {
     });
 
     assert.deepEqual(tokens(query.toString()), tokens(`query ($id:ID!) {
+      product (id: $id) {
+        id
+        title
+      }
+    }`));
+  });
+
+  test('it can use variables with a default value', () => {
+    const variableId = variable('id', 'ID!', '123');
+
+    const query = new Query(typeBundle, [variableId], (root) => {
+      root.add('product', {args: {id: variableId}}, (product) => {
+        product.add('title');
+      });
+    });
+
+    assert.deepEqual(tokens(query.toString()), tokens(`query ($id:ID! = "123") {
       product (id: $id) {
         id
         title
@@ -86,9 +90,5 @@ suite('query-variables-test', () => {
         }
       }
     }`));
-  });
-
-  test('variables are always frozen', () => {
-    assert.ok(Object.isFrozen(variable('foo', 'String')));
   });
 });

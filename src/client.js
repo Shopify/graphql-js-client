@@ -4,6 +4,9 @@ import decode from './decode';
 import ClassRegistry from './class-registry';
 import httpFetcher from './http-fetcher';
 
+export {default as GraphModel} from './graph-model';
+export {ClassRegistry};
+
 export default class Client {
   constructor(typeBundle, {url, fetcherOptions, fetcher, registry = new ClassRegistry()}) {
     this.typeBundle = typeBundle;
@@ -45,7 +48,7 @@ export default class Client {
 
     return this.fetcher(graphQLParams).then((response) => {
       if (response.data) {
-        response.model = decode(query, response.data);
+        response.model = decode(query, response.data, {classRegistry: this.classRegistry});
       }
 
       return response;

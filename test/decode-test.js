@@ -104,11 +104,9 @@ suite('decode-test', () => {
     const data = {shop: {name: 'foo'}};
     const decoded = decode(query, data);
 
-    assert.deepEqual(decoded, new GraphModel({
-      shop: new GraphModel({
-        name: 'foo'
-      })
-    }));
+    assert.ok(decoded);
+    assert.ok(decoded.shop);
+    assert.equal(decoded.shop.name, data.shop.name);
   });
 
   test('it creates a GraphModel from the root type', () => {
@@ -177,5 +175,12 @@ suite('decode-test', () => {
 
     assert.ok(ShopModel.prototype.isPrototypeOf(graph.shop), 'shop node is a shop model');
     assert.ok(ProductModel.prototype.isPrototypeOf(graph.shop.products[0]), 'product node is a product model');
+  });
+
+  test('it records type information on the model', () => {
+    const graph = decode(graphQuery, graphFixture.data);
+
+    assert.equal(graph.type.name, 'QueryRoot');
+    assert.equal(graph.shop.type.name, 'Shop');
   });
 });

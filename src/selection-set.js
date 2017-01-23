@@ -51,7 +51,7 @@ export class Field {
   }
 }
 
-class InlineFragment {
+export class InlineFragment {
   constructor(typeName, selectionSet) {
     this.typeName = typeName;
     this.selectionSet = selectionSet;

@@ -74,6 +74,18 @@ function selectionsHaveIdField(selections) {
   });
 }
 
+function selectionsHaveTypenameField(selections) {
+  return selections.some((fieldOrFragment) => {
+    if (Field.prototype.isPrototypeOf(fieldOrFragment)) {
+      return fieldOrFragment.name === '__typename';
+    } else if (InlineFragment.prototype.isPrototypeOf(fieldOrFragment) && fieldOrFragment.selectionSet.typeSchema.implementsNode) {
+      return selectionsHaveTypenameField(fieldOrFragment.selectionSet.selections);
+    }
+
+    return false;
+  });
+}
+
 function indexSelectionsByResponseKey(selections) {
   function assignOrPush(obj, key, value) {
     if (Array.isArray(obj[key])) {
@@ -126,6 +138,13 @@ export default class SelectionSet {
         this.selections.unshift(new Field('id', {}, new SelectionSet(typeBundle, 'ID')));
       }
     }
+
+    if (this.typeSchema.kind === 'INTERFACE') {
+      if (!selectionsHaveTypenameField(this.selections)) {
+        this.selections.unshift(new Field('__typename', {}, new SelectionSet(typeBundle, 'String')));
+      }
+    }
+
     this.selectionsByResponseKey = indexSelectionsByResponseKey(this.selections);
     Object.freeze(this.selections);
     Object.freeze(this);

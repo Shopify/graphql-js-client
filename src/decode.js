@@ -5,6 +5,7 @@ import Query from './query';
 import isObject from './is-object';
 import isNodeContext from './is-node-context';
 import transformConnections from './transform-connection';
+import schemaForType from './schema-for-type';
 
 class DecodingContext {
   constructor(selection, responseData, parent = null) {
@@ -101,7 +102,11 @@ function transformPojosToClassesWithRegistry(classRegistry) {
 
 function recordTypeInformation(context, value) {
   if (isObject(value)) {
-    value.type = context.selection.selectionSet.typeSchema;
+    if (value.__typename) {
+      value.type = schemaForType(context.selection.selectionSet.typeBundle, value.__typename);
+    } else {
+      value.type = context.selection.selectionSet.typeSchema;
+    }
   }
 
   return value;

@@ -10,13 +10,13 @@ suite('decode-inline-fragment-test', () => {
   const data = {
     node: {
       id,
-      handle: 'toilet-brush'
+      handle: 'toilet-brush',
+      __typename: 'Product'
     }
   };
 
   const query = new Query(typeBundle, (root) => {
     root.add('node', {args: {id}}, (node) => {
-      node.add('id');
       node.addInlineFragmentOn('Product', (product) => {
         product.add('handle');
       });
@@ -28,5 +28,28 @@ suite('decode-inline-fragment-test', () => {
 
     assert.equal(decoded.node.id, id);
     assert.equal(decoded.node.handle, handle);
+  });
+
+  test('it can apply type information to interfaces containing typed fragments', () => {
+    const decoded = decode(query, data);
+
+    assert.equal(decoded.node.type.name, 'Product');
+  });
+
+  test('it can recursively decode inline fragments', () => {
+    const queryWithNestedFragments = new Query(typeBundle, (root) => {
+      root.add('node', {args: {id}}, (node) => {
+        node.addInlineFragmentOn('Product', (product) => {
+          product.add('id');
+          product.addInlineFragmentOn('Product', (product2) => {
+            product2.add('handle');
+          });
+        });
+      });
+    });
+
+    const decoded = decode(queryWithNestedFragments, data);
+
+    assert.equal(decoded.node.type.name, 'Product');
   });
 });

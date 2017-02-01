@@ -107,6 +107,7 @@ suite('decode-next-page-query-test', () => {
 
     assert.deepEqual(tokens(nextPageQuery.toString()), tokens(`query {
       node (id: "${productId}") {
+        __typename
         ... on Product {
           id
           variants (first: 1, after: "${variantsCursor}") {
@@ -171,6 +172,7 @@ suite('decode-next-page-query-test', () => {
 
     assert.deepEqual(tokens(nextPageQuery.toString()), tokens(`query {
       node (id: "gid://shopify/ArbitraryNode/12345") {
+        __typename
         ... on ArbitraryNode {
           id
           hostObjectAlias: hostObject {

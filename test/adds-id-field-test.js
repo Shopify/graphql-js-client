@@ -104,6 +104,7 @@ suite('adds-id-field-test', () => {
 
     assert.deepEqual(tokens(relayQuery.toString()), tokens(`query {
       node (id: "gid://shopify/Product/12345") {
+        __typename
         id
       }
     }`));
@@ -121,6 +122,7 @@ suite('adds-id-field-test', () => {
 
     assert.deepEqual(tokens(relayQuery.toString()), tokens(`query {
       node (id: "gid://shopify/Product/12345") {
+        __typename
         ... on Product {
           id
           handle
@@ -163,6 +165,7 @@ suite('adds-id-field-test', () => {
 
     assert.deepEqual(tokens(relayQuery.toString()), tokens(`query {
       node (id: "gid://shopify/Product/12345") {
+        __typename
         ... on Product {
           handle
           ... on Product {

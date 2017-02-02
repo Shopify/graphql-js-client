@@ -69,6 +69,7 @@ suite('decode-refetch-query-test', () => {
 
     assert.deepEqual(tokens(refetchQuery.toString()), tokens(`query {
       node (id: "${productId}") {
+        __typename
         ... on Product {
           id
           handle

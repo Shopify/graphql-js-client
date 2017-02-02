@@ -51,7 +51,7 @@ export class Field {
   }
 }
 
-class InlineFragment {
+export class InlineFragment {
   constructor(typeName, selectionSet) {
     this.typeName = typeName;
     this.selectionSet = selectionSet;
@@ -68,6 +68,18 @@ function selectionsHaveIdField(selections) {
       return fieldOrFragment.name === 'id';
     } else if (InlineFragment.prototype.isPrototypeOf(fieldOrFragment) && fieldOrFragment.selectionSet.typeSchema.implementsNode) {
       return selectionsHaveIdField(fieldOrFragment.selectionSet.selections);
+    }
+
+    return false;
+  });
+}
+
+function selectionsHaveTypenameField(selections) {
+  return selections.some((fieldOrFragment) => {
+    if (Field.prototype.isPrototypeOf(fieldOrFragment)) {
+      return fieldOrFragment.name === '__typename';
+    } else if (InlineFragment.prototype.isPrototypeOf(fieldOrFragment) && fieldOrFragment.selectionSet.typeSchema.implementsNode) {
+      return selectionsHaveTypenameField(fieldOrFragment.selectionSet.selections);
     }
 
     return false;
@@ -126,6 +138,13 @@ export default class SelectionSet {
         this.selections.unshift(new Field('id', {}, new SelectionSet(typeBundle, 'ID')));
       }
     }
+
+    if (this.typeSchema.kind === 'INTERFACE') {
+      if (!selectionsHaveTypenameField(this.selections)) {
+        this.selections.unshift(new Field('__typename', {}, new SelectionSet(typeBundle, 'String')));
+      }
+    }
+
     this.selectionsByResponseKey = indexSelectionsByResponseKey(this.selections);
     Object.freeze(this.selections);
     Object.freeze(this);

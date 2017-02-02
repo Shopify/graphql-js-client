@@ -1,10 +1,11 @@
 /* eslint-disable no-warning-comments */
 import ClassRegistry from './class-registry';
-import {Field} from './selection-set';
+import {Field, InlineFragment} from './selection-set';
 import Query from './query';
 import isObject from './is-object';
 import isNodeContext from './is-node-context';
 import transformConnections from './transform-connection';
+import schemaForType from './schema-for-type';
 
 class DecodingContext {
   constructor(selection, responseData, parent = null) {
@@ -17,13 +18,21 @@ class DecodingContext {
   contextForObjectProperty(responseKey) {
     const nestedSelections = this.selection.selectionSet.selectionsByResponseKey[responseKey];
     const nextSelection = nestedSelections && nestedSelections[0];
-    const nextContext = new DecodingContext(nextSelection, this.responseData[responseKey], this);
+    let nextContext;
+
+    // Inline fragments operate inside the current context, so we recurse to get the proper
+    // selection set, but retain the current response context
+    if (InlineFragment.prototype.isPrototypeOf(nextSelection)) {
+      nextContext = new DecodingContext(nextSelection, this.responseData, this.parent);
+    } else {
+      nextContext = new DecodingContext(nextSelection, this.responseData[responseKey], this);
+    }
 
     if (!nextSelection) {
       throw new Error(`Unexpected response key "${responseKey}", not found in selection set: ${this.selection.selectionSet}`);
     }
 
-    if (nextSelection instanceof Field) {
+    if (Field.prototype.isPrototypeOf(nextSelection)) {
       return nextContext;
     } else {
       return nextContext.contextForObjectProperty(responseKey);
@@ -91,10 +100,23 @@ function transformPojosToClassesWithRegistry(classRegistry) {
   };
 }
 
+function recordTypeInformation(context, value) {
+  if (isObject(value)) {
+    if (value.__typename) {
+      value.type = schemaForType(context.selection.selectionSet.typeBundle, value.__typename);
+    } else {
+      value.type = context.selection.selectionSet.typeSchema;
+    }
+  }
+
+  return value;
+}
+
 function defaultTransformers({classRegistry = new ClassRegistry()}) {
   return [
     generateRefetchQueries,
     transformConnections,
+    recordTypeInformation,
     transformPojosToClassesWithRegistry(classRegistry)
   ];
 }

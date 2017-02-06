@@ -129,4 +129,19 @@ suite('document-test', () => {
       doc.addQuery(query);
     });
   });
+
+  test('it can have fragments', () => {
+    const doc = new Document(typeBundle);
+
+    doc.addFragment('myFragment', 'Product', (product) => {
+      product.add('title');
+    });
+
+    assert.deepEqual(tokens(doc.toString()), tokens(`
+      fragment myFragment on Product {
+        id
+        title
+      }
+    `));
+  });
 });

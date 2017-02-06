@@ -51,6 +51,32 @@ export class Field {
   }
 }
 
+class FragmentSpread {
+  constructor(fragmentDefinition) {
+    this.fragmentName = fragmentDefinition.fragmentName;
+    this.selectionSet = fragmentDefinition.selectionSet;
+    Object.freeze(this);
+  }
+
+  toString() {
+    return `...${this.fragmentName}`;
+  }
+}
+
+export class FragmentDefinition {
+  constructor(fragmentName, typeName, selectionSet) {
+    this.fragmentName = fragmentName;
+    this.typeName = typeName;
+    this.selectionSet = selectionSet;
+    this.spread = new FragmentSpread(this);
+    Object.freeze(this);
+  }
+
+  toString() {
+    return `fragment ${this.fragmentName} on ${this.typeName} ${this.selectionSet.toString()}`;
+  }
+}
+
 export class InlineFragment {
   constructor(typeName, selectionSet) {
     this.typeName = typeName;
@@ -177,11 +203,16 @@ class SelectionSetBuilder {
   }
 
   add(selectionOrFieldName, ...rest) {
-    let selection = selectionOrFieldName;
+    let selection;
 
-    if (Object.prototype.toString.call(selection) === '[object String]') {
-      selection = this.field(selection, ...rest);
+    if (Object.prototype.toString.call(selectionOrFieldName) === '[object String]') {
+      selection = this.field(selectionOrFieldName, ...rest);
+    } else if (FragmentDefinition.prototype.isPrototypeOf(selectionOrFieldName)) {
+      selection = selectionOrFieldName.spread;
+    } else {
+      selection = selectionOrFieldName;
     }
+
     if (selection.name && this.hasSelectionWithName(selection.name)) {
       throw new Error(`The field '${selection.name}' has already been added`);
     }
@@ -254,5 +285,9 @@ class SelectionSetBuilder {
 
   addInlineFragmentOn(typeName, fieldTypeCb = noop) {
     this.add(this.inlineFragmentOn(typeName, fieldTypeCb));
+  }
+
+  addFragment(fragmentDefinition) {
+    this.add(fragmentDefinition);
   }
 }

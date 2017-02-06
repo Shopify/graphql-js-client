@@ -1,5 +1,6 @@
 import Query from './query';
 import join from './join';
+import SelectionSet, {FragmentDefinition} from './selection-set';
 
 function isAnonymous(query) {
   return query.isAnonymous;
@@ -37,10 +38,14 @@ export default class Document {
   constructor(typeBundle) {
     this.typeBundle = typeBundle;
     this.queries = [];
+    this.fragmentDefitions = [];
   }
 
   toString() {
-    return join(this.queries.map((query) => query.toString()));
+    const queryStrings = this.queries.map((query) => query.toString());
+    const fragmentDefitions = this.fragmentDefitions.map((definition) => definition.toString());
+
+    return join(queryStrings.concat(fragmentDefitions));
   }
 
   /**
@@ -60,5 +65,13 @@ export default class Document {
     }
 
     this.queries.push(query);
+  }
+
+  addFragment(name, onType, builderFunction) {
+    const selectionSet = new SelectionSet(this.typeBundle, onType, builderFunction);
+
+    const fragment = new FragmentDefinition(name, onType, selectionSet);
+
+    this.fragmentDefitions.push(fragment);
   }
 }

@@ -1,13 +1,13 @@
 import assert from 'assert';
-import fetchMock from 'fetch-mock';
+import fetchMock from '/isomorphic-fetch-mock'; // eslint-disable-line import/no-unresolved
 import httpFetcher from '../src/http-fetcher';
 
 suite('http-fetcher-test', () => {
-  before(() => {
+  setup(() => {
     fetchMock.mock('https://graphql.example.com', {data: {}});
   });
 
-  after(() => {
+  teardown(() => {
     fetchMock.restore();
   });
 

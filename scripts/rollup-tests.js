@@ -7,7 +7,7 @@ const builtins = require('rollup-plugin-node-builtins');
 const globals = require('rollup-plugin-node-globals');
 const babel = require('rollup-plugin-babel');
 const json = require('rollup-plugin-json');
-const remap = require('@shopify/rollup-plugin-remap').default;
+const remap = require('@shopify/rollup-plugin-remap');
 const eslintTestGenerator = require('./rollup-plugin-eslint-test-generator');
 
 function envRollupInfo({browser, withDependencyTracking}) {
@@ -25,7 +25,8 @@ function envRollupInfo({browser, withDependencyTracking}) {
     }),
     nodeResolve({
       jsnext: true,
-      main: true
+      main: true,
+      preferBuiltins: !browser
     }),
     multiEntry({
       exports: false
@@ -44,9 +45,27 @@ function envRollupInfo({browser, withDependencyTracking}) {
   }
 
   if (browser) {
+    plugins.unshift(remap({
+      originalPath: '/isomorphic-fetch-mock',
+      targetPath: './node_modules/fetch-mock/es5/client'
+    }));
     plugins.unshift(globals(), builtins());
   } else {
-    external.push('assert');
+    external.push(
+      'assert',
+      'url',
+      'http',
+      'https',
+      'zlib',
+      'stream',
+      'buffer',
+      'util',
+      'string_decoder'
+    );
+    plugins.unshift(remap({
+      originalPath: '/isomorphic-fetch-mock',
+      targetPath: './node_modules/fetch-mock/src/server'
+    }));
   }
 
   return {plugins, external, format};

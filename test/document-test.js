@@ -144,4 +144,19 @@ suite('document-test', () => {
       }
     `));
   });
+
+  test('it throws if you pass more than one fragment of the same name.', () => {
+    const doc = new Document(typeBundle);
+    const fragmentName = 'myFragment';
+
+    doc.addFragment(fragmentName, 'Product', (product) => {
+      product.add('title');
+    });
+
+    assert.throws(() => {
+      doc.addFragment(fragmentName, 'Shop', (shop) => {
+        shop.add('name');
+      });
+    });
+  });
 });

@@ -53,19 +53,19 @@ export class Field {
 
 class FragmentSpread {
   constructor(fragmentDefinition) {
-    this.fragmentName = fragmentDefinition.fragmentName;
+    this.name = fragmentDefinition.name;
     this.selectionSet = fragmentDefinition.selectionSet;
     Object.freeze(this);
   }
 
   toString() {
-    return `...${this.fragmentName}`;
+    return `...${this.name}`;
   }
 }
 
 export class FragmentDefinition {
-  constructor(fragmentName, typeName, selectionSet) {
-    this.fragmentName = fragmentName;
+  constructor(name, typeName, selectionSet) {
+    this.name = name;
     this.typeName = typeName;
     this.selectionSet = selectionSet;
     this.spread = new FragmentSpread(this);
@@ -73,7 +73,7 @@ export class FragmentDefinition {
   }
 
   toString() {
-    return `fragment ${this.fragmentName} on ${this.typeName} ${this.selectionSet.toString()}`;
+    return `fragment ${this.name} on ${this.typeName} ${this.selectionSet.toString()}`;
   }
 }
 

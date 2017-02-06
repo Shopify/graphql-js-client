@@ -2,7 +2,7 @@
 const {createFilter} = require('rollup-pluginutils');
 const {statSync} = require('fs');
 const testGenerator = require('eslint-test-generator').default;
-const {walkSync} = require('fs-extra');
+const klawSync = require('klaw-sync');
 
 function lint(lintFile) {
   return testGenerator({
@@ -52,8 +52,8 @@ const lintResultCache = {};
 module.exports = function(options = {}) {
   const filter = createFilter(options.include, options.exclude);
   const files = options.paths
-    .reduce((fileAcc, lintPath) => fileAcc.concat(walkSync(lintPath)), [])
-    .filter((file) => file.endsWith('.js'))
+    .reduce((fileAcc, lintPath) => fileAcc.concat(klawSync(lintPath, {nodir: true})), [])
+    .filter((file) => file.path.endsWith('.js'))
     .filter((file) => filter(file));
 
   return {

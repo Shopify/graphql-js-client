@@ -19,13 +19,13 @@ function envRollupInfo({browser, withDependencyTracking}) {
         'test'
       ]
     }),
-    nodeResolve({
-      jsnext: true,
-      main: true
-    }),
     commonjs({
       include: 'node_modules/**',
       sourceMap: false
+    }),
+    nodeResolve({
+      jsnext: true,
+      main: true
     }),
     multiEntry({
       exports: false

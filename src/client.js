@@ -37,8 +37,8 @@ export default class Client {
     return new Query(this.typeBundle, ...args);
   }
 
-  send(query, variableValues = null, otherProperties = null) {
-    const graphQLParams = {query: query.toString()};
+  send(queryOrDocument, variableValues = null, otherProperties = null) {
+    const graphQLParams = {query: queryOrDocument.toString()};
 
     if (variableValues) {
       graphQLParams.variables = variableValues;
@@ -46,9 +46,32 @@ export default class Client {
 
     Object.assign(graphQLParams, otherProperties);
 
+    let operation;
+
+    if (Query.prototype.isPrototypeOf(queryOrDocument)) {
+      operation = queryOrDocument;
+    } else {
+      const document = queryOrDocument;
+
+      if (document.queries.length === 1) {
+        operation = document.queries[0];
+      } else if (otherProperties.operationName) {
+        // Note: We only support query operations, so that's what
+        // we're searching for until there are other operations.
+        operation = document.queries.find((query) => query.name === otherProperties.operationName);
+      } else {
+        throw new Error(`
+          A document must contain exactly one operation, or an operationName
+          must be specified. Example:
+
+            client.send(document, null, {operationName: 'myFancyQuery'});
+        `);
+      }
+    }
+
     return this.fetcher(graphQLParams).then((response) => {
       if (response.data) {
-        response.model = decode(query, response.data, {classRegistry: this.classRegistry});
+        response.model = decode(operation, response.data, {classRegistry: this.classRegistry});
       }
 
       return response;

@@ -20,8 +20,7 @@ function envRollupInfo({browser, withDependencyTracking}) {
       ]
     }),
     commonjs({
-      include: 'node_modules/**',
-      sourceMap: false
+      include: 'node_modules/**'
     }),
     nodeResolve({
       jsnext: true,

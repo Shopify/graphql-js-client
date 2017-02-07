@@ -1,6 +1,6 @@
 /* eslint-disable no-warning-comments */
 import ClassRegistry from './class-registry';
-import {Field, InlineFragment} from './selection-set';
+import {Field, InlineFragment, FragmentSpread} from './selection-set';
 import Query from './query';
 import isObject from './is-object';
 import isNodeContext from './is-node-context';
@@ -22,7 +22,7 @@ class DecodingContext {
 
     // Inline fragments operate inside the current context, so we recurse to get the proper
     // selection set, but retain the current response context
-    if (InlineFragment.prototype.isPrototypeOf(nextSelection)) {
+    if (InlineFragment.prototype.isPrototypeOf(nextSelection) || FragmentSpread.prototype.isPrototypeOf(nextSelection)) {
       nextContext = new DecodingContext(nextSelection, this.responseData, this.parent);
     } else {
       nextContext = new DecodingContext(nextSelection, this.responseData[responseKey], this);

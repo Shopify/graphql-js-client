@@ -51,7 +51,7 @@ export class Field {
   }
 }
 
-class FragmentSpread {
+export class FragmentSpread {
   constructor(fragmentDefinition) {
     this.name = fragmentDefinition.name;
     this.selectionSet = fragmentDefinition.selectionSet;

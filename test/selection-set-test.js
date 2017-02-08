@@ -45,7 +45,7 @@ suite('selection-set-test', () => {
     const fragment = new FragmentDefinition('sickFragment', 'Shop', set);
 
     const setWithFragment = new SelectionSet(typeBundle, 'Shop', (shop) => {
-      shop.add(fragment);
+      shop.add(fragment.spread);
     });
 
     assert.deepEqual(tokens(setWithFragment.toString()), tokens('{ ...sickFragment }'));
@@ -59,7 +59,7 @@ suite('selection-set-test', () => {
     const fragment = new FragmentDefinition('sickFragment', 'Shop', set);
 
     const setWithFragment = new SelectionSet(typeBundle, 'Shop', (shop) => {
-      shop.add(fragment);
+      shop.add(fragment.spread);
     });
 
     assert.deepEqual(tokens(setWithFragment.toString()), tokens('{ ...sickFragment }'));

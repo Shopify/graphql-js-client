@@ -76,6 +76,8 @@ export default class Document {
     const fragment = new FragmentDefinition(name, onType, selectionSet);
 
     this.definitions.push(fragment);
+
+    return fragment.spread;
   }
 
   get queries() {

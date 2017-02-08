@@ -16,7 +16,7 @@ suite('decode-named-fragment-test', () => {
   test('it can decode data from a query with named fragments', () => {
     const query = new Query(typeBundle, (root) => {
       root.add('shop', (shop) => {
-        shop.addFragment(fragment);
+        shop.addFragment(fragment.spread);
       });
     });
     const decoded = decode(query, data);
@@ -27,7 +27,7 @@ suite('decode-named-fragment-test', () => {
   test('it can decode deeply nested fragments', () => {
     const selections = new SelectionSet(typeBundle, 'Shop', (shop) => {
       shop.add('currencyCode');
-      shop.addFragment(fragment);
+      shop.addFragment(fragment.spread);
     });
     const fragmentWithNestedFragment = new FragmentDefinition('complexShopFragment', 'Shop', selections);
     const currencyCode = 'CAD';
@@ -35,7 +35,7 @@ suite('decode-named-fragment-test', () => {
 
     const complexQuery = new Query(typeBundle, (root) => {
       root.add('shop', (shop) => {
-        shop.addFragment(fragmentWithNestedFragment);
+        shop.addFragment(fragmentWithNestedFragment.spread);
       });
     });
     const decoded = decode(complexQuery, complexData);

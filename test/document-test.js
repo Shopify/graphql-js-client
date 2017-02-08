@@ -145,6 +145,31 @@ suite('document-test', () => {
     `));
   });
 
+  test('it can have fragments', () => {
+    const doc = new Document(typeBundle);
+
+    doc.addFragment('myFragment', 'Product', (product) => {
+      product.add('title');
+    });
+
+    assert.deepEqual(tokens(doc.toString()), tokens(`
+      fragment myFragment on Product {
+        id
+        title
+      }
+    `));
+  });
+
+  test('it returns the consumable part of the fragment (the spread)', () => {
+    const doc = new Document(typeBundle);
+
+    const spread = doc.addFragment('myFragment', 'Product', (product) => {
+      product.add('title');
+    });
+
+    assert.equal(spread.toString(), '...myFragment');
+  });
+
   test('it throws if you pass more than one fragment of the same name.', () => {
     const doc = new Document(typeBundle);
     const fragmentName = 'myFragment';

@@ -207,8 +207,6 @@ class SelectionSetBuilder {
 
     if (Object.prototype.toString.call(selectionOrFieldName) === '[object String]') {
       selection = this.field(selectionOrFieldName, ...rest);
-    } else if (FragmentDefinition.prototype.isPrototypeOf(selectionOrFieldName)) {
-      selection = selectionOrFieldName.spread;
     } else {
       selection = selectionOrFieldName;
     }
@@ -287,7 +285,7 @@ class SelectionSetBuilder {
     this.add(this.inlineFragmentOn(typeName, fieldTypeCb));
   }
 
-  addFragment(fragmentDefinition) {
-    this.add(fragmentDefinition);
+  addFragment(fragmentSpread) {
+    this.add(fragmentSpread);
   }
 }

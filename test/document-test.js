@@ -133,7 +133,7 @@ suite('document-test', () => {
   test('it can have fragments', () => {
     const doc = new Document(typeBundle);
 
-    doc.addFragment('myFragment', 'Product', (product) => {
+    doc.defineFragment('myFragment', 'Product', (product) => {
       product.add('title');
     });
 
@@ -148,7 +148,7 @@ suite('document-test', () => {
   test('it can have fragments', () => {
     const doc = new Document(typeBundle);
 
-    doc.addFragment('myFragment', 'Product', (product) => {
+    doc.defineFragment('myFragment', 'Product', (product) => {
       product.add('title');
     });
 
@@ -163,7 +163,7 @@ suite('document-test', () => {
   test('it returns the consumable part of the fragment (the spread)', () => {
     const doc = new Document(typeBundle);
 
-    const spread = doc.addFragment('myFragment', 'Product', (product) => {
+    const spread = doc.defineFragment('myFragment', 'Product', (product) => {
       product.add('title');
     });
 
@@ -174,12 +174,12 @@ suite('document-test', () => {
     const doc = new Document(typeBundle);
     const fragmentName = 'myFragment';
 
-    doc.addFragment(fragmentName, 'Product', (product) => {
+    doc.defineFragment(fragmentName, 'Product', (product) => {
       product.add('title');
     });
 
     assert.throws(() => {
-      doc.addFragment(fragmentName, 'Shop', (shop) => {
+      doc.defineFragment(fragmentName, 'Shop', (shop) => {
         shop.add('name');
       });
     });

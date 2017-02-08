@@ -167,5 +167,4 @@ suite('client-test', () => {
       assert.ok(response.model instanceof GraphModel);
     });
   });
-
 });

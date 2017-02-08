@@ -19,7 +19,7 @@ suite('client-document-fragment-integration-test', () => {
 
     const document = mockClient.document();
 
-    const fragment = document.addFragment('fancyFragment', 'Shop', (shop) => {
+    const fragment = document.defineFragment('fancyFragment', 'Shop', (shop) => {
       shop.add('name');
     });
 

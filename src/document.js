@@ -67,7 +67,7 @@ export default class Document {
     this.definitions.push(query);
   }
 
-  addFragment(name, onType, builderFunction) {
+  defineFragment(name, onType, builderFunction) {
     if (fragmentNameIsNotUnique(this.fragmentDefinitions, name)) {
       throw new Error('All queries must be named on a multi-query document');
     }

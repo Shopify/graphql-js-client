@@ -1,5 +1,6 @@
 import Query from './query';
 import join from './join';
+import SelectionSet, {FragmentDefinition} from './selection-set';
 
 function isAnonymous(query) {
   return query.isAnonymous;
@@ -33,14 +34,18 @@ function isInvalidQueryCombination(queries) {
   return hasAnonymousQueries(queries) || hasDuplicateQueryNames(queries);
 }
 
+function fragmentNameIsNotUnique(existingDefinitions, name) {
+  return existingDefinitions.some((definition) => (definition.name === name));
+}
+
 export default class Document {
   constructor(typeBundle) {
     this.typeBundle = typeBundle;
-    this.queries = [];
+    this.definitions = [];
   }
 
   toString() {
-    return join(this.queries.map((query) => query.toString()));
+    return join(this.definitions.map((definition) => definition.toString()));
   }
 
   /**
@@ -59,6 +64,27 @@ export default class Document {
       throw new Error('All queries must be named on a multi-query document');
     }
 
-    this.queries.push(query);
+    this.definitions.push(query);
+  }
+
+  defineFragment(name, onType, builderFunction) {
+    if (fragmentNameIsNotUnique(this.fragmentDefinitions, name)) {
+      throw new Error('All queries must be named on a multi-query document');
+    }
+
+    const selectionSet = new SelectionSet(this.typeBundle, onType, builderFunction);
+    const fragment = new FragmentDefinition(name, onType, selectionSet);
+
+    this.definitions.push(fragment);
+
+    return fragment.spread;
+  }
+
+  get queries() {
+    return this.definitions.filter((definition) => Query.prototype.isPrototypeOf(definition));
+  }
+
+  get fragmentDefinitions() {
+    return this.definitions.filter((definition) => FragmentDefinition.prototype.isPrototypeOf(definition));
   }
 }

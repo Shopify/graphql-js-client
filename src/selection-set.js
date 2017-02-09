@@ -51,8 +51,12 @@ export class Field {
   }
 }
 
-export class InlineFragment {
+// This is an interface that defines a usage, and simplifies type checking
+export class Spread {}
+
+export class InlineFragment extends Spread {
   constructor(typeName, selectionSet) {
+    super();
     this.typeName = typeName;
     this.selectionSet = selectionSet;
     Object.freeze(this);
@@ -62,11 +66,39 @@ export class InlineFragment {
   }
 }
 
+export class FragmentSpread extends Spread {
+  constructor(fragmentDefinition) {
+    super();
+    this.name = fragmentDefinition.name;
+    this.selectionSet = fragmentDefinition.selectionSet;
+    Object.freeze(this);
+  }
+
+  toString() {
+    return `...${this.name}`;
+  }
+}
+
+export class FragmentDefinition {
+  constructor(name, typeName, selectionSet) {
+    this.name = name;
+    this.typeName = typeName;
+    this.selectionSet = selectionSet;
+    this.spread = new FragmentSpread(this);
+    Object.freeze(this);
+  }
+
+  toString() {
+    return `fragment ${this.name} on ${this.typeName} ${this.selectionSet.toString()}`;
+  }
+}
+
+
 function selectionsHaveIdField(selections) {
   return selections.some((fieldOrFragment) => {
     if (Field.prototype.isPrototypeOf(fieldOrFragment)) {
       return fieldOrFragment.name === 'id';
-    } else if (InlineFragment.prototype.isPrototypeOf(fieldOrFragment) && fieldOrFragment.selectionSet.typeSchema.implementsNode) {
+    } else if (Spread.prototype.isPrototypeOf(fieldOrFragment) && fieldOrFragment.selectionSet.typeSchema.implementsNode) {
       return selectionsHaveIdField(fieldOrFragment.selectionSet.selections);
     }
 
@@ -78,7 +110,7 @@ function selectionsHaveTypenameField(selections) {
   return selections.some((fieldOrFragment) => {
     if (Field.prototype.isPrototypeOf(fieldOrFragment)) {
       return fieldOrFragment.name === '__typename';
-    } else if (InlineFragment.prototype.isPrototypeOf(fieldOrFragment) && fieldOrFragment.selectionSet.typeSchema.implementsNode) {
+    } else if (Spread.prototype.isPrototypeOf(fieldOrFragment) && fieldOrFragment.selectionSet.typeSchema.implementsNode) {
       return selectionsHaveTypenameField(fieldOrFragment.selectionSet.selections);
     }
 
@@ -177,11 +209,14 @@ class SelectionSetBuilder {
   }
 
   add(selectionOrFieldName, ...rest) {
-    let selection = selectionOrFieldName;
+    let selection;
 
-    if (Object.prototype.toString.call(selection) === '[object String]') {
-      selection = this.field(selection, ...rest);
+    if (Object.prototype.toString.call(selectionOrFieldName) === '[object String]') {
+      selection = this.field(selectionOrFieldName, ...rest);
+    } else {
+      selection = selectionOrFieldName;
     }
+
     if (selection.name && this.hasSelectionWithName(selection.name)) {
       throw new Error(`The field '${selection.name}' has already been added`);
     }
@@ -254,5 +289,9 @@ class SelectionSetBuilder {
 
   addInlineFragmentOn(typeName, fieldTypeCb = noop) {
     this.add(this.inlineFragmentOn(typeName, fieldTypeCb));
+  }
+
+  addFragment(fragmentSpread) {
+    this.add(fragmentSpread);
   }
 }

@@ -1,6 +1,6 @@
 /* eslint-disable no-warning-comments */
 import ClassRegistry from './class-registry';
-import {Field, InlineFragment} from './selection-set';
+import {Field, Spread} from './selection-set';
 import Query from './query';
 import isObject from './is-object';
 import isNodeContext from './is-node-context';
@@ -20,9 +20,9 @@ class DecodingContext {
     const nextSelection = nestedSelections && nestedSelections[0];
     let nextContext;
 
-    // Inline fragments operate inside the current context, so we recurse to get the proper
+    // fragment spreads operate inside the current context, so we recurse to get the proper
     // selection set, but retain the current response context
-    if (InlineFragment.prototype.isPrototypeOf(nextSelection)) {
+    if (Spread.prototype.isPrototypeOf(nextSelection)) {
       nextContext = new DecodingContext(nextSelection, this.responseData, this.parent);
     } else {
       nextContext = new DecodingContext(nextSelection, this.responseData[responseKey], this);

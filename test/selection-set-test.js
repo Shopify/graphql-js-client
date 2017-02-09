@@ -1,7 +1,7 @@
 /* eslint-disable no-new */
 import assert from 'assert';
 import assertDeeplyFrozen from './assert-deeply-frozen';
-import SelectionSet from '../src/selection-set';
+import SelectionSet, {FragmentDefinition} from '../src/selection-set';
 import typeBundle from '../fixtures/types'; // eslint-disable-line import/no-unresolved
 import variable from '../src/variable';
 
@@ -35,6 +35,34 @@ suite('selection-set-test', () => {
     });
 
     assert.deepEqual(tokens(set.toString()), tokens(' { ... on Shop { name } }'));
+  });
+
+  test('it can add named fragments', () => {
+    const set = new SelectionSet(typeBundle, 'Shop', (shop) => {
+      shop.add('name');
+    });
+
+    const fragment = new FragmentDefinition('sickFragment', 'Shop', set);
+
+    const setWithFragment = new SelectionSet(typeBundle, 'Shop', (shop) => {
+      shop.add(fragment.spread);
+    });
+
+    assert.deepEqual(tokens(setWithFragment.toString()), tokens('{ ...sickFragment }'));
+  });
+
+  test('it can add named fragments through "add"', () => {
+    const set = new SelectionSet(typeBundle, 'Shop', (shop) => {
+      shop.add('name');
+    });
+
+    const fragment = new FragmentDefinition('sickFragment', 'Shop', set);
+
+    const setWithFragment = new SelectionSet(typeBundle, 'Shop', (shop) => {
+      shop.add(fragment.spread);
+    });
+
+    assert.deepEqual(tokens(setWithFragment.toString()), tokens('{ ...sickFragment }'));
   });
 
   test('add yields an instance of SelectionSetBuilder representing the type of the field', () => {

@@ -129,4 +129,59 @@ suite('document-test', () => {
       doc.addQuery(query);
     });
   });
+
+  test('it can have fragments', () => {
+    const doc = new Document(typeBundle);
+
+    doc.defineFragment('myFragment', 'Product', (product) => {
+      product.add('title');
+    });
+
+    assert.deepEqual(tokens(doc.toString()), tokens(`
+      fragment myFragment on Product {
+        id
+        title
+      }
+    `));
+  });
+
+  test('it can have fragments', () => {
+    const doc = new Document(typeBundle);
+
+    doc.defineFragment('myFragment', 'Product', (product) => {
+      product.add('title');
+    });
+
+    assert.deepEqual(tokens(doc.toString()), tokens(`
+      fragment myFragment on Product {
+        id
+        title
+      }
+    `));
+  });
+
+  test('it returns the consumable part of the fragment (the spread)', () => {
+    const doc = new Document(typeBundle);
+
+    const spread = doc.defineFragment('myFragment', 'Product', (product) => {
+      product.add('title');
+    });
+
+    assert.equal(spread.toString(), '...myFragment');
+  });
+
+  test('it throws if you pass more than one fragment of the same name.', () => {
+    const doc = new Document(typeBundle);
+    const fragmentName = 'myFragment';
+
+    doc.defineFragment(fragmentName, 'Product', (product) => {
+      product.add('title');
+    });
+
+    assert.throws(() => {
+      doc.defineFragment(fragmentName, 'Shop', (shop) => {
+        shop.add('name');
+      });
+    });
+  });
 });

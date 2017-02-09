@@ -133,4 +133,38 @@ suite('client-test', () => {
       assert.ok(response.model.shop instanceof ShopModel);
     });
   });
+
+  test('it sends documents', () => {
+    let fetcherGraphQLParams = null;
+    let fetcherURL = null;
+
+    function mockFetcher(url) {
+      fetcherURL = url;
+
+      return function fetcher(graphQLParams) {
+        fetcherGraphQLParams = graphQLParams;
+
+        return Promise.resolve({data: {shop: {name: 'Snowdevil'}}});
+      };
+    }
+
+    const fetcher = mockFetcher('https://graphql.example.com');
+    const mockClient = new Client(typeBundle, {fetcher});
+
+    const document = mockClient.document();
+
+    document.addQuery((root) => {
+      root.addField('shop', (shop) => {
+        shop.addField('name');
+      });
+    });
+
+    return mockClient.send(document).then((response) => {
+      assert.equal(fetcherURL, 'https://graphql.example.com');
+      assert.deepEqual(fetcherGraphQLParams, {query: document.toString()});
+      assert.deepEqual(response.data, {shop: {name: 'Snowdevil'}});
+      assert.equal(response.model.shop.name, 'Snowdevil');
+      assert.ok(response.model instanceof GraphModel);
+    });
+  });
 });

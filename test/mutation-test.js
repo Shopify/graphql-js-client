@@ -1,0 +1,75 @@
+import assert from 'assert';
+import assertDeeplyFrozen from './assert-deeply-frozen';
+import Mutation from '../src/mutation';
+import typeBundle from '../fixtures/types';
+import variable from '../src/variable';
+
+suite('mutation-test', () => {
+  const querySplitter = /[\s,]+/;
+
+  function tokens(query) {
+    return query.split(querySplitter).filter((token) => Boolean(token));
+  }
+  const input = variable('input', 'ApiCustomerAccessTokenCreateInput!');
+
+  function buildMutation(root) {
+    root.add('apiCustomerAccessTokenCreate', {args: {input}}, (apiCustomerAccessTokenCreate) => {
+      apiCustomerAccessTokenCreate.add('apiCustomerAccessToken', (apiCustomerAccessToken) => {
+        apiCustomerAccessToken.add('accessToken');
+      });
+    });
+  }
+
+  test('constructor takes a typeBundle and a callback which is called with the mutation\'s SelectionSet', () => {
+    let rootType = null;
+    const mutation = new Mutation(typeBundle, [input], (root) => {
+      rootType = root.typeSchema;
+      buildMutation(root);
+    });
+
+    const mutationString = 'mutation ($input:ApiCustomerAccessTokenCreateInput!)  { apiCustomerAccessTokenCreate (input: $input) { apiCustomerAccessToken { id,accessToken } } }';
+
+    assert.deepEqual(typeBundle.types.Mutation, rootType);
+    assert.deepEqual(tokens(mutation.toString()), tokens(mutationString));
+  });
+
+  test('constructor takes a typeBundle, a name, and a callback rendering a named mutation', () => {
+    let rootType = null;
+    const mutation = new Mutation(typeBundle, 'myMutation', [input], (root) => {
+      rootType = root.typeSchema;
+      buildMutation(root);
+    });
+
+    const mutationString = 'mutation myMutation ($input:ApiCustomerAccessTokenCreateInput!)  { apiCustomerAccessTokenCreate (input: $input) { apiCustomerAccessToken { id,accessToken } } }';
+
+    assert.deepEqual(typeBundle.types.Mutation, rootType);
+    assert.deepEqual(tokens(mutation.toString()), tokens(mutationString));
+  });
+
+  test('it identifies anonymous mutations', () => {
+    const mutation = new Mutation(typeBundle, buildMutation);
+
+    assert.ok(mutation.isAnonymous);
+  });
+
+  test('it identifies named mutations as not anonymous', () => {
+    const mutation = new Mutation(typeBundle, 'myMutation', buildMutation);
+
+    assert.equal(mutation.isAnonymous, false);
+  });
+
+  test('mutations are deeply frozen once they\'ve been built', () => {
+    const mutation = new Mutation(typeBundle, 'foo', [input], buildMutation);
+
+    assertDeeplyFrozen(mutation);
+  });
+
+  test('constructor copies variable definition list into new array', () => {
+    const variables = [input];
+    const mutation = new Mutation(typeBundle, 'foo', variables, buildMutation);
+
+    variables.push(variable('foo', 'String'));
+    assert.deepEqual(variables, [variable('input', 'ApiCustomerAccessTokenCreateInput!'), variable('foo', 'String')]);
+    assert.deepEqual(mutation.variableDefinitions.variableDefinitions, [variable('input', 'ApiCustomerAccessTokenCreateInput!')]);
+  });
+});

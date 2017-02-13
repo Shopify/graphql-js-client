@@ -1,5 +1,6 @@
 import Document from './document';
 import Query from './query';
+import Mutation from './mutation';
 import decode from './decode';
 import ClassRegistry from './class-registry';
 import httpFetcher from './http-fetcher';
@@ -37,8 +38,12 @@ export default class Client {
     return new Query(this.typeBundle, ...args);
   }
 
-  send(queryOrDocument, variableValues = null, otherProperties = null) {
-    const graphQLParams = {query: queryOrDocument.toString()};
+  mutation(...args) {
+    return new Mutation(this.typeBundle, ...args);
+  }
+
+  send(operationOrDocument, variableValues = null, otherProperties = null) {
+    const graphQLParams = {query: operationOrDocument.toString()};
 
     if (variableValues) {
       graphQLParams.variables = variableValues;
@@ -48,10 +53,10 @@ export default class Client {
 
     let operation;
 
-    if (Query.prototype.isPrototypeOf(queryOrDocument)) {
-      operation = queryOrDocument;
+    if (Query.prototype.isPrototypeOf(operationOrDocument) || Mutation.prototype.isPrototypeOf(operationOrDocument)) {
+      operation = operationOrDocument;
     } else {
-      const document = queryOrDocument;
+      const document = operationOrDocument;
 
       if (document.queries.length === 1) {
         operation = document.queries[0];

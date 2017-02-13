@@ -3,8 +3,10 @@ import typeBundle from '../fixtures/types'; // eslint-disable-line import/no-unr
 import Client from '../src/client';
 import Document from '../src/document';
 import Query from '../src/query';
+import Mutation from '../src/mutation';
 import ClassRegistry from '../src/class-registry';
 import GraphModel from '../src/graph-model';
+import variable from '../src/variable';
 
 suite('client-test', () => {
   test('it has a type bundle', () => {
@@ -77,6 +79,28 @@ suite('client-test', () => {
     });
 
     assert.deepEqual(clientQuery, expectedQuery);
+  });
+
+  test('it builds mutations', () => {
+    const client = new Client(typeBundle, {url: '/graphql'});
+    const input = variable('input', 'ApiCustomerAccessTokenCreateInput!');
+    const clientMutation = client.mutation('myMutation', [input], (root) => {
+      root.addField('apiCustomerAccessTokenCreate', {args: {input}}, (apiCustomerAccessTokenCreate) => {
+        apiCustomerAccessTokenCreate.addField('apiCustomerAccessToken', (apiCustomerAccessToken) => {
+          apiCustomerAccessToken.addField('accessToken');
+        });
+      });
+    });
+
+    const expectedMutation = new Mutation(typeBundle, 'myMutation', [input], (root) => {
+      root.add('apiCustomerAccessTokenCreate', {args: {input}}, (apiCustomerAccessTokenCreate) => {
+        apiCustomerAccessTokenCreate.add('apiCustomerAccessToken', (apiCustomerAccessToken) => {
+          apiCustomerAccessToken.add('accessToken');
+        });
+      });
+    });
+
+    assert.deepEqual(clientMutation, expectedMutation);
   });
 
   test('it sends queries', () => {
@@ -164,6 +188,50 @@ suite('client-test', () => {
       assert.deepEqual(fetcherGraphQLParams, {query: document.toString()});
       assert.deepEqual(response.data, {shop: {name: 'Snowdevil'}});
       assert.equal(response.model.shop.name, 'Snowdevil');
+      assert.ok(response.model instanceof GraphModel);
+    });
+  });
+
+  test('it sends mutations', () => {
+    let fetcherGraphQLParams = null;
+    let fetcherURL = null;
+
+    function mockFetcher(url) {
+      fetcherURL = url;
+
+      return function fetcher(graphQLParams) {
+        fetcherGraphQLParams = graphQLParams;
+
+        return Promise.resolve({
+          data: {
+            apiCustomerAccessTokenCreate: {
+              apiCustomerAccessToken: {
+                id: 'gid://shopify/ApiCustomerAccessToken/1',
+                accessToken: '7bfefea8142a7ec40f694dc8336a8ddb'
+              }
+            }
+          }
+        });
+      };
+    }
+
+    const fetcher = mockFetcher('https://graphql.example.com');
+    const mockClient = new Client(typeBundle, {fetcher});
+
+    const input = variable('input', 'ApiCustomerAccessTokenCreateInput!');
+    const mutation = mockClient.mutation([input], (root) => {
+      root.addField('apiCustomerAccessTokenCreate', {args: {input}}, (apiCustomerAccessTokenCreate) => {
+        apiCustomerAccessTokenCreate.addField('apiCustomerAccessToken', (apiCustomerAccessToken) => {
+          apiCustomerAccessToken.addField('accessToken');
+        });
+      });
+    });
+
+    return mockClient.send(mutation, {input: {email: 'email@domain.com', password: 'test123'}}).then((response) => {
+      assert.equal(fetcherURL, 'https://graphql.example.com');
+      assert.deepEqual(fetcherGraphQLParams.query, mutation.toString());
+      assert.deepEqual(response.data, {apiCustomerAccessTokenCreate: {apiCustomerAccessToken: {id: 'gid://shopify/ApiCustomerAccessToken/1', accessToken: '7bfefea8142a7ec40f694dc8336a8ddb'}}});
+      assert.equal(response.model.apiCustomerAccessTokenCreate.apiCustomerAccessToken.accessToken, '7bfefea8142a7ec40f694dc8336a8ddb');
       assert.ok(response.model instanceof GraphModel);
     });
   });

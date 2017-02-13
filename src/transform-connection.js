@@ -31,13 +31,15 @@ function contextsFromNearestNode(context) {
   }
 }
 
-function addNextFieldTo(currentSelection, contextChain, cursor) {
+function addNextFieldTo(currentSelection, contextChain, cursor, path) {
   // There are always at least two. When we start, it's the root context, and the first set
   const nextContext = contextChain.shift();
 
+  path.push(nextContext.selection.alias || nextContext.selection.name);
+
   if (contextChain.length) {
     currentSelection.add(nextContext.selection.name, {alias: nextContext.selection.alias, args: nextContext.selection.args}, (newSelection) => {
-      addNextFieldTo(newSelection, contextChain, cursor);
+      addNextFieldTo(newSelection, contextChain, cursor, path);
     });
   } else {
     const edgesField = nextContext.selection.selectionSet.selections.find((field) => {
@@ -55,8 +57,9 @@ function addNextFieldTo(currentSelection, contextChain, cursor) {
   }
 }
 
-function nextPageQuery(context, value) {
+function nextPageQuery(context, cursor) {
   const nearestNodeContext = nearestNode(context);
+  const path = [];
 
   if (nearestNodeContext) {
     return function() {
@@ -64,32 +67,37 @@ function nextPageQuery(context, value) {
       const nodeId = nearestNodeContext.responseData.id;
       const contextChain = contextsFromNearestNode(context);
 
-      return new Query(context.selection.selectionSet.typeBundle, (root) => {
+      const query = new Query(context.selection.selectionSet.typeBundle, (root) => {
+        path.push('node');
         root.add('node', {args: {id: nodeId}}, (node) => {
           node.addInlineFragmentOn(nodeType.name, (fragment) => {
-            addNextFieldTo(fragment, contextChain.slice(1), value.edges[value.edges.length - 1].cursor);
+            addNextFieldTo(fragment, contextChain.slice(1), cursor, path);
           });
         });
       });
+
+      return [query, path];
     };
   } else {
     return function() {
       const contextChain = contextsFromRoot(context);
 
-      return new Query(context.selection.selectionSet.typeBundle, (root) => {
-        addNextFieldTo(root, contextChain.slice(1), value.edges[value.edges.length - 1].cursor);
+      const query = new Query(context.selection.selectionSet.typeBundle, (root) => {
+        addNextFieldTo(root, contextChain.slice(1), cursor, path);
       });
+
+      return [query, path];
     };
   }
 }
 
 export default function transformConnections(context, value) {
   if (isConnection(context)) {
-    const page = value.edges.map((edge) => edge.node);
-
-    page.nextPageQuery = nextPageQuery(context, value);
-
-    return page;
+    return value.edges.map((edge) => {
+      return Object.assign(edge.node, {
+        nextPageQuery: nextPageQuery(context, edge.cursor)
+      });
+    });
   } else {
     return value;
   }

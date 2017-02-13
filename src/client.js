@@ -77,4 +77,24 @@ export default class Client {
       return response;
     });
   }
+
+  fetchNextPage(nodeOrNodes) {
+    let node;
+
+    if (Array.isArray(nodeOrNodes)) {
+      node = nodeOrNodes[nodeOrNodes.length - 1];
+    } else {
+      node = nodeOrNodes;
+    }
+
+    const [query, path] = node.nextPageQuery();
+
+    return this.send(query).then((response) => {
+      response.model = path.reduce((object, key) => {
+        return object[key];
+      }, response.model);
+
+      return response;
+    });
+  }
 }

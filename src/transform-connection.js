@@ -57,7 +57,7 @@ function addNextFieldTo(currentSelection, contextChain, cursor, path) {
   }
 }
 
-function nextPageQuery(context, cursor) {
+function nextPageQueryAndPath(context, cursor) {
   const nearestNodeContext = nearestNode(context);
   const path = [];
 
@@ -95,7 +95,7 @@ export default function transformConnections(context, value) {
   if (isConnection(context)) {
     return value.edges.map((edge) => {
       return Object.assign(edge.node, {
-        nextPageQuery: nextPageQuery(context, edge.cursor)
+        nextPageQueryAndPath: nextPageQueryAndPath(context, edge.cursor)
       });
     });
   } else {

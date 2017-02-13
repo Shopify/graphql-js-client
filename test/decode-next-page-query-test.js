@@ -81,7 +81,7 @@ suite('decode-next-page-query-test', () => {
   });
 
   test('Arrays of Nodes can generate a query to fetch the next page', () => {
-    const [nextPageQuery, path] = decoded.shop.collections[0].nextPageQuery();
+    const [nextPageQuery, path] = decoded.shop.collections[0].nextPageQueryAndPath();
 
     assert.deepEqual(tokens(nextPageQuery.toString()), tokens(`query {
       shop {
@@ -105,7 +105,7 @@ suite('decode-next-page-query-test', () => {
   });
 
   test('Arrays of Nodes nested under a truncated query to fetch their next page', () => {
-    const [nextPageQuery, path] = decoded.shop.products[0].variants[0].nextPageQuery();
+    const [nextPageQuery, path] = decoded.shop.products[0].variants[0].nextPageQueryAndPath();
 
     assert.deepEqual(tokens(nextPageQuery.toString()), tokens(`query {
       node (id: "${productId}") {
@@ -172,7 +172,7 @@ suite('decode-next-page-query-test', () => {
 
     const decodedComplexChain = decode(nestedObjectsQuery, nestedObjectFixture.data);
 
-    const [nextPageQuery, path] = decodedComplexChain.arbitraryViewer.aNode.hostObjectAlias.anotherHost.productsAlias[0].nextPageQuery();
+    const [nextPageQuery, path] = decodedComplexChain.arbitraryViewer.aNode.hostObjectAlias.anotherHost.productsAlias[0].nextPageQueryAndPath();
 
     assert.deepEqual(tokens(nextPageQuery.toString()), tokens(`query {
       node (id: "gid://shopify/ArbitraryNode/12345") {

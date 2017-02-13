@@ -84,7 +84,7 @@ suite('client-fetch-next-page-test', () => {
     const mockClient = new Client(typeBundle, {fetcher});
 
     return mockClient.fetchNextPage(decoded.shop.collections[0].products).then((response) => {
-      assert.deepEqual(fetcherGraphQLParams, {query: decoded.shop.collections[0].products[0].nextPageQuery()[0].toString()});
+      assert.deepEqual(fetcherGraphQLParams, {query: decoded.shop.collections[0].products[0].nextPageQueryAndPath()[0].toString()});
       assert.ok(Array.isArray(response.model), 'model is array');
       assert.equal(response.model[0].type.name, 'Product', 'array members are Products');
       assert.equal(response.model[0].handle, 'a-different-literal-taco', 'model info gets passed through');
@@ -96,7 +96,7 @@ suite('client-fetch-next-page-test', () => {
     const mockClient = new Client(typeBundle, {fetcher});
 
     return mockClient.fetchNextPage(decoded.shop.collections[0].products[0]).then((response) => {
-      assert.deepEqual(fetcherGraphQLParams, {query: decoded.shop.collections[0].products[0].nextPageQuery()[0].toString()});
+      assert.deepEqual(fetcherGraphQLParams, {query: decoded.shop.collections[0].products[0].nextPageQueryAndPath()[0].toString()});
       assert.ok(Array.isArray(response.model), 'model is array');
       assert.equal(response.model[0].type.name, 'Product', 'array members are Products');
       assert.equal(response.model[0].handle, 'a-different-literal-taco', 'model info gets passed through');

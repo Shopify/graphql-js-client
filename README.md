@@ -49,7 +49,7 @@ client.send(client.query((root) => {
   if (shopModel.products.hasNextPage) {
     products.push(...shopModel.products);
 
-    return client.send(shopModel.products.nextPageQuery());
+    return client.send(shopModel.products.nextPageQueryAndPath());
   };
 }).then((shopModel) => {
   products.push(...shopModel.products); // Page two of products

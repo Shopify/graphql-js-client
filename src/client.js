@@ -87,7 +87,7 @@ export default class Client {
       node = nodeOrNodes;
     }
 
-    const [query, path] = node.nextPageQuery();
+    const [query, path] = node.nextPageQueryAndPath();
 
     return this.send(query).then((response) => {
       response.model = path.reduce((object, key) => {

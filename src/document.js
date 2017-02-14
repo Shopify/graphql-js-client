@@ -1,37 +1,43 @@
 import Query from './query';
+import Mutation from './mutation';
+import Operation from './operation';
 import join from './join';
 import SelectionSet, {FragmentDefinition} from './selection-set';
 
-function isAnonymous(query) {
-  return query.isAnonymous;
+function isAnonymous(operation) {
+  return operation.isAnonymous;
 }
 
-function hasAnonymousQueries(queries) {
-  return queries.some(isAnonymous);
+function hasAnonymousOperations(operations) {
+  return operations.some(isAnonymous);
 }
 
-function hasDuplicateQueryNames(queries) {
-  const names = queries.map((query) => query.name.toString());
+function hasDuplicateOperationNames(operations) {
+  const names = operations.map((operation) => operation.name.toString());
 
   return names.reduce((hasDuplicates, name, index) => {
     return hasDuplicates || names.indexOf(name) !== index;
   }, false);
 }
 
-function extractQuery(typeBundle, ...args) {
-  if (Query.prototype.isPrototypeOf(args[0])) {
+function extractOperation(typeBundle, type, ...args) {
+  if (Operation.prototype.isPrototypeOf(args[0])) {
     return args[0];
   }
 
-  return new Query(typeBundle, ...args);
+  if (type === 'query') {
+    return new Query(typeBundle, ...args);
+  } else {
+    return new Mutation(typeBundle, ...args);
+  }
 }
 
-function isInvalidQueryCombination(queries) {
-  if (queries.length === 1) {
+function isInvalidOperationCombination(operations) {
+  if (operations.length === 1) {
     return false;
   }
 
-  return hasAnonymousQueries(queries) || hasDuplicateQueryNames(queries);
+  return hasAnonymousOperations(operations) || hasDuplicateOperationNames(operations);
 }
 
 function fragmentNameIsNotUnique(existingDefinitions, name) {
@@ -48,23 +54,38 @@ export default class Document {
     return join(this.definitions.map((definition) => definition.toString()));
   }
 
+  addOperation(type, ...args) {
+    const operation = extractOperation(this.typeBundle, type, ...args);
+
+    if (isInvalidOperationCombination(this.operations.concat(operation))) {
+      throw new Error('All queries must be named on a multi-query document');
+    }
+
+    this.definitions.push(operation);
+  }
+
   /**
    * will add a query to the document
    *
-   * @param {TypeBundle} typeBundle The bundle of all supported types.
    * @param {Query|String} [query|queryName] Either an instance of a query
    * object, or the name of a query. Both are optional.
    * @param {Function} [callback] The query builder callback. If a query
    * instance is passed, this callback will be ignored.
    */
   addQuery(...args) {
-    const query = extractQuery(this.typeBundle, ...args);
+    this.addOperation('query', ...args);
+  }
 
-    if (isInvalidQueryCombination(this.queries.concat(query))) {
-      throw new Error('All queries must be named on a multi-query document');
-    }
-
-    this.definitions.push(query);
+  /**
+   * will add a mutation to the document
+   *
+   * @param {Mutation|String} [mutation|mutationName] Either an instance of a mutation
+   * object, or the name of a mutation. Both are optional.
+   * @param {Function} [callback] The mutation builder callback. If a mutation
+   * instance is passed, this callback will be ignored.
+   */
+  addMutation(...args) {
+    this.addOperation('mutation', ...args);
   }
 
   defineFragment(name, onType, builderFunction) {
@@ -80,8 +101,8 @@ export default class Document {
     return fragment.spread;
   }
 
-  get queries() {
-    return this.definitions.filter((definition) => Query.prototype.isPrototypeOf(definition));
+  get operations() {
+    return this.definitions.filter((definition) => Operation.prototype.isPrototypeOf(definition));
   }
 
   get fragmentDefinitions() {

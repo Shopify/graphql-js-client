@@ -10,10 +10,9 @@ suite('mutation-test', () => {
   function tokens(query) {
     return query.split(querySplitter).filter((token) => Boolean(token));
   }
-  const input = variable('input', 'ApiCustomerAccessTokenCreateInput!');
 
   function buildMutation(root) {
-    root.add('apiCustomerAccessTokenCreate', {args: {input}}, (apiCustomerAccessTokenCreate) => {
+    root.add('apiCustomerAccessTokenCreate', {args: {input: {email: 'email@domain.com', password: 'test123'}}}, (apiCustomerAccessTokenCreate) => {
       apiCustomerAccessTokenCreate.add('apiCustomerAccessToken', (apiCustomerAccessToken) => {
         apiCustomerAccessToken.add('accessToken');
       });
@@ -22,12 +21,12 @@ suite('mutation-test', () => {
 
   test('constructor takes a typeBundle and a callback which is called with the mutation\'s SelectionSet', () => {
     let rootType = null;
-    const mutation = new Mutation(typeBundle, [input], (root) => {
+    const mutation = new Mutation(typeBundle, (root) => {
       rootType = root.typeSchema;
       buildMutation(root);
     });
 
-    const mutationString = 'mutation ($input:ApiCustomerAccessTokenCreateInput!)  { apiCustomerAccessTokenCreate (input: $input) { apiCustomerAccessToken { id,accessToken } } }';
+    const mutationString = 'mutation { apiCustomerAccessTokenCreate (input: {email: "email@domain.com" password: "test123"}) { apiCustomerAccessToken { id,accessToken } } }';
 
     assert.deepEqual(typeBundle.types.Mutation, rootType);
     assert.deepEqual(tokens(mutation.toString()), tokens(mutationString));
@@ -35,12 +34,12 @@ suite('mutation-test', () => {
 
   test('constructor takes a typeBundle, a name, and a callback rendering a named mutation', () => {
     let rootType = null;
-    const mutation = new Mutation(typeBundle, 'myMutation', [input], (root) => {
+    const mutation = new Mutation(typeBundle, 'myMutation', (root) => {
       rootType = root.typeSchema;
       buildMutation(root);
     });
 
-    const mutationString = 'mutation myMutation ($input:ApiCustomerAccessTokenCreateInput!)  { apiCustomerAccessTokenCreate (input: $input) { apiCustomerAccessToken { id,accessToken } } }';
+    const mutationString = 'mutation myMutation { apiCustomerAccessTokenCreate (input: {email: "email@domain.com", password: "test123"}) { apiCustomerAccessToken { id,accessToken } } }';
 
     assert.deepEqual(typeBundle.types.Mutation, rootType);
     assert.deepEqual(tokens(mutation.toString()), tokens(mutationString));
@@ -59,13 +58,13 @@ suite('mutation-test', () => {
   });
 
   test('mutations are deeply frozen once they\'ve been built', () => {
-    const mutation = new Mutation(typeBundle, 'foo', [input], buildMutation);
+    const mutation = new Mutation(typeBundle, 'foo', buildMutation);
 
     assertDeeplyFrozen(mutation);
   });
 
   test('constructor copies variable definition list into new array', () => {
-    const variables = [input];
+    const variables = [variable('input', 'ApiCustomerAccessTokenCreateInput!')];
     const mutation = new Mutation(typeBundle, 'foo', variables, buildMutation);
 
     variables.push(variable('foo', 'String'));

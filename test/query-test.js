@@ -3,6 +3,7 @@ import assertDeeplyFrozen from './assert-deeply-frozen';
 import Query from '../src/query';
 import typeBundle from '../fixtures/types'; // eslint-disable-line import/no-unresolved
 import variable from '../src/variable';
+import schemaForType from '../src/schema-for-type';
 
 suite('query-test', () => {
   const querySplitter = /[\s,]+/;
@@ -24,7 +25,7 @@ suite('query-test', () => {
       buildQuery(root);
     });
 
-    assert.deepEqual(typeBundle.types.QueryRoot, rootType);
+    assert.deepEqual(schemaForType(typeBundle, 'QueryRoot'), rootType);
     assert.deepEqual(splitQuery(query.toString()), splitQuery('query { shop { name } }'));
   });
 
@@ -35,7 +36,7 @@ suite('query-test', () => {
       buildQuery(root);
     });
 
-    assert.deepEqual(typeBundle.types.QueryRoot, rootType);
+    assert.deepEqual(schemaForType(typeBundle, 'QueryRoot'), rootType);
     assert.deepEqual(splitQuery(query.toString()), splitQuery('query myQuery { shop { name } }'));
   });
 

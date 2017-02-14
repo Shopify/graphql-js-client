@@ -3,6 +3,7 @@ import assertDeeplyFrozen from './assert-deeply-frozen';
 import Mutation from '../src/mutation';
 import typeBundle from '../fixtures/types';
 import variable from '../src/variable';
+import schemaForType from '../src/schema-for-type';
 
 suite('mutation-test', () => {
   const querySplitter = /[\s,]+/;
@@ -19,17 +20,22 @@ suite('mutation-test', () => {
     });
   }
 
-  test('constructor takes a typeBundle and a callback which is called with the mutation\'s SelectionSet', () => {
+  test('constructor takes a typeBundle and a callback which is called with the mutation\'s SelectionSetBuilder', () => {
     let rootType = null;
     const mutation = new Mutation(typeBundle, (root) => {
       rootType = root.typeSchema;
       buildMutation(root);
     });
 
-    const mutationString = 'mutation { apiCustomerAccessTokenCreate (input: {email: "email@domain.com" password: "test123"}) { apiCustomerAccessToken { id,accessToken } } }';
-
-    assert.deepEqual(typeBundle.types.Mutation, rootType);
-    assert.deepEqual(tokens(mutation.toString()), tokens(mutationString));
+    assert.deepEqual(schemaForType(typeBundle, 'Mutation'), rootType);
+    assert.deepEqual(tokens(mutation.toString()), tokens(`mutation {
+      apiCustomerAccessTokenCreate (input: {email: "email@domain.com" password: "test123"}) {
+        apiCustomerAccessToken {
+          id,
+          accessToken
+        }
+      }
+    }`));
   });
 
   test('constructor takes a typeBundle, a name, and a callback rendering a named mutation', () => {
@@ -39,10 +45,15 @@ suite('mutation-test', () => {
       buildMutation(root);
     });
 
-    const mutationString = 'mutation myMutation { apiCustomerAccessTokenCreate (input: {email: "email@domain.com", password: "test123"}) { apiCustomerAccessToken { id,accessToken } } }';
-
-    assert.deepEqual(typeBundle.types.Mutation, rootType);
-    assert.deepEqual(tokens(mutation.toString()), tokens(mutationString));
+    assert.deepEqual(schemaForType(typeBundle, 'Mutation'), rootType);
+    assert.deepEqual(tokens(mutation.toString()), tokens(`mutation myMutation {
+      apiCustomerAccessTokenCreate (input: {email: "email@domain.com", password: "test123"}) {
+        apiCustomerAccessToken {
+          id,
+          accessToken
+        }
+      }
+    }`));
   });
 
   test('it identifies anonymous mutations', () => {

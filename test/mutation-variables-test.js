@@ -11,10 +11,10 @@ suite('mutation-variables-test', () => {
   }
 
   test('it can use variables with fields', () => {
-    const variableInput = variable('input', 'ApiCustomerAccessTokenCreateInput!');
+    const inputVariable = variable('input', 'ApiCustomerAccessTokenCreateInput!');
 
-    const mutation = new Mutation(typeBundle, [variableInput], (root) => {
-      root.add('apiCustomerAccessTokenCreate', {args: {input: variableInput}}, (apiCustomerAccessTokenCreate) => {
+    const mutation = new Mutation(typeBundle, [inputVariable], (root) => {
+      root.add('apiCustomerAccessTokenCreate', {args: {input: inputVariable}}, (apiCustomerAccessTokenCreate) => {
         apiCustomerAccessTokenCreate.add('apiCustomerAccessToken', (apiCustomerAccessToken) => {
           apiCustomerAccessToken.add('accessToken');
         });
@@ -33,10 +33,10 @@ suite('mutation-variables-test', () => {
   });
 
   test('it can use variables with a default value', () => {
-    const variableInput = variable('input', 'ApiCustomerAccessTokenCreateInput!', {email: 'email@domain.com', password: 'test123'});
+    const inputVariable = variable('input', 'ApiCustomerAccessTokenCreateInput!', {email: 'email@domain.com', password: 'test123'});
 
-    const mutation = new Mutation(typeBundle, [variableInput], (root) => {
-      root.add('apiCustomerAccessTokenCreate', {args: {input: variableInput}}, (apiCustomerAccessTokenCreate) => {
+    const mutation = new Mutation(typeBundle, [inputVariable], (root) => {
+      root.add('apiCustomerAccessTokenCreate', {args: {input: inputVariable}}, (apiCustomerAccessTokenCreate) => {
         apiCustomerAccessTokenCreate.add('apiCustomerAccessToken', (apiCustomerAccessToken) => {
           apiCustomerAccessToken.add('accessToken');
         });
@@ -54,11 +54,9 @@ suite('mutation-variables-test', () => {
   });
 
   test('it can use variables when a mutation is named', () => {
-    const variableInput = variable('input', 'ApiCustomerAccessTokenCreateInput!');
-
-
-    const mutation = new Mutation(typeBundle, 'bestMutationEver', [variableInput], (root) => {
-      root.add('apiCustomerAccessTokenCreate', {args: {input: variableInput}}, (apiCustomerAccessTokenCreate) => {
+    const inputVariable = variable('input', 'ApiCustomerAccessTokenCreateInput!');
+    const mutation = new Mutation(typeBundle, 'bestMutationEver', [inputVariable], (root) => {
+      root.add('apiCustomerAccessTokenCreate', {args: {input: inputVariable}}, (apiCustomerAccessTokenCreate) => {
         apiCustomerAccessTokenCreate.add('apiCustomerAccessToken', (apiCustomerAccessToken) => {
           apiCustomerAccessToken.add('accessToken');
         });

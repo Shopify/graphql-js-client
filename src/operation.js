@@ -56,11 +56,11 @@ export default class Operation {
     this.variableDefinitions = new VariableDefinitions(variables);
     this.operationType = operationType;
     if (operationType === 'query') {
-      this.selectionSet = new SelectionSet(typeBundle, 'QueryRoot', selectionSetCallback);
-      this.typeSchema = schemaForType(typeBundle, 'QueryRoot');
+      this.selectionSet = new SelectionSet(typeBundle, typeBundle.queryType, selectionSetCallback);
+      this.typeSchema = schemaForType(typeBundle, typeBundle.queryType);
     } else {
-      this.selectionSet = new SelectionSet(typeBundle, 'Mutation', selectionSetCallback);
-      this.typeSchema = schemaForType(typeBundle, 'Mutation');
+      this.selectionSet = new SelectionSet(typeBundle, typeBundle.mutationType, selectionSetCallback);
+      this.typeSchema = schemaForType(typeBundle, typeBundle.mutationType);
     }
     Object.freeze(this);
   }

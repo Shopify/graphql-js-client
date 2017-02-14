@@ -69,7 +69,7 @@ export default class Document {
 
   defineFragment(name, onType, builderFunction) {
     if (fragmentNameIsNotUnique(this.fragmentDefinitions, name)) {
-      throw new Error('All queries must be named on a multi-query document');
+      throw new Error('All fragments must be named on a multi-fragment document');
     }
 
     const selectionSet = new SelectionSet(this.typeBundle, onType, builderFunction);

@@ -81,7 +81,7 @@ suite('decode-next-page-query-test', () => {
   });
 
   test('Arrays of Nodes can generate a query to fetch the next page', () => {
-    const nextPageQuery = decoded.shop.collections.nextPageQuery();
+    const [nextPageQuery, path] = decoded.shop.collections[0].nextPageQueryAndPath();
 
     assert.deepEqual(tokens(nextPageQuery.toString()), tokens(`query {
       shop {
@@ -100,10 +100,12 @@ suite('decode-next-page-query-test', () => {
         }
       }
     }`));
+
+    assert.deepEqual(path, ['shop', 'collections']);
   });
 
   test('Arrays of Nodes nested under a truncated query to fetch their next page', () => {
-    const nextPageQuery = decoded.shop.products[0].variants.nextPageQuery();
+    const [nextPageQuery, path] = decoded.shop.products[0].variants[0].nextPageQueryAndPath();
 
     assert.deepEqual(tokens(nextPageQuery.toString()), tokens(`query {
       node (id: "${productId}") {
@@ -126,6 +128,8 @@ suite('decode-next-page-query-test', () => {
         }
       }
     }`));
+
+    assert.deepEqual(path, ['node', 'variants']);
   });
 
   test('it can generate a query off of a node with intermediate objects', () => {
@@ -168,7 +172,7 @@ suite('decode-next-page-query-test', () => {
 
     const decodedComplexChain = decode(nestedObjectsQuery, nestedObjectFixture.data);
 
-    const nextPageQuery = decodedComplexChain.arbitraryViewer.aNode.hostObjectAlias.anotherHost.productsAlias.nextPageQuery();
+    const [nextPageQuery, path] = decodedComplexChain.arbitraryViewer.aNode.hostObjectAlias.anotherHost.productsAlias[0].nextPageQueryAndPath();
 
     assert.deepEqual(tokens(nextPageQuery.toString()), tokens(`query {
       node (id: "gid://shopify/ArbitraryNode/12345") {
@@ -195,5 +199,7 @@ suite('decode-next-page-query-test', () => {
         }
       }
     }`));
+
+    assert.deepEqual(path, ['node', 'hostObjectAlias', 'anotherHost', 'productsAlias']);
   });
 });

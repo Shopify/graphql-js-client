@@ -43,16 +43,19 @@ client.send(client.query((root) => {
       product.add('title');
     });
   });
-}).then((shopModel) => {
-  console.log(shopModel);
+}).then(({model, data}) => {
+  console.log(model); // The serialized model with rich features
+  console.log(data); // The raw data returned from the endpoint
 
-  if (shopModel.products.hasNextPage) {
-    products.push(...shopModel.products);
+  products.push(...model.products);
 
-    return client.send(shopModel.products.nextPageQuery());
+  if (model.products.hasNextPage) {
+    return client.fetchNextPage(model.products);
   };
-}).then((shopModel) => {
-  products.push(...shopModel.products); // Page two of products
+
+// `fetchNextPage` resolves with the model you wanted the next page of
+}).then(({model, data}) => {
+  products.push(...model); // Page two of products
 });
 ```
 

@@ -42,7 +42,6 @@ suite('client-fetch-next-page-test', () => {
     }
   };
 
-
   const pageTwoData = {
     node: {
       id: 'collection-id',

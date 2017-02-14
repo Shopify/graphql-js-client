@@ -37,9 +37,12 @@ function getNewLints(files, cache) {
 }
 
 function generateLintBundle(lints) {
-  const lintTests = Object.keys(lints).sort().map((fileName) => {
-    return lints[fileName].lint;
-  }).join('\n');
+  const lintTests = Object.keys(lints)
+    .sort()
+    .map((fileName) => {
+      return lints[fileName].lint;
+    })
+    .join('\n');
 
   return `import assert from 'assert';
 suite('lint-tests', function() {
@@ -52,8 +55,9 @@ const lintResultCache = {};
 module.exports = function(options = {}) {
   const filter = createFilter(options.include, options.exclude);
   const files = options.paths
-    .reduce((fileAcc, lintPath) => fileAcc.concat(klawSync(lintPath, {nodir: true})), [])
-    .filter((file) => file.path.endsWith('.js'))
+    .reduce((fileAcc, lintPath) => fileAcc.concat(klawSync(lintPath)), [])
+    .map((file) => file.path)
+    .filter((file) => file.endsWith('.js'))
     .filter((file) => filter(file));
 
   return {

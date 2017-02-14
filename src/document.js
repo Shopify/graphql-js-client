@@ -20,12 +20,12 @@ function hasDuplicateOperationNames(operations) {
   }, false);
 }
 
-function extractOperation(typeBundle, type, ...args) {
+function extractOperation(typeBundle, operationType, ...args) {
   if (Operation.prototype.isPrototypeOf(args[0])) {
     return args[0];
   }
 
-  if (type === 'query') {
+  if (operationType === 'query') {
     return new Query(typeBundle, ...args);
   } else {
     return new Mutation(typeBundle, ...args);
@@ -54,11 +54,11 @@ export default class Document {
     return join(this.definitions.map((definition) => definition.toString()));
   }
 
-  addOperation(type, ...args) {
-    const operation = extractOperation(this.typeBundle, type, ...args);
+  addOperation(operationType, ...args) {
+    const operation = extractOperation(this.typeBundle, operationType, ...args);
 
     if (isInvalidOperationCombination(this.operations.concat(operation))) {
-      throw new Error('All queries must be named on a multi-query document');
+      throw new Error('All operations must be named on a multi-operation document');
     }
 
     this.definitions.push(operation);

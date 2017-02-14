@@ -1,5 +1,6 @@
 import join from './join';
 import SelectionSet from './selection-set';
+import schemaForType from './schema-for-type';
 
 function parseArgs(args) {
   let name;
@@ -47,19 +48,19 @@ class VariableDefinitions {
 }
 
 export default class Operation {
-  constructor(typeBundle, type, ...args) {
+  constructor(typeBundle, operationType, ...args) {
     const {name, variables, selectionSetCallback} = parseArgs(args);
 
     this.typeBundle = typeBundle;
     this.name = name;
     this.variableDefinitions = new VariableDefinitions(variables);
-    this.type = type;
-    if (type === 'query') {
+    this.operationType = operationType;
+    if (operationType === 'query') {
       this.selectionSet = new SelectionSet(typeBundle, 'QueryRoot', selectionSetCallback);
-      this.typeSchema = typeBundle.types.QueryRoot;
+      this.typeSchema = schemaForType(typeBundle, 'QueryRoot');
     } else {
       this.selectionSet = new SelectionSet(typeBundle, 'Mutation', selectionSetCallback);
-      this.typeSchema = typeBundle.types.Mutation;
+      this.typeSchema = schemaForType(typeBundle, 'Mutation');
     }
     Object.freeze(this);
   }
@@ -71,6 +72,6 @@ export default class Operation {
   toString() {
     const nameString = (this.name) ? ` ${this.name}` : '';
 
-    return `${this.type}${nameString}${this.variableDefinitions.toString()}${this.selectionSet.toString()}`;
+    return `${this.operationType}${nameString}${this.variableDefinitions.toString()}${this.selectionSet.toString()}`;
   }
 }

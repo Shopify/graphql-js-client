@@ -1,6 +1,7 @@
 import Document from './document';
 import Query from './query';
 import Mutation from './mutation';
+import Operation from './operation';
 import decode from './decode';
 import ClassRegistry from './class-registry';
 import httpFetcher from './http-fetcher';
@@ -53,17 +54,15 @@ export default class Client {
 
     let operation;
 
-    if (Query.prototype.isPrototypeOf(operationOrDocument) || Mutation.prototype.isPrototypeOf(operationOrDocument)) {
+    if (Operation.prototype.isPrototypeOf(operationOrDocument)) {
       operation = operationOrDocument;
     } else {
       const document = operationOrDocument;
 
-      if (document.queries.length === 1) {
-        operation = document.queries[0];
+      if (document.operations.length === 1) {
+        operation = document.operations[0];
       } else if (otherProperties.operationName) {
-        // Note: We only support query operations, so that's what
-        // we're searching for until there are other operations.
-        operation = document.queries.find((query) => query.name === otherProperties.operationName);
+        operation = document.operations.find((documentOperation) => documentOperation.name === otherProperties.operationName);
       } else {
         throw new Error(`
           A document must contain exactly one operation, or an operationName

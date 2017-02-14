@@ -35,7 +35,7 @@ function addNextFieldTo(currentSelection, contextChain, cursor, path) {
   // There are always at least two. When we start, it's the root context, and the first set
   const nextContext = contextChain.shift();
 
-  path.push(nextContext.selection.alias || nextContext.selection.name);
+  path.push(nextContext.selection.responseKey);
 
   if (contextChain.length) {
     currentSelection.add(nextContext.selection.name, {alias: nextContext.selection.alias, args: nextContext.selection.args}, (newSelection) => {

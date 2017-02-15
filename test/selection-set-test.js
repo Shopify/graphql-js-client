@@ -282,4 +282,14 @@ suite('selection-set-test', () => {
     assert.notEqual(set.selections[0].args.fakeArg, args.fakeArg);
     assert.equal(set.selections[0].args.fakeArg.nestedVariable, args.fakeArg.nestedVariable);
   });
+
+  test('it throws an informative error if the field does not exist in the schema', () => {
+    assert.throws(() => {
+      new SelectionSet(typeBundle, 'QueryRoot', (root) => {
+        root.add('shop', (shop) => {
+          shop.add('spaghetti');
+        });
+      });
+    }, /No field of name "spaghetti" found on type "Shop" in schema/);
+  });
 });

@@ -229,6 +229,10 @@ class SelectionSetBuilder {
     let {selectionSet} = parsedArgs;
 
     if (!selectionSet) {
+      if (!this.typeSchema.fieldBaseTypes[name]) {
+        throw new Error(`No field of name "${name}" found on type "${this.typeSchema.name}" in schema`);
+      }
+
       const fieldBaseType = schemaForType(this.typeBundle, this.typeSchema.fieldBaseTypes[name]);
 
       selectionSet = new SelectionSet(this.typeBundle, fieldBaseType, callback);

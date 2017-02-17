@@ -82,7 +82,7 @@ export default class Client {
     });
   }
 
-  fetchNextPage(nodeOrNodes) {
+  fetchNextPage(nodeOrNodes, options) {
     let node;
 
     if (Array.isArray(nodeOrNodes)) {
@@ -93,7 +93,7 @@ export default class Client {
 
     const [query, path] = node.nextPageQueryAndPath();
 
-    return this.send(query).then((response) => {
+    return this.send(query, options).then((response) => {
       response.model = path.reduce((object, key) => {
         return object[key];
       }, response.model);

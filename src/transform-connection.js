@@ -1,5 +1,6 @@
 import Query from './query';
 import isNodeContext from './is-node-context';
+import variable from './variable';
 
 function isConnection(context) {
   return context.selection.selectionSet.typeSchema.name.endsWith('Connection');
@@ -48,9 +49,10 @@ function addNextFieldTo(currentSelection, contextChain, cursor, path) {
     const nodeField = edgesField.selectionSet.selections.find((field) => {
       return field.name === 'node';
     });
+    const first = variable('first', 'Int', nextContext.selection.args.first);
     const options = {
       alias: nextContext.selection.alias,
-      args: Object.assign({}, nextContext.selection.args, {after: cursor})
+      args: Object.assign({}, nextContext.selection.args, {after: cursor, first})
     };
 
     currentSelection.addConnection(nextContext.selection.name, options, nodeField.selectionSet);
@@ -66,8 +68,9 @@ function nextPageQueryAndPath(context, cursor) {
       const nodeType = nearestNodeContext.selection.selectionSet.typeSchema;
       const nodeId = nearestNodeContext.responseData.id;
       const contextChain = contextsFromNearestNode(context);
+      const first = contextChain[contextChain.length - 1].selection.args.first;
 
-      const query = new Query(context.selection.selectionSet.typeBundle, (root) => {
+      const query = new Query(context.selection.selectionSet.typeBundle, [variable('first', 'Int', first)], (root) => {
         path.push('node');
         root.add('node', {args: {id: nodeId}}, (node) => {
           node.addInlineFragmentOn(nodeType.name, (fragment) => {
@@ -81,8 +84,9 @@ function nextPageQueryAndPath(context, cursor) {
   } else {
     return function() {
       const contextChain = contextsFromRoot(context);
+      const first = contextChain[contextChain.length - 1].selection.args.first;
 
-      const query = new Query(context.selection.selectionSet.typeBundle, (root) => {
+      const query = new Query(context.selection.selectionSet.typeBundle, [variable('first', 'Int', first)], (root) => {
         addNextFieldTo(root, contextChain.slice(1), cursor, path);
       });
 

@@ -83,9 +83,9 @@ suite('decode-next-page-query-test', () => {
   test('Arrays of Nodes can generate a query to fetch the next page', () => {
     const [nextPageQuery, path] = decoded.shop.collections[0].nextPageQueryAndPath();
 
-    assert.deepEqual(tokens(nextPageQuery.toString()), tokens(`query {
+    assert.deepEqual(tokens(nextPageQuery.toString()), tokens(`query ($first:Int = 1) {
       shop {
-        collections (first: 1, after: "${collectionCursor}") {
+        collections (first: $first, after: "${collectionCursor}") {
           pageInfo {
             hasNextPage
             hasPreviousPage
@@ -107,12 +107,12 @@ suite('decode-next-page-query-test', () => {
   test('Arrays of Nodes nested under a truncated query to fetch their next page', () => {
     const [nextPageQuery, path] = decoded.shop.products[0].variants[0].nextPageQueryAndPath();
 
-    assert.deepEqual(tokens(nextPageQuery.toString()), tokens(`query {
+    assert.deepEqual(tokens(nextPageQuery.toString()), tokens(`query ($first:Int = 1) {
       node (id: "${productId}") {
         __typename
         ... on Product {
           id
-          variants (first: 1, after: "${variantsCursor}") {
+          variants (first: $first, after: "${variantsCursor}") {
             pageInfo {
               hasNextPage
               hasPreviousPage
@@ -174,14 +174,14 @@ suite('decode-next-page-query-test', () => {
 
     const [nextPageQuery, path] = decodedComplexChain.arbitraryViewer.aNode.hostObjectAlias.anotherHost.productsAlias[0].nextPageQueryAndPath();
 
-    assert.deepEqual(tokens(nextPageQuery.toString()), tokens(`query {
+    assert.deepEqual(tokens(nextPageQuery.toString()), tokens(`query ($first:Int = 1) {
       node (id: "gid://shopify/ArbitraryNode/12345") {
         __typename
         ... on ArbitraryNode {
           id
           hostObjectAlias: hostObject {
             anotherHost {
-              productsAlias: products (first: 1, after: "${productCursor}") {
+              productsAlias: products (first: $first, after: "${productCursor}") {
                 pageInfo {
                   hasNextPage
                   hasPreviousPage

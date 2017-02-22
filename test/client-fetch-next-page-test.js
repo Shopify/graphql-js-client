@@ -59,6 +59,29 @@ suite('client-fetch-next-page-test', () => {
     }
   };
 
+  const pageTwoMultipleData = {
+    node: {
+      id: 'collection-id',
+      products: {
+        pageInfo: {
+          hasNextPage: true
+        },
+        edges: [{
+          cursor: 'product-cursor-two',
+          node: {
+            handle: 'a-different-literal-taco'
+          }
+        }, {
+          cursor: 'product-cursor-three',
+          node: {
+            handle: 'an-even-more-different-literal-taco'
+          }
+        }]
+      }
+    }
+  };
+
+
   let fetcherGraphQLParams;
   let decoded;
 
@@ -67,6 +90,14 @@ suite('client-fetch-next-page-test', () => {
       fetcherGraphQLParams = graphQLParams;
 
       return Promise.resolve({data: pageTwoData});
+    };
+  }
+
+  function mockFetcherMultiple() {
+    return function fetcher(graphQLParams) {
+      fetcherGraphQLParams = graphQLParams;
+
+      return Promise.resolve({data: pageTwoMultipleData});
     };
   }
 
@@ -99,6 +130,21 @@ suite('client-fetch-next-page-test', () => {
       assert.ok(Array.isArray(response.model), 'model is array');
       assert.equal(response.model[0].type.name, 'Product', 'array members are Products');
       assert.equal(response.model[0].handle, 'a-different-literal-taco', 'model info gets passed through');
+    });
+  });
+
+  test('it fetches next page with the number of models specified', () => {
+    const fetcher = mockFetcherMultiple();
+    const mockClient = new Client(typeBundle, {fetcher});
+
+    return mockClient.fetchNextPage(decoded.shop.collections[0].products, {first: 2}).then((response) => {
+      assert.deepEqual(fetcherGraphQLParams, {query: decoded.shop.collections[0].products[0].nextPageQueryAndPath()[0].toString(), variables: {first: 2}});
+      assert.ok(Array.isArray(response.model), 'model is array');
+      assert.equal(response.model.length, 2, 'two products are returned');
+      assert.equal(response.model[0].type.name, 'Product', 'array members are Products');
+      assert.equal(response.model[1].type.name, 'Product', 'array members are Products');
+      assert.equal(response.model[0].handle, 'a-different-literal-taco', 'model info gets passed through');
+      assert.equal(response.model[1].handle, 'an-even-more-different-literal-taco', 'model info gets passed through');
     });
   });
 });

@@ -183,6 +183,7 @@ suite('decode-test', () => {
 
     assert.equal(graph.type.name, 'QueryRoot');
     assert.equal(graph.shop.type.name, 'Shop');
+    assert.equal(graph.shop.name.type.name, 'String');
   });
 
   test('it wraps primitives in a Scalar wrapper (allowing extensibility)', () => {

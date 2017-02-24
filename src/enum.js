@@ -6,6 +6,10 @@ export class Enum {
   toString() {
     return this.key;
   }
+
+  valueOf() {
+    return this.key;
+  }
 }
 
 export default (key) => {

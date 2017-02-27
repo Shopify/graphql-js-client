@@ -1,6 +1,7 @@
 import assert from 'assert';
 import formatArgs from '../src/format-args';
 import _enum from '../src/enum';
+import Scalar from '../src/scalar';
 
 suite('format-args-test', () => {
   test('it formats args with only scalars', () => {
@@ -31,5 +32,11 @@ suite('format-args-test', () => {
     const result = formatArgs({list: [_enum('ONE'), _enum('TWO')]});
 
     assert.equal(result, ' (list: [ONE TWO])');
+  });
+
+  test('it formats args with wrapped scalars', () => {
+    const result = formatArgs({int: new Scalar(1), float: new Scalar(0.1), string: new Scalar('two'), boolean: new Scalar(true)});
+
+    assert.equal(result, ' (int: 1 float: 0.1 string: "two" boolean: true)');
   });
 });

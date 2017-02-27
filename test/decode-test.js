@@ -2,6 +2,7 @@ import assert from 'assert';
 import ClassRegistry from '../src/class-registry';
 import decode from '../src/decode';
 import GraphModel from '../src/graph-model';
+import Scalar from '../src/scalar';
 import Query from '../src/query';
 import typeBundle from '../fixtures/types'; // eslint-disable-line import/no-unresolved
 
@@ -119,9 +120,9 @@ suite('decode-test', () => {
     const graph = decode(graphQuery, graphFixture.data);
 
     assert.ok(GraphModel.prototype.isPrototypeOf(graph.shop), 'shop relationship is a graph model');
-    assert.equal(graph.shop.attrs.name, 'buckets-o-stuff', 'shop model contains scalar attrs');
+    assert.equal(graph.shop.name, 'buckets-o-stuff', 'shop model contains scalar attrs');
     assert.deepEqual(
-      graph.shop.attrs.products.map((product) => product.attrs).map((attrs) => attrs.handle),
+      graph.shop.products.map((attrs) => attrs.handle.valueOf()),
       [
         'aluminum-pole',
         'electricity-socket-with-jam',
@@ -182,5 +183,13 @@ suite('decode-test', () => {
 
     assert.equal(graph.type.name, 'QueryRoot');
     assert.equal(graph.shop.type.name, 'Shop');
+    assert.equal(graph.shop.name.type.name, 'String');
+  });
+
+  test('it wraps primitives in a Scalar wrapper (allowing extensibility)', () => {
+    const graph = decode(graphQuery, graphFixture.data);
+
+    assert.ok(Scalar.prototype.isPrototypeOf(graph.shop.name));
+    assert.equal(graph.shop.name, 'buckets-o-stuff');
   });
 });

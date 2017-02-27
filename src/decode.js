@@ -6,6 +6,8 @@ import isObject from './is-object';
 import isNodeContext from './is-node-context';
 import transformConnections from './transform-connection';
 import schemaForType from './schema-for-type';
+import Scalar from './scalar';
+import {Enum} from './enum';
 
 class DecodingContext {
   constructor(selection, responseData, parent = null) {
@@ -100,13 +102,21 @@ function transformPojosToClassesWithRegistry(classRegistry) {
   };
 }
 
+function transformScalars(context, value) {
+  if (context.selection.selectionSet.typeSchema.kind === 'SCALAR') {
+    return new Scalar(value);
+  } else if (context.selection.selectionSet.typeSchema.kind === 'ENUM') {
+    return new Enum(value);
+  } else {
+    return value;
+  }
+}
+
 function recordTypeInformation(context, value) {
-  if (isObject(value)) {
-    if (value.__typename) {
-      value.type = schemaForType(context.selection.selectionSet.typeBundle, value.__typename);
-    } else {
-      value.type = context.selection.selectionSet.typeSchema;
-    }
+  if (value.__typename) {
+    value.type = schemaForType(context.selection.selectionSet.typeBundle, value.__typename);
+  } else {
+    value.type = context.selection.selectionSet.typeSchema;
   }
 
   return value;
@@ -114,6 +124,7 @@ function recordTypeInformation(context, value) {
 
 function defaultTransformers({classRegistry = new ClassRegistry()}) {
   return [
+    transformScalars,
     generateRefetchQueries,
     transformConnections,
     recordTypeInformation,

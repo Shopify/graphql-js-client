@@ -1,3 +1,3 @@
 export default function isObject(value) {
-  return Object.prototype.toString.call(value) === '[object Object]';
+  return Boolean(value) && Object.prototype.toString.call(value.valueOf()) === '[object Object]';
 }

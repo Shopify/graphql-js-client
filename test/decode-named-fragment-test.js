@@ -41,6 +41,6 @@ suite('decode-named-fragment-test', () => {
     const decoded = decode(complexQuery, complexData);
 
     assert.equal(decoded.shop.name, name);
-    assert.equal(decoded.shop.currencyCode, currencyCode);
+    assert.equal(decoded.shop.currencyCode.toString(), currencyCode);
   });
 });

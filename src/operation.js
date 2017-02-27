@@ -39,11 +39,7 @@ class VariableDefinitions {
       return '';
     }
 
-    const variableDefinitionsStrings = this.variableDefinitions.map((variableDefinition) => {
-      return variableDefinition.toVariableDefinitionString();
-    });
-
-    return ` (${join(variableDefinitionsStrings)}) `;
+    return ` (${join(this.variableDefinitions)}) `;
   }
 }
 
@@ -72,6 +68,6 @@ export default class Operation {
   toString() {
     const nameString = (this.name) ? ` ${this.name}` : '';
 
-    return `${this.operationType}${nameString}${this.variableDefinitions.toString()}${this.selectionSet.toString()}`;
+    return `${this.operationType}${nameString}${this.variableDefinitions}${this.selectionSet}`;
   }
 }

@@ -25,15 +25,15 @@ suite('variable-test', () => {
     assert.equal(variableId.toInputValueString(), '$id');
   });
 
-  test('toVariableDefinitionString returns a formatted string with its name and type', () => {
+  test('toString returns a formatted string with its name and type', () => {
     const variableId = variable('id', 'ID!');
 
-    assert.equal(variableId.toVariableDefinitionString(), '$id:ID!');
+    assert.equal(variableId.toString(), '$id:ID!');
   });
 
-  test('toVariableDefinitionString returns a formatted string with its name, type, and defaultValue', () => {
+  test('toString returns a formatted string with its name, type, and defaultValue', () => {
     const variableId = variable('id', 'ID!', '123');
 
-    assert.equal(variableId.toVariableDefinitionString(), '$id:ID! = "123"');
+    assert.equal(variableId.toString(), '$id:ID! = "123"');
   });
 });

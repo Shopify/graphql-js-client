@@ -238,4 +238,15 @@ suite('decode-test', () => {
     assert.equal(Object.prototype.toString.call(model.product.options), '[object Null]');
     assert.equal(Object.prototype.toString.call(model.product.variants[0].weightUnit), '[object Null]');
   });
+
+  test('it applies `hasNextPage` and `hasPreviousPage` to every node in the list', () => {
+    const decoded = decode(graphQuery, graphFixture.data);
+
+    assert.equal(decoded.shop.products[0].hasNextPage, true, 'nodes with later items have a next page');
+    assert.equal(decoded.shop.products[0].hasPreviousPage, false, 'nodes at the beginning inherit from `pageInfo`');
+    assert.equal(decoded.shop.products[1].hasNextPage, true, 'nodes bounded by other nodes have a next page');
+    assert.equal(decoded.shop.products[1].hasPreviousPage, true, 'nodes bounded by other nodes have a previous page');
+    assert.equal(decoded.shop.products[2].hasNextPage, false, 'nodes at the end inherit from `pageInfo`');
+    assert.equal(decoded.shop.products[2].hasPreviousPage, true, 'nodes with previous items have a previous page');
+  });
 });

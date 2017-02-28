@@ -64,6 +64,10 @@ const productFixture = {
         }
       ],
       imagesAlias: {
+        pageInfo: {
+          hasPreviousPage: false,
+          hasNextPage: false
+        },
         edges: [
           {
             node: {

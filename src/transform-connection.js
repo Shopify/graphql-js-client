@@ -100,10 +100,6 @@ function hasNextPage(connection, edge) {
     return true;
   }
 
-  if (!connection.pageInfo) {
-    return null;
-  }
-
   return connection.pageInfo.hasNextPage;
 }
 
@@ -112,15 +108,15 @@ function hasPreviousPage(connection, edge) {
     return true;
   }
 
-  if (!connection.pageInfo) {
-    return null;
-  }
-
   return connection.pageInfo.hasPreviousPage;
 }
 
 export default function transformConnections(context, value) {
   if (isConnection(context)) {
+    if (!value.pageInfo) {
+      throw new Error('Connections must include the "pageInfo" field');
+    }
+
     return value.edges.map((edge) => {
       return Object.assign(edge.node, {
         nextPageQueryAndPath: nextPageQueryAndPath(context, edge.cursor),

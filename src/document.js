@@ -13,7 +13,7 @@ function hasAnonymousOperations(operations) {
 }
 
 function hasDuplicateOperationNames(operations) {
-  const names = operations.map((operation) => operation.name.toString());
+  const names = operations.map((operation) => operation.name);
 
   return names.reduce((hasDuplicates, name, index) => {
     return hasDuplicates || names.indexOf(name) !== index;
@@ -51,7 +51,7 @@ export default class Document {
   }
 
   toString() {
-    return join(this.definitions.map((definition) => definition.toString()));
+    return join(this.definitions);
   }
 
   addOperation(operationType, ...args) {

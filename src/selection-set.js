@@ -47,7 +47,7 @@ export class Field {
   toString() {
     const aliasPrefix = this.alias ? `${this.alias}: ` : '';
 
-    return `${aliasPrefix}${this.name}${formatArgs(this.args)}${this.selectionSet.toString()}`;
+    return `${aliasPrefix}${this.name}${formatArgs(this.args)}${this.selectionSet}`;
   }
 }
 
@@ -62,7 +62,7 @@ export class InlineFragment extends Spread {
     Object.freeze(this);
   }
   toString() {
-    return `... on ${this.typeName}${this.selectionSet.toString()}`;
+    return `... on ${this.typeName}${this.selectionSet}`;
   }
 }
 
@@ -89,7 +89,7 @@ export class FragmentDefinition {
   }
 
   toString() {
-    return `fragment ${this.name} on ${this.typeName} ${this.selectionSet.toString()}`;
+    return `fragment ${this.name} on ${this.typeName} ${this.selectionSet}`;
   }
 }
 
@@ -186,11 +186,7 @@ export default class SelectionSet {
     if (this.typeSchema.kind === 'SCALAR') {
       return '';
     } else {
-      const commaDelimitedSelections = join(this.selections.map((selection) => {
-        return selection.toString();
-      }));
-
-      return ` { ${commaDelimitedSelections} }`;
+      return ` { ${join(this.selections)} }`;
     }
   }
 }

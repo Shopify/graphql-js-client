@@ -12,7 +12,7 @@ export class VariableDefinition {
     return `$${this.name}`;
   }
 
-  toVariableDefinitionString() {
+  toString() {
     const defaultValueString = this.defaultValue ? ` = ${formatInputValue(this.defaultValue)}` : '';
 
     return `$${this.name}:${this.type}${defaultValueString}`;

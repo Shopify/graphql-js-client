@@ -1,6 +1,7 @@
 import assert from 'assert';
 import isObject from '../src/is-object';
 import Scalar from '../src/scalar';
+import _enum from '../src/enum';
 
 suite('is-object-test', () => {
   test('it returns true for POJOs', () => {
@@ -40,5 +41,9 @@ suite('is-object-test', () => {
 
   test('it handles undefined values', () => {
     assert.equal(isObject(), false);
+  });
+
+  test('it returns false for enums', () => {
+    assert.equal(isObject(_enum('enum')), false);
   });
 });

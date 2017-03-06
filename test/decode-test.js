@@ -94,7 +94,6 @@ const productQuery = new Query(typeBundle, (root) => {
   });
 });
 
-
 suite('decode-test', () => {
   test('it decodes a very simple query response', () => {
     const query = new Query(typeBundle, (root) => {
@@ -193,23 +192,22 @@ suite('decode-test', () => {
     assert.equal(graph.shop.name, 'buckets-o-stuff');
   });
 
-  test('it does not record type information for null values', () => {
-    const nullProductFixture = {
+  test('it decodes query responses with null values', () => {
+    const productWithNullFieldsId = 'gid://shopify/Product/1893855669';
+    const productWithNullFieldsFixture = {
       data: {
         product: {
-          id: productId,
-          handle: 'aluminum-pole',
+          id: productWithNullFieldsId,
+          handle: null,
           options: null,
-          imagesAlias: {
+          images: {
+            edges: []
+          },
+          variants: {
             edges: [
               {
                 node: {
-                  src: 'https://cdn.shopify.com/s/files/1/1090/1932/products/festivus-pole-the-strike-seinfeld.jpg?v=1449866700'
-                }
-              },
-              {
-                node: {
-                  src: 'https://cdn.shopify.com/s/files/1/1090/1932/products/giphy.gif?v=1450204755'
+                  weightUnit: null
                 }
               }
             ]
@@ -218,8 +216,26 @@ suite('decode-test', () => {
       }
     };
 
-    const model = decode(productQuery, nullProductFixture.data);
+    const productWithNullFieldsQuery = new Query(typeBundle, (root) => {
+      root.addField('product', {args: {id: productWithNullFieldsId}}, (product) => {
+        product.addField('id');
+        product.addField('handle');
+        product.addField('options', (options) => {
+          options.addField('name');
+        });
+        product.addConnection('images', (images) => {
+          images.addField('src');
+        });
+        product.addConnection('variants', (variants) => {
+          variants.add('weightUnit');
+        });
+      });
+    });
 
+    const model = decode(productWithNullFieldsQuery, productWithNullFieldsFixture.data);
+
+    assert.equal(Object.prototype.toString.call(model.product.handle), '[object Null]');
     assert.equal(Object.prototype.toString.call(model.product.options), '[object Null]');
+    assert.equal(Object.prototype.toString.call(model.product.variants[0].weightUnit), '[object Null]');
   });
 });

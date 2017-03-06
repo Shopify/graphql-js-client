@@ -8,7 +8,7 @@ export class Enum {
   }
 
   valueOf() {
-    return this.key ? this.key.valueOf() : this.key;
+    return this.key.valueOf();
   }
 }
 

@@ -192,4 +192,34 @@ suite('decode-test', () => {
     assert.ok(Scalar.prototype.isPrototypeOf(graph.shop.name));
     assert.equal(graph.shop.name, 'buckets-o-stuff');
   });
+
+  test('it does not record type information for null values', () => {
+    const nullProductFixture = {
+      data: {
+        product: {
+          id: productId,
+          handle: 'aluminum-pole',
+          options: null,
+          imagesAlias: {
+            edges: [
+              {
+                node: {
+                  src: 'https://cdn.shopify.com/s/files/1/1090/1932/products/festivus-pole-the-strike-seinfeld.jpg?v=1449866700'
+                }
+              },
+              {
+                node: {
+                  src: 'https://cdn.shopify.com/s/files/1/1090/1932/products/giphy.gif?v=1450204755'
+                }
+              }
+            ]
+          }
+        }
+      }
+    };
+
+    const model = decode(productQuery, nullProductFixture.data);
+
+    assert.equal(Object.prototype.toString.call(model.product.options), '[object Null]');
+  });
 });

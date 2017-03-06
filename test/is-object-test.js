@@ -46,4 +46,12 @@ suite('is-object-test', () => {
   test('it returns false for enums', () => {
     assert.equal(isObject(_enum('enum')), false);
   });
+
+  test('it returns false for Scalar wrapped null values', () => {
+    assert.equal(isObject(new Scalar(null)), false);
+  });
+
+  test('it returns false for Enum wrapped null values', () => {
+    assert.equal(isObject(_enum(null)), false);
+  });
 });

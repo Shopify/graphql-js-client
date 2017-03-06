@@ -8,7 +8,7 @@ export default class Scalar {
   }
 
   valueOf() {
-    return this.value.valueOf();
+    return this.value ? this.value.valueOf() : this.value;
   }
 
   get unwrapped() {

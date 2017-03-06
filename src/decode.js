@@ -113,10 +113,12 @@ function transformScalars(context, value) {
 }
 
 function recordTypeInformation(context, value) {
-  if (value.__typename) {
-    value.type = schemaForType(context.selection.selectionSet.typeBundle, value.__typename);
-  } else {
-    value.type = context.selection.selectionSet.typeSchema;
+  if (Object.prototype.toString.call(value) !== '[object Null]') {
+    if (value.__typename) {
+      value.type = schemaForType(context.selection.selectionSet.typeBundle, value.__typename);
+    } else {
+      value.type = context.selection.selectionSet.typeSchema;
+    }
   }
 
   return value;

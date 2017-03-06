@@ -183,7 +183,7 @@ export default class SelectionSet {
   }
 
   toString() {
-    if (this.typeSchema.kind === 'SCALAR') {
+    if (this.typeSchema.kind === 'SCALAR' || this.typeSchema.kind === 'ENUM') {
       return '';
     } else {
       return ` { ${join(this.selections)} }`;

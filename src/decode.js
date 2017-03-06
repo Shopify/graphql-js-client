@@ -3,6 +3,7 @@ import ClassRegistry from './class-registry';
 import {Field, Spread} from './selection-set';
 import Query from './query';
 import isObject from './is-object';
+import isValue from './is-value';
 import isNodeContext from './is-node-context';
 import transformConnections from './transform-connection';
 import schemaForType from './schema-for-type';
@@ -103,20 +104,24 @@ function transformPojosToClassesWithRegistry(classRegistry) {
 }
 
 function transformScalars(context, value) {
-  if (context.selection.selectionSet.typeSchema.kind === 'SCALAR') {
-    return new Scalar(value);
-  } else if (context.selection.selectionSet.typeSchema.kind === 'ENUM') {
-    return new Enum(value);
-  } else {
-    return value;
+  if (isValue(value)) {
+    if (context.selection.selectionSet.typeSchema.kind === 'SCALAR') {
+      return new Scalar(value);
+    } else if (context.selection.selectionSet.typeSchema.kind === 'ENUM') {
+      return new Enum(value);
+    }
   }
+
+  return value;
 }
 
 function recordTypeInformation(context, value) {
-  if (value.__typename) {
-    value.type = schemaForType(context.selection.selectionSet.typeBundle, value.__typename);
-  } else {
-    value.type = context.selection.selectionSet.typeSchema;
+  if (isValue(value)) {
+    if (value.__typename) {
+      value.type = schemaForType(context.selection.selectionSet.typeBundle, value.__typename);
+    } else {
+      value.type = context.selection.selectionSet.typeSchema;
+    }
   }
 
   return value;

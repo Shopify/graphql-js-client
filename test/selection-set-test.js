@@ -292,4 +292,33 @@ suite('selection-set-test', () => {
       });
     }, /No field of name "spaghetti" found on type "Shop" in schema/);
   });
+
+  test('it can add enum fields', () => {
+    const set = new SelectionSet(typeBundle, 'QueryRoot', (root) => {
+      root.add('product', (product) => {
+        product.addConnection('variants', (variant) => {
+          variant.add('weightUnit'); // enum field
+        });
+      });
+    });
+
+    assert.deepEqual(tokens(set.toString()), tokens(`{
+      product {
+        id,
+        variants {
+          pageInfo {
+            hasNextPage,
+            hasPreviousPage
+          },
+          edges {
+            cursor,
+            node {
+              id,
+              weightUnit
+            }
+          }
+        }
+      }
+    }`));
+  });
 });

@@ -16,7 +16,8 @@ suite('decode-next-page-query-on-scalars-test', () => {
     arbitraryViewer: {
       paginatedScalars: {
         pageInfo: {
-          hasNextPage: true
+          hasNextPage: true,
+          hasPreviousPage: false
         },
         edges: [{
           cursor,

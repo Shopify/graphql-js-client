@@ -95,11 +95,33 @@ function nextPageQueryAndPath(context, cursor) {
   }
 }
 
+function hasNextPage(connection, edge) {
+  if (edge !== connection.edges[connection.edges.length - 1]) {
+    return true;
+  }
+
+  return connection.pageInfo.hasNextPage;
+}
+
+function hasPreviousPage(connection, edge) {
+  if (edge !== connection.edges[0]) {
+    return true;
+  }
+
+  return connection.pageInfo.hasPreviousPage;
+}
+
 export default function transformConnections(context, value) {
   if (isConnection(context)) {
+    if (!(value.pageInfo && value.pageInfo.hasOwnProperty('hasNextPage') && value.pageInfo.hasOwnProperty('hasPreviousPage'))) {
+      throw new Error('Connections must include the selections "pageInfo { hasNextPage, hasPreviousPage }".');
+    }
+
     return value.edges.map((edge) => {
       return Object.assign(edge.node, {
-        nextPageQueryAndPath: nextPageQueryAndPath(context, edge.cursor)
+        nextPageQueryAndPath: nextPageQueryAndPath(context, edge.cursor),
+        hasNextPage: hasNextPage(value, edge),
+        hasPreviousPage: hasPreviousPage(value, edge)
       });
     });
   } else {

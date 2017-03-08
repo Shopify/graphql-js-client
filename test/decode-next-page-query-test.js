@@ -14,7 +14,8 @@ suite('decode-next-page-query-test', () => {
         name: 'my-shop',
         collections: {
           pageInfo: {
-            hasNextPage: true
+            hasNextPage: true,
+            hasPreviousPage: false
           },
           edges: [{
             cursor: collectionCursor,
@@ -26,7 +27,8 @@ suite('decode-next-page-query-test', () => {
         },
         products: {
           pageInfo: {
-            hasNextPage: true
+            hasNextPage: true,
+            hasPreviousPage: false
           },
           edges: [{
             cursor: 'product-cursor',
@@ -35,7 +37,8 @@ suite('decode-next-page-query-test', () => {
               handle: 'some-product',
               variants: {
                 pageInfo: {
-                  hasNextPage: true
+                  hasNextPage: true,
+                  hasPreviousPage: false
                 },
                 edges: [{
                   cursor: variantsCursor,
@@ -155,6 +158,10 @@ suite('decode-next-page-query-test', () => {
             hostObjectAlias: {
               anotherHost: {
                 productsAlias: {
+                  pageInfo: {
+                    hasNextPage: true,
+                    hasPreviousPage: false
+                  },
                   edges: [{
                     cursor: productCursor,
                     node: {

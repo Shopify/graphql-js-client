@@ -205,9 +205,17 @@ suite('decode-test', () => {
           handle: null,
           options: null,
           images: {
+            pageInfo: {
+              hasNextPage: false,
+              hasPreviousPage: false
+            },
             edges: []
           },
           variants: {
+            pageInfo: {
+              hasNextPage: false,
+              hasPreviousPage: false
+            },
             edges: [
               {
                 node: {

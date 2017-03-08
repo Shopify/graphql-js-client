@@ -113,8 +113,8 @@ function hasPreviousPage(connection, edge) {
 
 export default function transformConnections(context, value) {
   if (isConnection(context)) {
-    if (!value.pageInfo) {
-      throw new Error('Connections must include the "pageInfo" field');
+    if (!(value.pageInfo && value.pageInfo.hasOwnProperty('hasNextPage') && value.pageInfo.hasOwnProperty('hasPreviousPage'))) {
+      throw new Error('Connections must include the selections "pageInfo { hasNextPage, hasPreviousPage }".');
     }
 
     return value.edges.map((edge) => {

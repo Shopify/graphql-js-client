@@ -19,7 +19,8 @@ suite('client-fetch-next-page-test', () => {
     shop: {
       collections: {
         pageInfo: {
-          hasNextPage: true
+          hasNextPage: true,
+          hasPreviousPage: false
         },
         edges: [{
           cursor: 'collection-cursor',
@@ -27,7 +28,8 @@ suite('client-fetch-next-page-test', () => {
             id: 'collection-id',
             products: {
               pageInfo: {
-                hasNextPage: true
+                hasNextPage: true,
+                hasPreviousPage: false
               },
               edges: [{
                 cursor: 'product-cursor-one',
@@ -47,7 +49,8 @@ suite('client-fetch-next-page-test', () => {
       id: 'collection-id',
       products: {
         pageInfo: {
-          hasNextPage: true
+          hasNextPage: true,
+          hasPreviousPage: true
         },
         edges: [{
           cursor: 'product-cursor-two',
@@ -64,7 +67,8 @@ suite('client-fetch-next-page-test', () => {
       id: 'collection-id',
       products: {
         pageInfo: {
-          hasNextPage: true
+          hasNextPage: true,
+          hasPreviousPage: true
         },
         edges: [{
           cursor: 'product-cursor-two',

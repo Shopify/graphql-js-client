@@ -1,6 +1,7 @@
 import Query from './query';
 import isNodeContext from './is-node-context';
 import variable from './variable';
+import Scalar from './scalar';
 
 function isConnection(context) {
   return context.selection.selectionSet.typeSchema.name.endsWith('Connection');
@@ -97,7 +98,7 @@ function nextPageQueryAndPath(context, cursor) {
 
 function hasNextPage(connection, edge) {
   if (edge !== connection.edges[connection.edges.length - 1]) {
-    return true;
+    return new Scalar(true);
   }
 
   return connection.pageInfo.hasNextPage;
@@ -105,7 +106,7 @@ function hasNextPage(connection, edge) {
 
 function hasPreviousPage(connection, edge) {
   if (edge !== connection.edges[0]) {
-    return true;
+    return new Scalar(true);
   }
 
   return connection.pageInfo.hasPreviousPage;

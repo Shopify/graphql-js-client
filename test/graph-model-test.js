@@ -1,5 +1,6 @@
 import assert from 'assert';
 import GraphModel from '../src/graph-model';
+import Scalar from '../src/scalar';
 
 suite('graph-model-test', () => {
   const attrs = {
@@ -44,5 +45,12 @@ suite('graph-model-test', () => {
     assert.equal(model.beans, 'so-many');
     assert.equal(model.attrs.beans, attrs.beans);
     assert.equal(model.beanType, attrs.beanType);
+  });
+
+  test('it unboxes scalars', () => {
+    const model = new GraphModel({theBusiness: new Scalar(4)});
+
+    assert.equal(typeof model.theBusiness, 'number');
+    assert.ok(Scalar.prototype.isPrototypeOf(model.attrs.theBusiness));
   });
 });

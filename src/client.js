@@ -9,6 +9,7 @@ import httpFetcher from './http-fetcher';
 export {default as GraphModel} from './graph-model';
 export {ClassRegistry};
 export {default as _enum} from './enum';
+export {default as decode} from './decode';
 
 export default class Client {
   constructor(typeBundle, {url, fetcherOptions, fetcher, registry = new ClassRegistry()}) {

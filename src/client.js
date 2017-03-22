@@ -103,4 +103,22 @@ export default class Client {
       return response;
     });
   }
+
+  fetchAllPages(paginatedModels, first) {
+    let promise;
+
+    if (paginatedModels && paginatedModels.length && paginatedModels[paginatedModels.length - 1].hasNextPage) {
+      promise = this.fetchNextPage(paginatedModels, {first}).then(({model}) => {
+        paginatedModels.push(...model);
+
+        if (!model[model.length - 1].hasNextPage) {
+          return paginatedModels;
+        }
+
+        return this.fetchAllPages(paginatedModels, first);
+      });
+    }
+
+    return promise;
+  }
 }

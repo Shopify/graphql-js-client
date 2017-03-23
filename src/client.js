@@ -11,6 +11,10 @@ export {ClassRegistry};
 export {default as _enum} from './enum';
 export {default as decode} from './decode';
 
+function hasNextPage(paginatedModels) {
+  return paginatedModels && paginatedModels.length && paginatedModels[paginatedModels.length - 1].hasNextPage;
+}
+
 export default class Client {
   constructor(typeBundle, {url, fetcherOptions, fetcher, registry = new ClassRegistry()}) {
     this.typeBundle = typeBundle;
@@ -104,21 +108,15 @@ export default class Client {
     });
   }
 
-  fetchAllPages(paginatedModels, first) {
-    let promise;
+  fetchAllPages(paginatedModels, {pageSize}) {
+    if (hasNextPage(paginatedModels)) {
+      return this.fetchNextPage(paginatedModels, {first: pageSize}).then(({model}) => {
+        const pages = paginatedModels.concat(model);
 
-    if (paginatedModels && paginatedModels.length && paginatedModels[paginatedModels.length - 1].hasNextPage) {
-      promise = this.fetchNextPage(paginatedModels, {first}).then(({model}) => {
-        paginatedModels.push(...model);
-
-        if (!model[model.length - 1].hasNextPage) {
-          return paginatedModels;
-        }
-
-        return this.fetchAllPages(paginatedModels, first);
+        return this.fetchAllPages(pages, {pageSize});
       });
     }
 
-    return promise;
+    return Promise.resolve(paginatedModels);
   }
 }

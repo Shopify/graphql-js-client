@@ -5,10 +5,11 @@ import Operation from './operation';
 import decode from './decode';
 import ClassRegistry from './class-registry';
 import httpFetcher from './http-fetcher';
+import enumFunction from './enum';
+import variableFunction from './variable';
 
 export {default as GraphModel} from './graph-model';
 export {ClassRegistry};
-export {default as _enum} from './enum';
 export {default as decode} from './decode';
 
 function hasNextPage(paginatedModels) {
@@ -118,5 +119,13 @@ export default class Client {
     }
 
     return Promise.resolve(paginatedModels);
+  }
+
+  variable(name, type, defaultValue) {
+    return variableFunction(name, type, defaultValue);
+  }
+
+  enum(key) {
+    return enumFunction(key);
   }
 }

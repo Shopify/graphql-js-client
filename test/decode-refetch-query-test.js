@@ -77,4 +77,29 @@ suite('decode-refetch-query-test', () => {
       }
     }`));
   });
+
+  test('Null nodes remain null and do not generate a refetch query', () => {
+    const nullNodeFixture = {
+      data: {
+        node: {
+          __typename: 'Checkout',
+          shippingAddress: null
+        }
+      }
+    };
+
+    const checkoutQuery = new Query(typeBundle, (root) => {
+      root.add('node', {args: {id: 'gid://shopify/Checkout/1'}}, (node) => {
+        node.addInlineFragmentOn('Checkout', (checkout) => {
+          checkout.add('shippingAddress', (shippingAddress) => {
+            shippingAddress.add('address1');
+          });
+        });
+      });
+    });
+
+    const shippingAddressNode = decode(checkoutQuery, nullNodeFixture.data).node.shippingAddress;
+
+    assert.equal(Object.prototype.toString.call(shippingAddressNode), '[object Null]');
+  });
 });

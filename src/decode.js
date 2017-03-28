@@ -78,7 +78,7 @@ function decodeContext(context, transformers) {
 }
 
 function generateRefetchQueries(context, value) {
-  if (isNodeContext(context)) {
+  if (isValue(value) && isNodeContext(context)) {
     value.refetchQuery = function() {
       return new Query(context.selection.selectionSet.typeBundle, (root) => {
         root.add('node', {args: {id: context.responseData.id}}, (node) => {

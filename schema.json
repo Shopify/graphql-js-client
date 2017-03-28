@@ -11,6 +11,64 @@
       "types": [
         {
           "kind": "OBJECT",
+          "name": "Checkout",
+          "description": null,
+          "fields": [
+            {
+              "name": "shippingAddress",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "MailingAddress",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Node",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "MailingAddress",
+          "description": null,
+          "fields": [
+            {
+              "name": "address1",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Node",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
           "name": "PaginatedScalarEdge",
           "description": null,
           "fields": [
@@ -441,6 +499,16 @@
             {
               "kind": "OBJECT",
               "name": "ProductVariant",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "Checkout",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "MailingAddress",
               "ofType": null
             }
           ]

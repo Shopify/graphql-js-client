@@ -1,6 +1,6 @@
 {
   "name": "@shopify/graphql-js-client",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Feature light client library for fetching resources via GraphQL",
   "main": "index.js",
   "jsnext:main": "index.es.js",

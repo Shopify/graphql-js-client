@@ -2,27 +2,6 @@
 # yarn lockfile v1
 
 
-"@shopify/graphql-js-schema@0.2.3":
-  version "0.2.3"
-  resolved "https://registry.yarnpkg.com/@shopify/graphql-js-schema/-/graphql-js-schema-0.2.3.tgz#9134302ea9f2b02500a710f4cc5808e7644c69ab"
-  dependencies:
-    babel-generator "6.16.0"
-    babel-template "6.16.0"
-    babel-types "6.16.0"
-    babylon "6.11.2"
-    get-stdin "5.0.1"
-    lodash.kebabcase "4.1.1"
-    minimist "1.2.0"
-    mkdirp "0.5.1"
-    rollup "0.36.3"
-    tmp "0.0.29"
-
-"@shopify/rollup-plugin-remap@0.0.3":
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/@shopify/rollup-plugin-remap/-/rollup-plugin-remap-0.0.3.tgz#14a909e1cb0f389bdd6854e4a7c3c07af879dd49"
-  dependencies:
-    rollup-pluginutils "1.5.2"
-
 abbrev@1:
   version "1.0.9"
   resolved "https://registry.yarnpkg.com/abbrev/-/abbrev-1.0.9.tgz#91b4792588a7738c25f35dd6f63752a2f8776135"
@@ -2542,6 +2521,21 @@ graceful-fs@^4.0.0, graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.4:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/graceful-readlink/-/graceful-readlink-1.0.1.tgz#4cafad76bc62f02fa039b2f94e9a3dd3a391a725"
 
+graphql-js-schema@0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/graphql-js-schema/-/graphql-js-schema-0.3.0.tgz#c5adbe75f12b3b05dd56ae12073abfda1bf9146b"
+  dependencies:
+    babel-generator "6.16.0"
+    babel-template "6.16.0"
+    babel-types "6.16.0"
+    babylon "6.11.2"
+    get-stdin "5.0.1"
+    lodash.kebabcase "4.1.1"
+    minimist "1.2.0"
+    mkdirp "0.5.1"
+    rollup "0.36.3"
+    tmp "0.0.29"
+
 growl@1.9.2:
   version "1.9.2"
   resolved "https://registry.yarnpkg.com/growl/-/growl-1.9.2.tgz#0ea7743715db8d8de2c5ede1775e1b45ac85c02f"
@@ -4062,6 +4056,12 @@ rollup-plugin-node-resolve@2.0.0:
     browser-resolve "^1.11.0"
     builtin-modules "^1.1.0"
     resolve "^1.1.6"
+
+rollup-plugin-remap@0.0.3:
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/rollup-plugin-remap/-/rollup-plugin-remap-0.0.3.tgz#cbf6ad8de8532961cf2b48973117cc884c3a00fa"
+  dependencies:
+    rollup-pluginutils "1.5.2"
 
 rollup-pluginutils@1.5.2, rollup-pluginutils@^1.5.0, rollup-pluginutils@^1.5.1, rollup-pluginutils@^1.5.2:
   version "1.5.2"

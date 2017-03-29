@@ -8,8 +8,8 @@
   "author": "Shopify Inc.",
   "dependencies": {},
   "devDependencies": {
-    "@shopify/graphql-js-schema": "0.3.0",
-    "@shopify/rollup-plugin-remap": "0.0.3",
+    "graphql-js-schema": "0.3.0",
+    "rollup-plugin-remap": "0.0.3",
     "babel": "6.5.2",
     "babel-cli": "6.22.2",
     "babel-core": "6.22.1",

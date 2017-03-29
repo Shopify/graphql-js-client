@@ -74,4 +74,10 @@ suite('client-refetch-test', () => {
       mockClient.refetch(decoded.shop);
     }, /'client#refetch' must be called with a type that implements Node. Received Shop./);
   });
+
+  test('it throws when you refetch a null value', () => {
+    return assert.throws(() => {
+      mockClient.refetch(null);
+    }, /'client#refetch' must be called with a non-null instance of a Node./);
+  });
 });

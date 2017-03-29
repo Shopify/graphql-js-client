@@ -122,7 +122,9 @@ export default class Client {
   }
 
   refetch(nodeType) {
-    if (!(nodeType && nodeType.type.implementsNode)) {
+    if (!nodeType) {
+      throw new Error('\'client#refetch\' must be called with a non-null instance of a Node.');
+    } else if (!nodeType.type.implementsNode) {
       throw new Error(`'client#refetch' must be called with a type that implements Node. Received ${nodeType.type.name}.`);
     }
 

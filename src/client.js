@@ -121,6 +121,14 @@ export default class Client {
     return Promise.resolve(paginatedModels);
   }
 
+  refetch(nodeType) {
+    if (!(nodeType && nodeType.type.implementsNode)) {
+      throw new Error(`'client#refetch' must be called with a type that implements Node. Received ${nodeType.type.name}.`);
+    }
+
+    return this.send(nodeType.refetchQuery()).then(({model}) => model.node);
+  }
+
   variable(name, type, defaultValue) {
     return variableFunction(name, type, defaultValue);
   }

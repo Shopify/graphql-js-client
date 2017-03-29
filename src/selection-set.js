@@ -198,9 +198,9 @@ class SelectionSetBuilder {
     this.selections = selections;
   }
 
-  hasSelectionWithName(name) {
+  hasSelectionWithResponseKey(responseKey) {
     return this.selections.some((field) => {
-      return field.name === name;
+      return field.responseKey === responseKey;
     });
   }
 
@@ -213,8 +213,8 @@ class SelectionSetBuilder {
       selection = selectionOrFieldName;
     }
 
-    if (selection.name && this.hasSelectionWithName(selection.name)) {
-      throw new Error(`The field '${selection.name}' has already been added`);
+    if (selection.responseKey && this.hasSelectionWithResponseKey(selection.responseKey)) {
+      throw new Error(`The field name or alias '${selection.responseKey}' has already been added.`);
     }
     this.selections.push(selection);
   }

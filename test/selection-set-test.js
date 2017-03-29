@@ -179,7 +179,49 @@ suite('selection-set-test', () => {
           });
         });
       },
-      /The field 'name' has already been added/
+      /The field name or alias 'name' has already been added/
+    );
+  });
+
+  test('it cannot use the same alias twice', () => {
+    assert.throws(
+      () => {
+        new SelectionSet(typeBundle, 'QueryRoot', (root) => {
+          root.add('shop', (shop) => {
+            shop.add('name', {alias: 'theNameOfTheShop'});
+            shop.add('name', {alias: 'theNameOfTheShop'});
+          });
+        });
+      },
+      /The field name or alias 'theNameOfTheShop' has already been added/
+    );
+  });
+
+  test('it cannot add an alias with the same name as a field', () => {
+    assert.throws(
+      () => {
+        new SelectionSet(typeBundle, 'QueryRoot', (root) => {
+          root.add('shop', (shop) => {
+            shop.add('name');
+            shop.add('description', {alias: 'name'});
+          });
+        });
+      },
+      /The field name or alias 'name' has already been added/
+    );
+  });
+
+  test('it cannot add a field with the same name as an alias', () => {
+    assert.throws(
+      () => {
+        new SelectionSet(typeBundle, 'QueryRoot', (root) => {
+          root.add('shop', (shop) => {
+            shop.add('description', {alias: 'name'});
+            shop.add('name');
+          });
+        });
+      },
+      /The field name or alias 'name' has already been added/
     );
   });
 
@@ -241,6 +283,15 @@ suite('selection-set-test', () => {
     });
 
     assert.deepEqual(tokens(set.toString()), tokens('{ theNameOfTheShop: name }'));
+  });
+
+  test('it can add fields with the same name, but different aliases', () => {
+    const set = new SelectionSet(typeBundle, 'Shop', (shop) => {
+      shop.add('name', {alias: 'theNameOfTheShop'});
+      shop.add('name', {alias: 'alsoTheNameOfTheShop'});
+    });
+
+    assert.deepEqual(tokens(set.toString()), tokens('{ theNameOfTheShop: name, alsoTheNameOfTheShop: name }'));
   });
 
   test('field.responseKey === field.alias when alias is present', () => {

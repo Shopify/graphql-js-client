@@ -1,13 +1,17 @@
 /* eslint-env node */
 import {readFileSync} from 'fs';
 import babel from 'rollup-plugin-babel';
-import remap from '@shopify/rollup-plugin-remap';
+import remap from 'rollup-plugin-remap';
 
 const plugins = [babel()];
 const targets = [];
 
+let entry;
+
 // eslint-disable-next-line no-process-env
 if (process.env.BUILD_MODE === 'production') {
+  entry = 'src/client.js';
+
   plugins.push(remap({
     originalPath: './src/track-type-dependency',
     targetPath: './src/noop'
@@ -18,6 +22,8 @@ if (process.env.BUILD_MODE === 'production') {
     {dest: 'index.es.js', format: 'es'}
   );
 } else {
+  entry = 'src/client-dev.js';
+
   targets.push(
     {dest: 'dev.js', format: 'cjs'},
     {dest: 'dev.es.js', format: 'es'}
@@ -32,7 +38,7 @@ export default {
   plugins,
   targets,
   banner,
-  entry: 'src/client.js',
+  entry,
   moduleName: 'GraphQLClient',
   sourceMap: true
 };

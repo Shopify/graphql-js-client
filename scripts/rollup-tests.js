@@ -23,8 +23,8 @@ function envRollupInfo({browser, withDependencyTracking}) {
       include: 'node_modules/**'
     }),
     nodeResolve({
-      jsnext: true,
       main: true,
+      module: true,
       preferBuiltins: !browser
     }),
     multiEntry({

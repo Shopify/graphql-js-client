@@ -10,8 +10,13 @@ Feature light client library for fetching resources via GraphQL
 - [License](http://github.com/Shopify/graphql-js-client/blob/master/LICENSE.md)
 
 ## Installation
+**With Yarn:**
 ```bash
 $ yarn add graphql-js-client
+```
+**With NPM:**
+```bash
+$ npm install graphql-js-client
 ```
 
 ## Examples

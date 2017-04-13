@@ -11,7 +11,7 @@ Feature light client library for fetching resources via GraphQL
 
 ## Installation
 ```bash
-$ yarn install graphql-js-client
+$ yarn add graphql-js-client
 ```
 
 ## Examples

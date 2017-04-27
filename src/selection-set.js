@@ -44,8 +44,8 @@ export class Field {
    *
    * @param {String} name The name of the field.
    * @param {Object} [options] An options object containing:
-   *   @param {String} [options.alias] An alias for the field.
    *   @param {Object} [options.args] Arguments for the field.
+   *   @param {String} [options.alias] An alias for the field.
    * @param {SelectionSet} selectionSet The selection set on the field.
    */
   constructor(name, options, selectionSet) {
@@ -291,8 +291,17 @@ class SelectionSetBuilder {
   /**
    * Adds a field to be queried on the current selection.
    *
+   * @example
+   * client.query((root) => {
+   *   root.add('cat', {args: {id: '123456'}, alias: 'meow'}, (cat) => {
+   *     cat.add('name');
+   *   });
+   * });
+   *
    * @param {SelectionSet|String} selectionOrFieldName The selection or name of the field to add.
-   * @param {Object} [options] Arguments for the field to query.
+   * @param {Object} [options] Options on the query including:
+   *   @param {Object} [options.args] Arguments on the query (e.g. `{id: '123456'}`).
+   *   @param {String} [options.alias] Alias for the field being added.
    * @param {Function|SelectionSet} [callbackOrSelectionSet] Either a callback which will be used to create a new {@link SelectionSet}, or an existing {@link SelectionSet}.
    */
   add(selectionOrFieldName, ...rest) {
@@ -357,7 +366,9 @@ class SelectionSetBuilder {
    *
    * @access private
    * @param {String}    name The name of the field to add to the query.
-   * @param {Object}    [args] Arguments for the field to query.
+   * @param {Object} [options] Options on the query including:
+   *   @param {Object} [options.args] Arguments on the query (e.g. `{id: '123456'}`).
+   *   @param {String} [options.alias] Alias for the field being added.
    * @param {Function}  [callback] Callback which will be used to create a new {@link SelectionSet} for the field added.
    */
   addField(name, ...creationArgs) {
@@ -368,8 +379,19 @@ class SelectionSetBuilder {
    * Adds a connection to be queried on the current selection.
    * This adds all the fields necessary for pagination.
    *
+   * @example
+   * client.query((root) => {
+   *   root.add('cat', (cat) => {
+   *     cat.addConnection('friends', {args: {first: 10}, alias: 'coolCats'}, (friends) => {
+   *       friends.add('name');
+   *     });
+   *   });
+   * });
+   *
    * @param {String}    name The name of the connection to add to the query.
-   * @param {Object}    [args] Arguments for the connection query (e.g. `{ first: 10 }`).
+   * @param {Object} [options] Options on the query including:
+   *   @param {Object} [options.args] Arguments on the query (e.g. `{first: 10}`).
+   *   @param {String} [options.alias] Alias for the field being added.
    * @param {Function|SelectionSet}  [callbackOrSelectionSet] Either a callback which will be used to create a new {@link SelectionSet}, or an existing {@link SelectionSet}.
    */
   addConnection(name, ...creationArgs) {
@@ -390,6 +412,15 @@ class SelectionSetBuilder {
   /**
    * Adds an inline fragment on the current selection.
    *
+   * @example
+   * client.query((root) => {
+   *   root.add('animal', (animal) => {
+   *     animal.addInlineFragmentOn('cat', (cat) => {
+   *       cat.add('name');
+   *     });
+   *   });
+   * });
+   *
    * @param {String} typeName The name of the type of the inline fragment.
    * @param {Function|SelectionSet}  [callbackOrSelectionSet] Either a callback which will be used to create a new {@link SelectionSet}, or an existing {@link SelectionSet}.
    */
@@ -399,6 +430,11 @@ class SelectionSetBuilder {
 
   /**
    * Adds a fragment spread on the current selection.
+   *
+   * @example
+   * client.query((root) => {
+   *   root.addFragment(catFragmentSpread);
+   * });
    *
    * @param {FragmentSpread} fragmentSpread The fragment spread to add.
    */

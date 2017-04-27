@@ -344,7 +344,101 @@
 
             
 
-            <td class="description last"><p>Arguments for the field to query.</p></td>
+            <td class="description last"><p>Options on the query including:</p>
+                <h6>Properties</h6>
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>args</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Arguments on the query (e.g. <code>{id: '123456'}</code>).</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>alias</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Alias for the field being added.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
         </tr>
 
     
@@ -421,7 +515,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="selection-set.js.html">selection-set.js</a>, <a href="selection-set.js.html#line300">line 300</a>
+        <a href="selection-set.js.html">selection-set.js</a>, <a href="selection-set.js.html#line309">line 309</a>
     </li></ul></dd>
     
 
@@ -446,13 +540,22 @@
 
 
 
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>client.query((root) => {
+  root.add('cat', {args: {id: '123456'}, alias: 'meow'}, (cat) => {
+    cat.add('name');
+  });
+});</code></pre>
+
+
 
         
             
 
     
 
-    <h4 class="name" id="addConnection"><span class="type-signature"></span>addConnection<span class="signature">(name, args<span class="signature-attributes">opt</span>, callbackOrSelectionSet<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="addConnection"><span class="type-signature"></span>addConnection<span class="signature">(name, options<span class="signature-attributes">opt</span>, callbackOrSelectionSet<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
 
     
 
@@ -529,6 +632,60 @@ This adds all the fields necessary for pagination.</p>
 
         <tr>
             
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Options on the query including:</p>
+                <h6>Properties</h6>
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
                 <td class="name"><code>args</code></td>
             
 
@@ -555,7 +712,47 @@ This adds all the fields necessary for pagination.</p>
 
             
 
-            <td class="description last"><p>Arguments for the connection query (e.g. <code>{ first: 10 }</code>).</p></td>
+            <td class="description last"><p>Arguments on the query (e.g. <code>{first: 10}</code>).</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>alias</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Alias for the field being added.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
         </tr>
 
     
@@ -632,7 +829,7 @@ This adds all the fields necessary for pagination.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="selection-set.js.html">selection-set.js</a>, <a href="selection-set.js.html#line377">line 377</a>
+        <a href="selection-set.js.html">selection-set.js</a>, <a href="selection-set.js.html#line399">line 399</a>
     </li></ul></dd>
     
 
@@ -655,6 +852,17 @@ This adds all the fields necessary for pagination.</p>
 
 
 
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>client.query((root) => {
+  root.add('cat', (cat) => {
+    cat.addConnection('friends', {args: {first: 10}, alias: 'coolCats'}, (friends) => {
+      friends.add('name');
+    });
+  });
+});</code></pre>
 
 
 
@@ -763,7 +971,7 @@ This adds all the fields necessary for pagination.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="selection-set.js.html">selection-set.js</a>, <a href="selection-set.js.html#line407">line 407</a>
+        <a href="selection-set.js.html">selection-set.js</a>, <a href="selection-set.js.html#line443">line 443</a>
     </li></ul></dd>
     
 
@@ -786,6 +994,13 @@ This adds all the fields necessary for pagination.</p>
 
 
 
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>client.query((root) => {
+  root.addFragment(catFragmentSpread);
+});</code></pre>
 
 
 
@@ -940,7 +1155,7 @@ This adds all the fields necessary for pagination.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="selection-set.js.html">selection-set.js</a>, <a href="selection-set.js.html#line398">line 398</a>
+        <a href="selection-set.js.html">selection-set.js</a>, <a href="selection-set.js.html#line429">line 429</a>
     </li></ul></dd>
     
 
@@ -963,6 +1178,17 @@ This adds all the fields necessary for pagination.</p>
 
 
 
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>client.query((root) => {
+  root.add('animal', (animal) => {
+    animal.addInlineFragmentOn('cat', (cat) => {
+      cat.add('name');
+    });
+  });
+});</code></pre>
 
 
 
@@ -988,7 +1214,7 @@ This adds all the fields necessary for pagination.</p>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Tue Apr 25 2017 16:19:19 GMT-0400 (EDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Thu Apr 27 2017 10:07:53 GMT-0400 (EDT)
 </footer>
 
 <script> prettyPrint(); </script>

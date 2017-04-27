@@ -6,6 +6,7 @@ junit
 node_modules
 fixtures/types.js
 .tmp
+docs
 
 # Package Source
 scripts

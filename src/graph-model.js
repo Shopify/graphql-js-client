@@ -1,4 +1,14 @@
+/**
+ * The base class used when deserializing response data.
+ * Provides rich features, like functions to generate queries to refetch a node or fetch the next page.
+ *
+ * @class
+ */
 export default class GraphModel {
+
+  /**
+   * @param {Object} attrs Attributes on the GraphModel.
+   */
   constructor(attrs) {
     this.attrs = attrs;
 

@@ -1,11 +1,12 @@
 # graphql-js-client
 
-Feature light client library for fetching resources via GraphQL
+Feature light client library for fetching resources via GraphQL.
 
 ## Table Of Contents
 
 - [Installation](#installation)
 - [Examples](#examples)
+- [Documentation](#documentation)
 - [Contributing](#contributing)
 - [License](http://github.com/Shopify/graphql-js-client/blob/master/LICENSE.md)
 
@@ -207,6 +208,10 @@ In both cases, `fetchNextPage` resolves with the models you're paginating, since
 the object graph to those models may not be obvious due to the query generation
 algorithm. Page size and fields on the paginated object are retained, while
 fields not in the paginated set are pruned.
+
+## Documentation
+
+For full API documentation, check out the [API docs](https://shopify.github.io/graphql-js-client).
 
 ## Contributing
 

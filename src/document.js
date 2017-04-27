@@ -58,7 +58,7 @@ export default class Document {
     const operation = extractOperation(this.typeBundle, operationType, ...args);
 
     if (isInvalidOperationCombination(this.operations.concat(operation))) {
-      throw new Error('All operations must be named on a multi-operation document');
+      throw new Error('All operations must be uniquely named on a multi-operation document');
     }
 
     this.definitions.push(operation);
@@ -90,7 +90,7 @@ export default class Document {
 
   defineFragment(name, onType, builderFunction) {
     if (fragmentNameIsNotUnique(this.fragmentDefinitions, name)) {
-      throw new Error('All fragments must be named on a multi-fragment document');
+      throw new Error('All fragments must be uniquely named on a multi-fragment document');
     }
 
     const selectionSet = new SelectionSet(this.typeBundle, onType, builderFunction);

@@ -7,7 +7,8 @@ fixtures/types.js
 
 # build artifacts
 dev.*
-index.*
+index.*js
+index.*map
 
 # System junk
 .DS_Store

@@ -1,5 +1,5 @@
 /**
- * The base class used when serializing response data.
+ * The base class used when deserializing response data.
  * Provides rich features, like functions to generate queries to refetch a node or fetch the next page.
  *
  * @class

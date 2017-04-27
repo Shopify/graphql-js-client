@@ -1,7 +1,7 @@
 import GraphModel from './graph-model';
 
 /**
- * A registry of classes used to serialize the response data. Uses {@link GraphModel} by default.
+ * A registry of classes used to deserialize the response data. Uses {@link GraphModel} by default.
  */
 export default class ClassRegistry {
   constructor() {
@@ -12,7 +12,7 @@ export default class ClassRegistry {
    * Registers a class for a GraphQL type in the registry.
    *
    * @param {Class} constructor The constructor of the class.
-   * @param {String} type The GraphQL type of the object to serialize into the class.
+   * @param {String} type The GraphQL type of the object to deserialize into the class.
    */
   registerClassForType(constructor, type) {
     this.classStore[type] = constructor;

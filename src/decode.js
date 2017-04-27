@@ -144,7 +144,7 @@ function defaultTransformers({classRegistry = new ClassRegistry()}) {
  * @param {SelectionSet} selection The selection set used to query the response data.
  * @param {Object} responseData The response data returned.
  * @param {Object} [options] Options to use when decoding including:
- *   @param {ClassRegistry} [options.classRegistry] A class registry to use when serializing the data into classes.
+ *   @param {ClassRegistry} [options.classRegistry] A class registry to use when deserializing the data into classes.
  * @return {GraphModel} The decoded response data.
  */
 export default function decode(selection, responseData, options = {}) {

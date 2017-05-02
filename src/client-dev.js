@@ -1,5 +1,5 @@
 import Client from './client';
-import {resetTracker, startTracking, pauseTracking, trackedTypes, printTypes} from './track-type-dependency';
+import {resetTracker, startTracking, pauseTracking, trackedTypes, trackedFields, printTypes} from './track-type-dependency';
 
 export {default as GraphModel} from './graph-model';
 export {default as ClassRegistry} from './class-registry';
@@ -10,6 +10,7 @@ Object.assign(Client, {
   startTracking,
   pauseTracking,
   trackedTypes,
+  trackedFields,
   printTypes
 });
 

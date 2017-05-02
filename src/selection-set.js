@@ -4,7 +4,9 @@ import schemaForType from './schema-for-type';
 import formatArgs from './format-args';
 import noop from './noop';
 import {isVariable} from './variable';
-import trackTypeDependency from './track-type-dependency';
+import Tracker from './track-type-dependency';
+
+const {trackTypeDependency, trackFieldDependency} = Tracker;
 
 function parseFieldCreationArgs(creationArgs) {
   let callback = noop;
@@ -308,8 +310,14 @@ class SelectionSetBuilder {
     let selection;
 
     if (Object.prototype.toString.call(selectionOrFieldName) === '[object String]') {
+      trackFieldDependency(this.typeSchema.name, selectionOrFieldName);
+
       selection = this.field(selectionOrFieldName, ...rest);
     } else {
+      if (Field.prototype.isPrototypeOf(selectionOrFieldName)) {
+        trackFieldDependency(this.typeSchema.name, selectionOrFieldName.name);
+      }
+
       selection = selectionOrFieldName;
     }
 

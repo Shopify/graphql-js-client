@@ -1,14 +1,14 @@
 import assert from 'assert';
 import Query from '../src/query';
 import typeBundle from '../fixtures/types'; // eslint-disable-line import/no-unresolved
-import {resetTracker, startTracking, pauseTracking, trackedFields} from '../src/track-type-dependency';
+import {resetTracker, startTracking, pauseTracking, captureProfile} from '../src/track-type-dependency';
 
 suite('track-field-dependency-test', () => {
   setup(() => {
     resetTracker();
   });
 
-  test('it reports the types used in a query', () => {
+  test('it reports the fields used in a query', () => {
     startTracking();
 
     // eslint-disable-next-line no-new
@@ -24,7 +24,11 @@ suite('track-field-dependency-test', () => {
       });
     });
 
-    assert.deepEqual(trackedFields(), {
+    assert.deepEqual(captureProfile(), {
+      Boolean: [],
+      ID: [],
+      Money: [],
+      String: [],
       QueryRoot: [
         'shop'
       ],
@@ -96,7 +100,9 @@ suite('track-field-dependency-test', () => {
       });
     });
 
-    assert.deepEqual(trackedFields(), {
+    assert.deepEqual(captureProfile(), {
+      ID: [],
+      String: [],
       QueryRoot: [
         'shop',
         'node'
@@ -122,6 +128,6 @@ suite('track-field-dependency-test', () => {
       });
     });
 
-    assert.deepEqual(trackedFields(), {});
+    assert.deepEqual(captureProfile(), {});
   });
 });

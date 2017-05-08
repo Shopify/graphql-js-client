@@ -1,5 +1,4 @@
-let types = {};
-let fields = {};
+let profile = {};
 let tracking = false;
 
 function trackTypeDependency(typeName) {
@@ -7,7 +6,7 @@ function trackTypeDependency(typeName) {
     return;
   }
 
-  types[typeName] = true;
+  profile[typeName] = profile[typeName] || {};
 }
 
 function trackFieldDependency(typeName, fieldName) {
@@ -15,16 +14,11 @@ function trackFieldDependency(typeName, fieldName) {
     return;
   }
 
-  if (!fields[typeName]) {
-    fields[typeName] = {};
-  }
-
-  fields[typeName][fieldName] = true;
+  profile[typeName][fieldName] = true;
 }
 
 export function resetTracker() {
-  types = {};
-  fields = {};
+  profile = {};
   tracking = false;
 }
 
@@ -36,18 +30,13 @@ export function pauseTracking() {
   tracking = false;
 }
 
-export function trackedTypes() {
-  return Object.keys(types).sort();
+export function captureTypeProfile() {
+  return Object.keys(profile).sort();
 }
 
-export function printTypes() {
-  // eslint-disable-next-line
-  console.log(trackedTypes().join());
-}
-
-export function trackedFields() {
-  return Object.getOwnPropertyNames(fields).reduce((acc, key) => {
-    acc[key] = Object.getOwnPropertyNames(fields[key]);
+export function captureProfile() {
+  return Object.getOwnPropertyNames(profile).reduce((acc, typeName) => {
+    acc[typeName] = Object.getOwnPropertyNames(profile[typeName]);
 
     return acc;
   }, {});

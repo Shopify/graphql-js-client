@@ -1,7 +1,7 @@
 import assert from 'assert';
 import Query from '../src/query';
 import typeBundle from '../fixtures/types'; // eslint-disable-line import/no-unresolved
-import {resetTracker, startTracking, pauseTracking, trackedTypes, printTypes} from '../src/track-type-dependency';
+import {resetTracker, startTracking, pauseTracking, captureTypeProfile} from '../src/track-type-dependency';
 
 suite('track-type-dependency-test', () => {
   setup(() => {
@@ -24,7 +24,7 @@ suite('track-type-dependency-test', () => {
       });
     });
 
-    assert.deepEqual(trackedTypes(), [
+    assert.deepEqual(captureTypeProfile(), [
       'Boolean',
       'ID',
       'Money',
@@ -75,7 +75,7 @@ suite('track-type-dependency-test', () => {
       });
     });
 
-    assert.deepEqual(trackedTypes(), [
+    assert.deepEqual(captureTypeProfile(), [
       'ID',
       'Node',
       'QueryRoot',
@@ -96,7 +96,7 @@ suite('track-type-dependency-test', () => {
 
     resetTracker();
 
-    assert.deepEqual(trackedTypes(), []);
+    assert.deepEqual(captureTypeProfile(), []);
   });
 
   test('it stops tracking when `resetTypes` is called (returning the tracker to it\'s initial state.', () => {
@@ -111,38 +111,6 @@ suite('track-type-dependency-test', () => {
       });
     });
 
-    assert.deepEqual(trackedTypes(), []);
-  });
-
-  test('it logs the tracked types when `printTypes` is called', () => {
-    startTracking();
-
-    // eslint-disable-next-line no-new
-    new Query(typeBundle, (root) => {
-      root.add('shop', (shop) => {
-        shop.add('name');
-      });
-    });
-
-    let loggedTypes;
-
-    // eslint-disable-next-line
-    const originalLog = console.log;
-
-    // eslint-disable-next-line
-    console.log = function (types) {
-      loggedTypes = types;
-    };
-
-    printTypes();
-
-    // eslint-disable-next-line
-    console.log = originalLog;
-
-    assert.deepEqual(loggedTypes, [
-      'QueryRoot',
-      'Shop',
-      'String'
-    ].join());
+    assert.deepEqual(captureTypeProfile(), []);
   });
 });

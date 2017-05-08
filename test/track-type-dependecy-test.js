@@ -1,15 +1,15 @@
 import assert from 'assert';
 import Query from '../src/query';
 import typeBundle from '../fixtures/types'; // eslint-disable-line import/no-unresolved
-import {resetTracker, startTracking, pauseTracking, captureTypeProfile} from '../src/track-type-dependency';
+import {resetProfiler, startProfiling, pauseProfiling, captureTypeProfile} from '../src/profile-schema-usage';
 
-suite('track-type-dependency-test', () => {
+suite('profile-schema-usage-test', () => {
   setup(() => {
-    resetTracker();
+    resetProfiler();
   });
 
   test('it reports the types used in a query', () => {
-    startTracking();
+    startProfiling();
 
     // eslint-disable-next-line no-new
     new Query(typeBundle, (root) => {
@@ -41,8 +41,8 @@ suite('track-type-dependency-test', () => {
     ]);
   });
 
-  test('it pauses tracking when `pauseTracking` is called', () => {
-    startTracking();
+  test('it pauses tracking when `pauseProfiling` is called', () => {
+    startProfiling();
 
     // eslint-disable-next-line no-new
     new Query(typeBundle, (root) => {
@@ -51,7 +51,7 @@ suite('track-type-dependency-test', () => {
       });
     });
 
-    pauseTracking();
+    pauseProfiling();
 
     // eslint-disable-next-line no-new
     new Query(typeBundle, (root) => {
@@ -66,7 +66,7 @@ suite('track-type-dependency-test', () => {
       });
     });
 
-    startTracking();
+    startProfiling();
 
     // eslint-disable-next-line no-new
     new Query(typeBundle, (root) => {
@@ -84,8 +84,8 @@ suite('track-type-dependency-test', () => {
     ]);
   });
 
-  test('it clears the tracked types when `resetTracker` is called', () => {
-    startTracking();
+  test('it clears the tracked types when `resetProfiler` is called', () => {
+    startProfiling();
 
     // eslint-disable-next-line no-new
     new Query(typeBundle, (root) => {
@@ -94,15 +94,15 @@ suite('track-type-dependency-test', () => {
       });
     });
 
-    resetTracker();
+    resetProfiler();
 
     assert.deepEqual(captureTypeProfile(), []);
   });
 
   test('it stops tracking when `resetTypes` is called (returning the tracker to it\'s initial state.', () => {
-    startTracking();
+    startProfiling();
 
-    resetTracker();
+    resetProfiler();
 
     // eslint-disable-next-line no-new
     new Query(typeBundle, (root) => {

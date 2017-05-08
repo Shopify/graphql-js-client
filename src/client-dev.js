@@ -1,14 +1,14 @@
 import Client from './client';
-import {resetTracker, startTracking, pauseTracking, captureTypeProfile, captureProfile} from './track-type-dependency';
+import {resetProfiler, startProfiling, pauseProfiling, captureTypeProfile, captureProfile} from './profile-schema-usage';
 
 export {default as GraphModel} from './graph-model';
 export {default as ClassRegistry} from './class-registry';
 export {default as decode} from './decode';
 
 Object.assign(Client, {
-  resetTracker,
-  startTracking,
-  pauseTracking,
+  resetProfiler,
+  startProfiling,
+  pauseProfiling,
   captureTypeProfile,
   captureProfile
 });

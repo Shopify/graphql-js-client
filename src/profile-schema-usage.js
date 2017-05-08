@@ -1,8 +1,8 @@
 let profile = {};
-let tracking = false;
+let profiling = false;
 
 function trackTypeDependency(typeName) {
-  if (!tracking) {
+  if (!profiling) {
     return;
   }
 
@@ -10,24 +10,24 @@ function trackTypeDependency(typeName) {
 }
 
 function trackFieldDependency(typeName, fieldName) {
-  if (!tracking) {
+  if (!profiling) {
     return;
   }
 
   profile[typeName][fieldName] = true;
 }
 
-export function resetTracker() {
+export function resetProfiler() {
   profile = {};
-  tracking = false;
+  profiling = false;
 }
 
-export function startTracking() {
-  tracking = true;
+export function startProfiling() {
+  profiling = true;
 }
 
-export function pauseTracking() {
-  tracking = false;
+export function pauseProfiling() {
+  profiling = false;
 }
 
 export function captureTypeProfile() {
@@ -42,6 +42,6 @@ export function captureProfile() {
   }, {});
 }
 
-const Tracker = {trackTypeDependency, trackFieldDependency};
+const Profiler = {trackTypeDependency, trackFieldDependency};
 
-export default Tracker;
+export default Profiler;

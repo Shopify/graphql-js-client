@@ -13,7 +13,7 @@ if (process.env.BUILD_MODE === 'production') {
   entry = 'src/client.js';
 
   plugins.push(remap({
-    originalPath: './src/track-type-dependency',
+    originalPath: './src/profile-schema-usage',
     targetPath: './src/noop'
   }));
 

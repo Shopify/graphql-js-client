@@ -4,9 +4,9 @@ import schemaForType from './schema-for-type';
 import formatArgs from './format-args';
 import noop from './noop';
 import {isVariable} from './variable';
-import Tracker from './track-type-dependency';
+import Profiler from './profile-schema-usage';
 
-const {trackTypeDependency, trackFieldDependency} = Tracker;
+const {trackTypeDependency, trackFieldDependency} = Profiler;
 
 function parseFieldCreationArgs(creationArgs) {
   let callback = noop;

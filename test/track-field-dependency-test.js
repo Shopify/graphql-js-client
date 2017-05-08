@@ -1,15 +1,15 @@
 import assert from 'assert';
 import Query from '../src/query';
 import typeBundle from '../fixtures/types'; // eslint-disable-line import/no-unresolved
-import {resetTracker, startTracking, pauseTracking, trackedFields} from '../src/track-type-dependency';
+import {resetProfiler, startProfiling, pauseProfiling, captureProfile} from '../src/profile-schema-usage';
 
 suite('track-field-dependency-test', () => {
   setup(() => {
-    resetTracker();
+    resetProfiler();
   });
 
-  test('it reports the types used in a query', () => {
-    startTracking();
+  test('it reports the fields used in a query', () => {
+    startProfiling();
 
     // eslint-disable-next-line no-new
     new Query(typeBundle, (root) => {
@@ -24,7 +24,11 @@ suite('track-field-dependency-test', () => {
       });
     });
 
-    assert.deepEqual(trackedFields(), {
+    assert.deepEqual(captureProfile(), {
+      Boolean: [],
+      ID: [],
+      Money: [],
+      String: [],
       QueryRoot: [
         'shop'
       ],
@@ -62,8 +66,8 @@ suite('track-field-dependency-test', () => {
     });
   });
 
-  test('it pauses tracking when `pauseTracking` is called', () => {
-    startTracking();
+  test('it pauses tracking when `pauseProfiling` is called', () => {
+    startProfiling();
 
     // eslint-disable-next-line no-new
     new Query(typeBundle, (root) => {
@@ -72,7 +76,7 @@ suite('track-field-dependency-test', () => {
       });
     });
 
-    pauseTracking();
+    pauseProfiling();
 
     // eslint-disable-next-line no-new
     new Query(typeBundle, (root) => {
@@ -87,7 +91,7 @@ suite('track-field-dependency-test', () => {
       });
     });
 
-    startTracking();
+    startProfiling();
 
     // eslint-disable-next-line no-new
     new Query(typeBundle, (root) => {
@@ -96,7 +100,9 @@ suite('track-field-dependency-test', () => {
       });
     });
 
-    assert.deepEqual(trackedFields(), {
+    assert.deepEqual(captureProfile(), {
+      ID: [],
+      String: [],
       QueryRoot: [
         'shop',
         'node'
@@ -111,9 +117,9 @@ suite('track-field-dependency-test', () => {
   });
 
   test('it stops tracking when `resetTypes` is called (returning the tracker to it\'s initial state.', () => {
-    startTracking();
+    startProfiling();
 
-    resetTracker();
+    resetProfiler();
 
     // eslint-disable-next-line no-new
     new Query(typeBundle, (root) => {
@@ -122,6 +128,6 @@ suite('track-field-dependency-test', () => {
       });
     });
 
-    assert.deepEqual(trackedFields(), {});
+    assert.deepEqual(captureProfile(), {});
   });
 });

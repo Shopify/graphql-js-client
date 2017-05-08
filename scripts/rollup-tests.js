@@ -38,7 +38,7 @@ function envRollupInfo({browser, withDependencyTracking}) {
   // eslint-disable-next-line no-process-env
   if (!withDependencyTracking) {
     plugins.unshift(remap({
-      originalPath: './src/track-type-dependency',
+      originalPath: './src/profile-schema-usage',
       targetPath: './src/noop'
     }));
   }

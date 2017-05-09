@@ -14,7 +14,7 @@ if (process.env.BUILD_MODE === 'production') {
 
   plugins.push(remap({
     originalPath: './src/profile-schema-usage',
-    targetPath: './src/noop'
+    targetPath: './src/fake-profiler'
   }));
 
   targets.push(

@@ -39,7 +39,7 @@ function envRollupInfo({browser, withDependencyTracking}) {
   if (!withDependencyTracking) {
     plugins.unshift(remap({
       originalPath: './src/profile-schema-usage',
-      targetPath: './src/noop'
+      targetPath: './src/fake-profiler'
     }));
   }
 

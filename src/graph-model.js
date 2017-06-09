@@ -19,12 +19,14 @@ export default class GraphModel {
 
       if (attrs[key] === null) {
         descriptor = {
+          enumerable: true,
           get() {
             return null;
           }
         };
       } else {
         descriptor = {
+          enumerable: true,
           get() {
             return this.attrs[key].valueOf();
           }

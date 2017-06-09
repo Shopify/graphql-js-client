@@ -23,6 +23,13 @@ suite('graph-model-test', () => {
     assert.equal(model.beanType, attrs.beanType);
   });
 
+  test('it creates an object with enumerable keys', () => {
+
+    const model = new GraphModel(attrs);
+
+    assert.deepEqual(Object.keys(model), ['attrs', 'beans', 'beanType']);
+  });
+
   test('it creates read-only proxies', () => {
 
     const model = new GraphModel(attrs);

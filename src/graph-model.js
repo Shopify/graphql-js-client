@@ -10,7 +10,7 @@ export default class GraphModel {
    * @param {Object} attrs Attributes on the GraphModel.
    */
   constructor(attrs) {
-    this.attrs = attrs;
+    Object.defineProperty(this, 'attrs', {value: attrs, enumerable: false});
 
     Object.keys(this.attrs).filter((key) => {
       return !(key in this);
@@ -34,6 +34,5 @@ export default class GraphModel {
       }
       Object.defineProperty(this, key, descriptor);
     });
-    Object.defineProperty(this, 'attrs', { enumerable: false });
   }
 }

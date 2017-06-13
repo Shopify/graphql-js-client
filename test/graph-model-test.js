@@ -27,7 +27,7 @@ suite('graph-model-test', () => {
 
     const model = new GraphModel(attrs);
 
-    assert.deepEqual(Object.keys(model), ['attrs', 'beans', 'beanType']);
+    assert.deepEqual(Object.keys(model), ['beans', 'beanType']);
   });
 
   test('it creates read-only proxies', () => {

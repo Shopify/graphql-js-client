@@ -34,5 +34,6 @@ export default class GraphModel {
       }
       Object.defineProperty(this, key, descriptor);
     });
+    Object.defineProperty(this, 'attrs', { enumerable: false });
   }
 }

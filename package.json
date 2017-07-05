@@ -4,6 +4,7 @@
   "description": "Feature light client library for fetching resources via GraphQL",
   "main": "index.js",
   "module": "index.es.js",
+  "jsnext:main": "index.es.js",
   "license": "MIT",
   "author": "Shopify Inc.",
   "dependencies": {},

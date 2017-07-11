@@ -135,6 +135,43 @@ suite('client-test', () => {
     });
   });
 
+  test('it sends queries represented as functions', () => {
+    let fetcherGraphQLParams = null;
+    let fetcherURL = null;
+
+    function mockFetcher(url) {
+      fetcherURL = url;
+
+      return function fetcher(graphQLParams) {
+        fetcherGraphQLParams = graphQLParams;
+
+        return Promise.resolve({data: {shop: {name: 'Snowdevil'}}});
+      };
+    }
+
+    const fetcher = mockFetcher('https://graphql.example.com');
+    const mockClient = new Client(typeBundle, {fetcher});
+
+    function query(client) {
+      const document = client.document();
+
+      document.addQuery((root) => {
+        root.addField('shop', (shop) => {
+          shop.addField('name');
+        });
+      });
+
+      return document;
+    }
+
+    return mockClient.send(query).then((response) => {
+      assert.equal(fetcherURL, 'https://graphql.example.com');
+      assert.deepEqual(fetcherGraphQLParams, {query: query(mockClient).toString()});
+      assert.deepEqual(response.data, {shop: {name: 'Snowdevil'}});
+      assert.equal(response.model.shop.name, 'Snowdevil');
+      assert.ok(response.model instanceof GraphModel);
+    });
+  });
   test('it decodes responses with ClassRegistry', () => {
     class ShopModel extends GraphModel {}
 

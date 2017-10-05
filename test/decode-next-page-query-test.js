@@ -1,6 +1,7 @@
 import assert from 'assert';
 import decode from '../src/decode';
 import typeBundle from '../fixtures/types'; // eslint-disable-line import/no-unresolved
+import variable from '../src/variable';
 import Query from '../src/query';
 
 suite('decode-next-page-query-test', () => {
@@ -58,10 +59,10 @@ suite('decode-next-page-query-test', () => {
   let decoded;
   let query;
 
-  const querySplitter = /[\s,]+/;
+  const querySplitter = /[\s,:]+/;
 
   function tokens(queryString) {
-    return queryString.split(querySplitter).filter((token) => Boolean(token));
+    return queryString.trim().split(querySplitter).filter((token) => Boolean(token));
   }
 
   setup(() => {
@@ -208,5 +209,67 @@ suite('decode-next-page-query-test', () => {
     }`));
 
     assert.deepEqual(path, ['node', 'hostObjectAlias', 'anotherHost', 'productsAlias']);
+  });
+
+  test('it can generate the next page query for a query with variables', () => {
+    const variables = [variable('sort', 'ProductSortKeys')];
+    const variablesQuery = new Query(typeBundle, variables, (root) => {
+      root.add('node', {args: {id: 'gid://shopify/Collection/12345'}}, (node) => {
+        node.addInlineFragmentOn('Collection', (collection) => {
+          collection.addConnection('products', {args: {first: 1, sortKey: variables[0]}}, (products) => {
+            products.add('handle');
+          });
+        });
+      });
+    });
+    const productCursor = 'product-cursor';
+    const variablesFixture = {
+      data: {
+        node: {
+          id: 'gid://shopify/Collection/12345',
+          products: {
+            pageInfo: {
+              hasNextPage: true,
+              hasPreviousPage: false
+            },
+            edges: [{
+              cursor: productCursor,
+              node: {
+                id: productId,
+                handle: 'some-product'
+              }
+            }]
+          }
+        }
+      }
+    };
+
+    const decodedDataFromRequestWithVariables = decode(variablesQuery, variablesFixture.data);
+
+    const [nextPageQuery] = decodedDataFromRequestWithVariables.node.products[0].nextPageQueryAndPath();
+
+    assert.deepEqual(tokens(nextPageQuery.toString()), tokens(`
+      query ($sort: ProductSortKeys, $first: Int = 1) {
+        node (id: "gid://shopify/Collection/12345") {
+          __typename
+          ... on Collection {
+            id
+            products (first: $first, sortKey: $sort,  after: "${productCursor}") {
+              pageInfo {
+                hasNextPage
+                hasPreviousPage
+              }
+              edges {
+                cursor
+                node {
+                  id
+                  handle
+                }
+              }
+            }
+          }
+        }
+      }
+    `));
   });
 });

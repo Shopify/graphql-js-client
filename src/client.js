@@ -109,14 +109,14 @@ export default class Client {
    * Sends a GraphQL operation (query or mutation) or a document.
    *
    * @example
-   * client.send(query, [{id: '12345'}]).then((result) => {
+   * client.send(query, {id: '12345'}).then((result) => {
    *   // Do something with the returned result
    *   console.log(result);
    * });
    *
    * @param {(Query|Mutation|Document|Function)} request The operation or document to send. If represented
    * as a function, it must return `Query`, `Mutation`, or `Document` and recieve the client as the only param.
-   * @param {Object[]} [variableValues] The values for variables in the operation or document.
+   * @param {Object} [variableValues] The values for variables in the operation or document.
    * @param {Object} [otherProperties] Other properties to send with the query. For example, a custom operation name.
    * @return {Promise.<Object>} A promise resolving to an object containing the response data.
    */

@@ -127,11 +127,11 @@ function recordTypeInformation(context, value) {
   return value;
 }
 
-function defaultTransformers({classRegistry = new ClassRegistry()}) {
+function defaultTransformers({classRegistry = new ClassRegistry(), variableValues}) {
   return [
     transformScalars,
     generateRefetchQueries,
-    transformConnections,
+    transformConnections(variableValues),
     recordTypeInformation,
     transformPojosToClassesWithRegistry(classRegistry)
   ];

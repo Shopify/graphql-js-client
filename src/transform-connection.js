@@ -1,6 +1,6 @@
 import Query from './query';
 import isNodeContext from './is-node-context';
-import variable from './variable';
+import variable, {VariableDefinition} from './variable';
 import Scalar from './scalar';
 
 function isConnection(context) {
@@ -69,9 +69,15 @@ function nextPageQueryAndPath(context, cursor) {
       const nodeType = nearestNodeContext.selection.selectionSet.typeSchema;
       const nodeId = nearestNodeContext.responseData.id;
       const contextChain = contextsFromNearestNode(context);
-      const first = contextChain[contextChain.length - 1].selection.args.first;
+      const lastInChain = contextChain[contextChain.length - 1];
+      const first = lastInChain.selection.args.first;
+      const variableDefinitions = Object.keys(lastInChain.selection.args).filter((key) => {
+        return VariableDefinition.prototype.isPrototypeOf(lastInChain.selection.args[key]);
+      }).map((key) => {
+        return lastInChain.selection.args[key];
+      });
 
-      const query = new Query(context.selection.selectionSet.typeBundle, [variable('first', 'Int', first)], (root) => {
+      const query = new Query(context.selection.selectionSet.typeBundle, variableDefinitions.concat(variable('first', 'Int', first)), (root) => {
         path.push('node');
         root.add('node', {args: {id: nodeId}}, (node) => {
           node.addInlineFragmentOn(nodeType.name, (fragment) => {
@@ -112,20 +118,23 @@ function hasPreviousPage(connection, edge) {
   return connection.pageInfo.hasPreviousPage;
 }
 
-export default function transformConnections(context, value) {
-  if (isConnection(context)) {
-    if (!(value.pageInfo && value.pageInfo.hasOwnProperty('hasNextPage') && value.pageInfo.hasOwnProperty('hasPreviousPage'))) {
-      throw new Error('Connections must include the selections "pageInfo { hasNextPage, hasPreviousPage }".');
-    }
+export default function transformConnections(variableValues) {
+  return function(context, value) {
+    if (isConnection(context)) {
+      if (!(value.pageInfo && value.pageInfo.hasOwnProperty('hasNextPage') && value.pageInfo.hasOwnProperty('hasPreviousPage'))) {
+        throw new Error('Connections must include the selections "pageInfo { hasNextPage, hasPreviousPage }".');
+      }
 
-    return value.edges.map((edge) => {
-      return Object.assign(edge.node, {
-        nextPageQueryAndPath: nextPageQueryAndPath(context, edge.cursor),
-        hasNextPage: hasNextPage(value, edge),
-        hasPreviousPage: hasPreviousPage(value, edge)
+      return value.edges.map((edge) => {
+        return Object.assign(edge.node, {
+          nextPageQueryAndPath: nextPageQueryAndPath(context, edge.cursor),
+          hasNextPage: hasNextPage(value, edge),
+          hasPreviousPage: hasPreviousPage(value, edge),
+          variableValues
+        });
       });
-    });
-  } else {
-    return value;
-  }
+    } else {
+      return value;
+    }
+  };
 }

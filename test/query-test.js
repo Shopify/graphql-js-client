@@ -6,10 +6,10 @@ import variable from '../src/variable';
 import schemaForType from '../src/schema-for-type';
 
 suite('query-test', () => {
-  const querySplitter = /[\s,]+/;
+  const querySplitter = /[\s,:]+/;
 
   function splitQuery(query) {
-    return query.split(querySplitter);
+    return query.trim().split(querySplitter);
   }
 
   function buildQuery(root) {
@@ -65,5 +65,28 @@ suite('query-test', () => {
     variables.push(variable('foo', 'String'));
     assert.deepEqual(variables, [variable('productId', 'ID!'), variable('foo', 'String')]);
     assert.deepEqual(query.variableDefinitions.variableDefinitions, [variable('productId', 'ID!')]);
+  });
+
+  test('it properly interpolates variable arguments into queries', () => {
+    const variables = [variable('productId', 'ID!')];
+    const query = new Query(typeBundle, 'foo', variables, (root) => {
+      root.add('node', {args: {id: variables[0]}}, (node) => {
+        node.addInlineFragmentOn('Product', (product) => {
+          product.add('title');
+        });
+      });
+    });
+
+    assert.deepEqual(splitQuery(query.toString()), splitQuery(`
+      query foo ($productId: ID!) {
+        node (id: $productId) {
+          __typename
+          ... on Product {
+            id
+            title
+          }
+        }
+      }
+    `));
   });
 });

@@ -109,14 +109,14 @@ export default class Client {
    * Sends a GraphQL operation (query or mutation) or a document.
    *
    * @example
-   * client.send(query, [{id: '12345'}]).then((result) => {
+   * client.send(query, {id: '12345'}).then((result) => {
    *   // Do something with the returned result
    *   console.log(result);
    * });
    *
    * @param {(Query|Mutation|Document|Function)} request The operation or document to send. If represented
    * as a function, it must return `Query`, `Mutation`, or `Document` and recieve the client as the only param.
-   * @param {Object[]} [variableValues] The values for variables in the operation or document.
+   * @param {Object} [variableValues] The values for variables in the operation or document.
    * @param {Object} [otherProperties] Other properties to send with the query. For example, a custom operation name.
    * @return {Promise.<Object>} A promise resolving to an object containing the response data.
    */
@@ -160,7 +160,10 @@ export default class Client {
 
     return this.fetcher(graphQLParams).then((response) => {
       if (response.data) {
-        response.model = decode(operation, response.data, {classRegistry: this.classRegistry});
+        response.model = decode(operation, response.data, {
+          classRegistry: this.classRegistry,
+          variableValues
+        });
       }
 
       return response;
@@ -191,8 +194,13 @@ export default class Client {
     }
 
     const [query, path] = node.nextPageQueryAndPath();
+    let variableValues;
 
-    return this.send(query, options).then((response) => {
+    if (variableValues || options) {
+      variableValues = Object.assign({}, node.variableValues, options);
+    }
+
+    return this.send(query, variableValues).then((response) => {
       response.model = path.reduce((object, key) => {
         return object[key];
       }, response.model);

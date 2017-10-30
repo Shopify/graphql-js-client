@@ -33,6 +33,22 @@ function contextsFromNearestNode(context) {
   }
 }
 
+function initializeQuery(currentContext, contextChain, queryBuilder) {
+  const lastInChain = contextChain[contextChain.length - 1];
+  const first = lastInChain.selection.args.first;
+  const variableDefinitions = Object
+    .keys(lastInChain.selection.args)
+    .filter((key) => {
+      return VariableDefinition.prototype.isPrototypeOf(lastInChain.selection.args[key]);
+    })
+    .map((key) => {
+      return lastInChain.selection.args[key];
+    })
+    .concat(variable('first', 'Int', first));
+
+  return new Query(currentContext.selection.selectionSet.typeBundle, variableDefinitions, queryBuilder);
+}
+
 function addNextFieldTo(currentSelection, contextChain, cursor, path) {
   // There are always at least two. When we start, it's the root context, and the first set
   const nextContext = contextChain.shift();
@@ -69,15 +85,7 @@ function nextPageQueryAndPath(context, cursor) {
       const nodeType = nearestNodeContext.selection.selectionSet.typeSchema;
       const nodeId = nearestNodeContext.responseData.id;
       const contextChain = contextsFromNearestNode(context);
-      const lastInChain = contextChain[contextChain.length - 1];
-      const first = lastInChain.selection.args.first;
-      const variableDefinitions = Object.keys(lastInChain.selection.args).filter((key) => {
-        return VariableDefinition.prototype.isPrototypeOf(lastInChain.selection.args[key]);
-      }).map((key) => {
-        return lastInChain.selection.args[key];
-      });
-
-      const query = new Query(context.selection.selectionSet.typeBundle, variableDefinitions.concat(variable('first', 'Int', first)), (root) => {
+      const query = initializeQuery(context, contextChain, (root) => {
         path.push('node');
         root.add('node', {args: {id: nodeId}}, (node) => {
           node.addInlineFragmentOn(nodeType.name, (fragment) => {
@@ -91,9 +99,7 @@ function nextPageQueryAndPath(context, cursor) {
   } else {
     return function() {
       const contextChain = contextsFromRoot(context);
-      const first = contextChain[contextChain.length - 1].selection.args.first;
-
-      const query = new Query(context.selection.selectionSet.typeBundle, [variable('first', 'Int', first)], (root) => {
+      const query = initializeQuery(context, contextChain, (root) => {
         addNextFieldTo(root, contextChain.slice(1), cursor, path);
       });
 

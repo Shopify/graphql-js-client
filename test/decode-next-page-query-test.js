@@ -211,7 +211,7 @@ suite('decode-next-page-query-test', () => {
     assert.deepEqual(path, ['node', 'hostObjectAlias', 'anotherHost', 'productsAlias']);
   });
 
-  test('it can generate the next page query for a query with variables', () => {
+  test('it can generate the next page query for a query with variables off a nearest `Node`', () => {
     const variables = [variable('sort', 'ProductSortKeys')];
     const variablesQuery = new Query(typeBundle, variables, (root) => {
       root.add('node', {args: {id: 'gid://shopify/Collection/12345'}}, (node) => {
@@ -265,6 +265,61 @@ suite('decode-next-page-query-test', () => {
                   id
                   handle
                 }
+              }
+            }
+          }
+        }
+      }
+    `));
+  });
+
+  test('it can generate the next page query for a query with variables with no parent `Node`s', () => {
+    const variables = [variable('sort', 'ProductSortKeys')];
+    const variablesQuery = new Query(typeBundle, variables, (root) => {
+      root.add('shop', (shop) => {
+        shop.addConnection('products', {args: {first: 1, sortKey: variables[0]}}, (products) => {
+          products.add('handle');
+        });
+      });
+    });
+    const productCursor = 'product-cursor';
+    const variablesFixture = {
+      data: {
+        shop: {
+          products: {
+            pageInfo: {
+              hasNextPage: true,
+              hasPreviousPage: false
+            },
+            edges: [{
+              cursor: productCursor,
+              node: {
+                id: productId,
+                handle: 'some-product'
+              }
+            }]
+          }
+        }
+      }
+    };
+
+    const decodedDataFromRequestWithVariables = decode(variablesQuery, variablesFixture.data);
+
+    const [nextPageQuery] = decodedDataFromRequestWithVariables.shop.products[0].nextPageQueryAndPath();
+
+    assert.deepEqual(tokens(nextPageQuery.toString()), tokens(`
+      query ($sort: ProductSortKeys, $first: Int = 1) {
+        shop {
+          products (first: $first, sortKey: $sort,  after: "${productCursor}") {
+            pageInfo {
+              hasNextPage
+              hasPreviousPage
+            }
+            edges {
+              cursor
+              node {
+                id
+                handle
               }
             }
           }

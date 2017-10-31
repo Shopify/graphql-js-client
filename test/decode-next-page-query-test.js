@@ -3,6 +3,7 @@ import decode from '../src/decode';
 import typeBundle from '../fixtures/types'; // eslint-disable-line import/no-unresolved
 import variable from '../src/variable';
 import Query from '../src/query';
+import Document from '../src/document';
 
 suite('decode-next-page-query-test', () => {
   const collectionId = 'gid://shopify/Collection/67890';
@@ -211,7 +212,7 @@ suite('decode-next-page-query-test', () => {
     assert.deepEqual(path, ['node', 'hostObjectAlias', 'anotherHost', 'productsAlias']);
   });
 
-  test('it can generate the next page query for a query with variables', () => {
+  test('it can generate the next page query for a query with variables off a nearest `Node`', () => {
     const variables = [variable('sort', 'ProductSortKeys')];
     const variablesQuery = new Query(typeBundle, variables, (root) => {
       root.add('node', {args: {id: 'gid://shopify/Collection/12345'}}, (node) => {
@@ -265,6 +266,179 @@ suite('decode-next-page-query-test', () => {
                   id
                   handle
                 }
+              }
+            }
+          }
+        }
+      }
+    `));
+  });
+
+  test('it can generate the next page query for a query with variables with no parent `Node`s', () => {
+    const variables = [variable('sort', 'ProductSortKeys')];
+    const variablesQuery = new Query(typeBundle, variables, (root) => {
+      root.add('shop', (shop) => {
+        shop.addConnection('products', {args: {first: 1, sortKey: variables[0]}}, (products) => {
+          products.add('handle');
+        });
+      });
+    });
+    const cursor = 'product-cursor';
+    const variablesFixture = {
+      data: {
+        shop: {
+          products: {
+            pageInfo: {
+              hasNextPage: true,
+              hasPreviousPage: false
+            },
+            edges: [{
+              cursor,
+              node: {
+                id: productId,
+                handle: 'some-product'
+              }
+            }]
+          }
+        }
+      }
+    };
+
+    const decodedDataFromRequestWithVariables = decode(variablesQuery, variablesFixture.data);
+
+    const [nextPageQuery] = decodedDataFromRequestWithVariables.shop.products[0].nextPageQueryAndPath();
+
+    assert.deepEqual(tokens(nextPageQuery.toString()), tokens(`
+      query ($sort: ProductSortKeys, $first: Int = 1) {
+        shop {
+          products (first: $first, sortKey: $sort,  after: "${cursor}") {
+            pageInfo {
+              hasNextPage
+              hasPreviousPage
+            }
+            edges {
+              cursor
+              node {
+                id
+                handle
+              }
+            }
+          }
+        }
+      }
+    `));
+  });
+
+  test('it doesn\'t duplicate the "first" var if it\'s passed as variable instead of a literal', () => {
+    const variables = [variable('first', 'Int', 1), variable('sort', 'ProductSortKeys')];
+    const variablesQuery = new Query(typeBundle, variables, (root) => {
+      root.add('shop', (shop) => {
+        shop.addConnection('products', {args: {first: variables[0], sortKey: variables[1]}}, (products) => {
+          products.add('handle');
+        });
+      });
+    });
+    const cursor = 'product-cursor';
+    const variablesFixture = {
+      data: {
+        shop: {
+          products: {
+            pageInfo: {
+              hasNextPage: true,
+              hasPreviousPage: false
+            },
+            edges: [{
+              cursor,
+              node: {
+                id: productId,
+                handle: 'some-product'
+              }
+            }]
+          }
+        }
+      }
+    };
+
+    const decodedDataFromRequestWithVariables = decode(variablesQuery, variablesFixture.data);
+
+    const [nextPageQuery] = decodedDataFromRequestWithVariables.shop.products[0].nextPageQueryAndPath();
+
+    assert.deepEqual(tokens(nextPageQuery.toString()), tokens(`
+      query ($first: Int = 1, $sort: ProductSortKeys) {
+        shop {
+          products (first: $first, sortKey: $sort,  after: "${cursor}") {
+            pageInfo {
+              hasNextPage
+              hasPreviousPage
+            }
+            edges {
+              cursor
+              node {
+                id
+                handle
+              }
+            }
+          }
+        }
+      }
+    `));
+  });
+
+  test('it can generated the next page query when selections include named fragments', () => {
+    const variables = [variable('sort', 'ProductSortKeys')];
+    const cursor = 'product-cursor';
+    const fragmentFixture = {
+      data: {
+        shop: {
+          products: {
+            pageInfo: {
+              hasNextPage: true,
+              hasPreviousPage: false
+            },
+            edges: [{
+              cursor,
+              node: {
+                id: productId,
+                handle: 'some-product'
+              }
+            }]
+          }
+        }
+      }
+    };
+    const document = new Document(typeBundle);
+    const fragment = document.defineFragment('ProductFragment', 'Product', (product) => {
+      product.add('handle');
+    });
+
+    document.addQuery(variables, (root) => {
+      root.add('shop', (shop) => {
+        shop.addConnection('products', {args: {first: 1, sortKey: variables[0]}}, (products) => {
+          products.add(fragment);
+        });
+      });
+    });
+
+    const decodedFromFragments = decode(document.operations[0], fragmentFixture.data);
+
+    const [nextPageQuery] = decodedFromFragments.shop.products[0].nextPageQueryAndPath();
+
+    assert.deepEqual(tokens(nextPageQuery.toString()), tokens(`
+      fragment ProductFragment on Product {
+        id
+        handle
+      }
+      query ($sort: ProductSortKeys, $first: Int = 1) {
+        shop {
+          products (first: $first, sortKey: $sort,  after: "${cursor}") {
+            pageInfo {
+              hasNextPage
+              hasPreviousPage
+            }
+            edges {
+              cursor
+              node {
+                ...ProductFragment
               }
             }
           }

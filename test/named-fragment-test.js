@@ -33,6 +33,12 @@ suite('named-fragment-test', () => {
     assert.deepEqual(definition.spread.toString(), '...sickFragment');
   });
 
+  test('it can generate a definition from a spread', () => {
+    const definition = new FragmentDefinition('sickFragment', typeName, selections);
+    const spread = definition.spread;
+
+    assert.equal(spread.toDefinition().toString(), definition.toString());
+  });
 
   test('it is deeply frozen after being built.', () => {
     const definition = new FragmentDefinition('sickFragment', typeName, selections);

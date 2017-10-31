@@ -123,6 +123,11 @@ export class FragmentSpread extends Spread {
   toString() {
     return `...${this.name}`;
   }
+
+  toDefinition() {
+    // eslint-disable-next-line no-use-before-define
+    return new FragmentDefinition(this.name, this.selectionSet.typeSchema.name, this.selectionSet);
+  }
 }
 
 export class FragmentDefinition {

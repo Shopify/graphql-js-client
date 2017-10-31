@@ -1,7 +1,8 @@
-import Query from './query';
+import Document from './document';
 import isNodeContext from './is-node-context';
 import variable, {VariableDefinition} from './variable';
 import Scalar from './scalar';
+import {FragmentSpread} from './selection-set';
 
 function isConnection(context) {
   return context.selection.selectionSet.typeSchema.name.endsWith('Connection');
@@ -33,7 +34,7 @@ function contextsFromNearestNode(context) {
   }
 }
 
-function initializeQuery(currentContext, contextChain, queryBuilder) {
+function initializeDocumentAndVars(currentContext, contextChain) {
   const lastInChain = contextChain[contextChain.length - 1];
   const first = lastInChain.selection.args.first;
   const variableDefinitions = Object
@@ -43,13 +44,23 @@ function initializeQuery(currentContext, contextChain, queryBuilder) {
     })
     .map((key) => {
       return lastInChain.selection.args[key];
-    })
-    .concat(variable('first', 'Int', first));
+    });
 
-  return new Query(currentContext.selection.selectionSet.typeBundle, variableDefinitions, queryBuilder);
+  let firstVar = variableDefinitions.find((definition) => {
+    return definition.name === 'first';
+  });
+
+  if (!firstVar) {
+    firstVar = variable('first', 'Int', first);
+    variableDefinitions.push(firstVar);
+  }
+
+  const document = new Document(currentContext.selection.selectionSet.typeBundle);
+
+  return [document, variableDefinitions, firstVar];
 }
 
-function addNextFieldTo(currentSelection, contextChain, cursor, path) {
+function addNextFieldTo(currentSelection, contextChain, path, cursor) {
   // There are always at least two. When we start, it's the root context, and the first set
   const nextContext = contextChain.shift();
 
@@ -57,7 +68,7 @@ function addNextFieldTo(currentSelection, contextChain, cursor, path) {
 
   if (contextChain.length) {
     currentSelection.add(nextContext.selection.name, {alias: nextContext.selection.alias, args: nextContext.selection.args}, (newSelection) => {
-      addNextFieldTo(newSelection, contextChain, cursor, path);
+      addNextFieldTo(newSelection, contextChain, path, cursor);
     });
   } else {
     const edgesField = nextContext.selection.selectionSet.selections.find((field) => {
@@ -76,6 +87,18 @@ function addNextFieldTo(currentSelection, contextChain, cursor, path) {
   }
 }
 
+function collectFragments(selections) {
+  return selections.reduce((fragmentDefinitions, field) => {
+    if (FragmentSpread.prototype.isPrototypeOf(field)) {
+      fragmentDefinitions.push(field.toDefinition());
+    }
+
+    fragmentDefinitions.push(...collectFragments(field.selectionSet.selections));
+
+    return fragmentDefinitions;
+  }, []);
+}
+
 function nextPageQueryAndPath(context, cursor) {
   const nearestNodeContext = nearestNode(context);
   const path = [];
@@ -85,25 +108,37 @@ function nextPageQueryAndPath(context, cursor) {
       const nodeType = nearestNodeContext.selection.selectionSet.typeSchema;
       const nodeId = nearestNodeContext.responseData.id;
       const contextChain = contextsFromNearestNode(context);
-      const query = initializeQuery(context, contextChain, (root) => {
+      const [document, variableDefinitions] = initializeDocumentAndVars(context, contextChain);
+
+      document.addQuery(variableDefinitions, (root) => {
         path.push('node');
         root.add('node', {args: {id: nodeId}}, (node) => {
           node.addInlineFragmentOn(nodeType.name, (fragment) => {
-            addNextFieldTo(fragment, contextChain.slice(1), cursor, path);
+            addNextFieldTo(fragment, contextChain.slice(1), path, cursor);
           });
         });
       });
 
-      return [query, path];
+      const fragments = collectFragments(document.operations[0].selectionSet.selections);
+
+      document.definitions.unshift(...fragments);
+
+      return [document, path];
     };
   } else {
     return function() {
       const contextChain = contextsFromRoot(context);
-      const query = initializeQuery(context, contextChain, (root) => {
-        addNextFieldTo(root, contextChain.slice(1), cursor, path);
+      const [document, variableDefinitions] = initializeDocumentAndVars(context, contextChain);
+
+      document.addQuery(variableDefinitions, (root) => {
+        addNextFieldTo(root, contextChain.slice(1), path, cursor);
       });
 
-      return [query, path];
+      const fragments = collectFragments(document.operations[0].selectionSet.selections);
+
+      document.definitions.unshift(...fragments);
+
+      return [document, path];
     };
   }
 }

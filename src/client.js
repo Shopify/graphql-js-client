@@ -196,7 +196,7 @@ export default class Client {
     const [query, path] = node.nextPageQueryAndPath();
     let variableValues;
 
-    if (variableValues || options) {
+    if (node.variableValues || options) {
       variableValues = Object.assign({}, node.variableValues, options);
     }
 

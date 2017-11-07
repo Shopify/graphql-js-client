@@ -109,6 +109,14 @@ suite('decode-next-page-query-test', () => {
     assert.deepEqual(path, ['shop', 'collections']);
   });
 
+  test('Arrays of Nodes can generate a query to fetch the next page', () => {
+    const [_, pathFirstCall] = decoded.shop.collections[0].nextPageQueryAndPath();
+    const [__, pathSecondCall] = decoded.shop.collections[0].nextPageQueryAndPath();
+
+    assert.deepEqual(pathFirstCall, ['shop', 'collections']);
+    assert.deepEqual(pathFirstCall, pathSecondCall);
+  });
+
   test('Arrays of Nodes nested under a truncated query to fetch their next page', () => {
     const [nextPageQuery, path] = decoded.shop.products[0].variants[0].nextPageQueryAndPath();
 

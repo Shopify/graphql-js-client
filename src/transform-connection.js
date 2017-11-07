@@ -101,10 +101,10 @@ function collectFragments(selections) {
 
 function nextPageQueryAndPath(context, cursor) {
   const nearestNodeContext = nearestNode(context);
-  const path = [];
 
   if (nearestNodeContext) {
     return function() {
+      const path = [];
       const nodeType = nearestNodeContext.selection.selectionSet.typeSchema;
       const nodeId = nearestNodeContext.responseData.id;
       const contextChain = contextsFromNearestNode(context);
@@ -127,6 +127,7 @@ function nextPageQueryAndPath(context, cursor) {
     };
   } else {
     return function() {
+      const path = [];
       const contextChain = contextsFromRoot(context);
       const [document, variableDefinitions] = initializeDocumentAndVars(context, contextChain);
 

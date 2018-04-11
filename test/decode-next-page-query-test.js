@@ -454,4 +454,82 @@ suite('decode-next-page-query-test', () => {
       }
     `));
   });
+
+  test('it retains variable values on multiple next-page-queries', () => {
+    const variables = [variable('first', 'Int', 1)];
+    const cursor = 'product-cursor';
+    const fragmentFixture = {
+      data: {
+        shop: {
+          products: {
+            pageInfo: {
+              hasNextPage: true,
+              hasPreviousPage: false
+            },
+            edges: [{
+              cursor,
+              node: {
+                id: productId
+              }
+            }]
+          }
+        }
+      }
+    };
+    const document = new Document(typeBundle);
+
+    document.addQuery(variables, (root) => {
+      root.add('shop', (shop) => {
+        shop.addConnection('products', {args: {first: variables[0]}}, (products) => {
+          products.add('id');
+        });
+      });
+    });
+
+    const decodedPageOne = decode(document.operations[0], fragmentFixture.data);
+
+    const [pageTwoQuery] = decodedPageOne.shop.products[0].nextPageQueryAndPath();
+
+    assert.deepEqual(tokens(pageTwoQuery.toString()), tokens(`
+      query ($first: Int = 1) {
+        shop {
+          products (first: $first, after: "${cursor}") {
+            pageInfo {
+              hasNextPage
+              hasPreviousPage
+            }
+            edges {
+              cursor
+              node {
+                id
+              }
+            }
+          }
+        }
+      }
+    `), 'page two query is as expected');
+
+    const decodedPageTwo = decode(pageTwoQuery.operations[0], fragmentFixture.data);
+
+    const [pageThreeQuery] = decodedPageTwo.shop.products[0].nextPageQueryAndPath();
+
+    assert.deepEqual(tokens(pageThreeQuery.toString()), tokens(`
+      query ($first: Int = 1) {
+        shop {
+          products (first: $first, after: "${cursor}") {
+            pageInfo {
+              hasNextPage
+              hasPreviousPage
+            }
+            edges {
+              cursor
+              node {
+                id
+              }
+            }
+          }
+        }
+      }
+    `), 'page three query is as expected');
+  });
 });

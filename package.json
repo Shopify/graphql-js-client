@@ -7,6 +7,10 @@
   "jsnext:main": "index.es.js",
   "license": "MIT",
   "author": "Shopify Inc.",
+  "publishConfig": {
+    "access": "public",
+    "@shopify:registry": "https://registry.npmjs.org/"
+  },
   "dependencies": {},
   "devDependencies": {
     "babel": "6.5.2",

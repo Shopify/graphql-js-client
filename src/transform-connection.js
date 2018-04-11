@@ -1,6 +1,6 @@
 import Document from './document';
 import isNodeContext from './is-node-context';
-import variable, {VariableDefinition} from './variable';
+import variable, {isVariable} from './variable';
 import Scalar from './scalar';
 import {FragmentSpread} from './selection-set';
 
@@ -40,7 +40,7 @@ function initializeDocumentAndVars(currentContext, contextChain) {
   const variableDefinitions = Object
     .keys(lastInChain.selection.args)
     .filter((key) => {
-      return VariableDefinition.prototype.isPrototypeOf(lastInChain.selection.args[key]);
+      return isVariable(lastInChain.selection.args[key]);
     })
     .map((key) => {
       return lastInChain.selection.args[key];
@@ -77,7 +77,14 @@ function addNextFieldTo(currentSelection, contextChain, path, cursor) {
     const nodeField = edgesField.selectionSet.selections.find((field) => {
       return field.name === 'node';
     });
-    const first = variable('first', 'Int', nextContext.selection.args.first);
+    let first;
+
+    if (isVariable(nextContext.selection.args.first)) {
+      first = nextContext.selection.args.first;
+    } else {
+      first = variable('first', 'Int', nextContext.selection.args.first);
+    }
+
     const options = {
       alias: nextContext.selection.alias,
       args: Object.assign({}, nextContext.selection.args, {after: cursor, first})

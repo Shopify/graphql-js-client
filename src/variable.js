@@ -39,7 +39,7 @@ export class VariableDefinition {
 }
 
 export function isVariable(value) {
-  return value instanceof VariableDefinition;
+  return VariableDefinition.prototype.isPrototypeOf(value);
 }
 
 export default function variable(name, type, defaultValue) {

@@ -17,7 +17,7 @@ test
 .eslintrc.json
 .gitignore
 .npmignore
-circle.yml
+.travis.yml
 package.json
 rollup.config.js
 schema.json

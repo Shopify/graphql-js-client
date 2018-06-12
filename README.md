@@ -1,3 +1,4 @@
+[![Travis](https://travis-ci.com/Shopify/graphql-js-client.svg?branch=master)](https://travis-ci.com/Shopify/graphql-js-client)
 # graphql-js-client
 
 Feature light client library for fetching resources via GraphQL.

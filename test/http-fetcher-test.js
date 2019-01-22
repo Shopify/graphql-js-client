@@ -74,4 +74,27 @@ suite('http-fetcher-test', () => {
       });
     });
   });
+
+  test('it should allow setting custom headers as request time', () => {
+    const request = {
+      query: '{ shop { name } }',
+      variables: {}
+    };
+
+    const customHeaders = {'X-API-KEY': '12345'};
+    const fetcher = httpFetcher('https://graphql.example.com', {headers: customHeaders});
+
+    const customHeadersRequestTime = {Authorization: 'abcde'};
+
+    return fetcher(request, customHeadersRequestTime).then(() => {
+      const [_url, {headers}] = fetchMock.lastCall();
+
+      assert.deepEqual(headers, {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        ...customHeaders,
+        ...customHeadersRequestTime
+      });
+    });
+  });
 });

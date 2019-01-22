@@ -80,10 +80,8 @@ suite('http-fetcher-test', () => {
       query: '{ shop { name } }',
       variables: {}
     };
-
     const customHeaders = {'X-API-KEY': '12345'};
     const fetcher = httpFetcher('https://graphql.example.com', {headers: customHeaders});
-
     const requestTimeHeaders = {Authorization: 'abcde'};
 
     return fetcher(request, requestTimeHeaders).then(() => {

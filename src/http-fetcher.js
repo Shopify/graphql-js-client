@@ -1,5 +1,5 @@
 export default function httpFetcher(url, options = {}) {
-  return function fetcher(graphQLParams, headers = null) {
+  return function fetcher(graphQLParams, headers) {
     return fetch(url, {
       body: JSON.stringify(graphQLParams),
       method: 'POST',

@@ -118,7 +118,7 @@ export default class Client {
    * as a function, it must return `Query`, `Mutation`, or `Document` and recieve the client as the only param.
    * @param {Object} [variableValues] The values for variables in the operation or document.
    * @param {Object} [otherProperties] Other properties to send with the query. For example, a custom operation name.
-   * @param {Object} [headers] Aditional headers to be applied on a request by request basis.
+   * @param {Object} [headers] Additional headers to be applied on a request by request basis.
    * @return {Promise.<Object>} A promise resolving to an object containing the response data.
    */
   send(request, variableValues = null, otherProperties = null, headers = null) {

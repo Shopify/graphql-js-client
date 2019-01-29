@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: graph-model.js</title>
+    <title>JSDoc: Class: Enum</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,56 +17,185 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: graph-model.js</h1>
+    <h1 class="page-title">Class: Enum</h1>
 
     
 
 
 
+
+<section>
+
+<header>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>/**
- * The base class used when deserializing response data.
- * Provides rich features, like functions to generate queries to refetch a node or fetch the next page.
- *
- * @class
- */
-export default class GraphModel {
+        <h2><span class="attribs"><span class="type-signature"></span></span>Enum<span class="signature">(key)</span><span class="type-signature"></span></h2>
+        
+    
+</header>
 
-  /**
-   * @param {Object} attrs Attributes on the GraphModel.
-   */
-  constructor(attrs) {
-    Object.defineProperty(this, 'attrs', {value: attrs, enumerable: false});
+<article>
+    <div class="container-overview">
+    
+        
 
-    Object.keys(this.attrs).filter((key) => {
-      return !(key in this);
-    }).forEach((key) => {
-      let descriptor;
+    
 
-      if (attrs[key] === null) {
-        descriptor = {
-          enumerable: true,
-          get() {
-            return null;
-          }
-        };
-      } else {
-        descriptor = {
-          enumerable: true,
-          get() {
-            return this.attrs[key].valueOf();
-          }
-        };
-      }
-      Object.defineProperty(this, key, descriptor);
-    });
-  }
-}
-</code></pre>
-        </article>
-    </section>
+    
+    <h4 class="name" id="Enum"><span class="type-signature"></span>new Enum<span class="signature">(key)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>This constructor should not be invoked directly.
+Use the factory function <a href="Client.html#enum">Client#enum</a> to create an Enum.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>key</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The key of the enum.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="enum.js.html">enum.js</a>, <a href="enum.js.html#line9">line 9</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: SelectionSet</title>
+    <title>JSDoc: Class: Mutation</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Class: SelectionSet</h1>
+    <h1 class="page-title">Class: Mutation</h1>
 
     
 
@@ -28,9 +28,8 @@
 
 <header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>SelectionSet<span class="signature">(typeBundle, type, builderFunction)</span><span class="type-signature"></span></h2>
-        
-            <div class="class-description"><p>Class that specifies the full selection of data to query.</p></div>
+        <h2><span class="attribs"><span class="type-signature"></span></span>
+            <span class="ancestors"><a href="Mutation.html">Mutation</a>#</span>Mutation<span class="signature">(typeBundle, name<span class="signature-attributes">opt</span>, variables<span class="signature-attributes">opt</span>, selectionSetCallback)</span><span class="type-signature"></span></h2>
         
     
 </header>
@@ -41,11 +40,9 @@
         
 
     
-    <h2>Constructor</h2>
-    
 
     
-    <h4 class="name" id="SelectionSet"><span class="type-signature"></span>new SelectionSet<span class="signature">(typeBundle, type, builderFunction)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="Mutation"><span class="type-signature"></span>new Mutation<span class="signature">(typeBundle, name<span class="signature-attributes">opt</span>, variables<span class="signature-attributes">opt</span>, selectionSetCallback)</span><span class="type-signature"></span></h4>
     
 
     
@@ -53,7 +50,8 @@
 
 
 <div class="description">
-    <p>This constructor should not be invoked directly. SelectionSets are created when building queries/mutations.</p>
+    <p>This constructor should not be invoked directly.
+Use the factory functions <a href="Client.html#mutation">Client#mutation</a> or <a href="Document.html#addMutation">Document#addMutation</a> to create a Mutation.</p>
 </div>
 
 
@@ -76,6 +74,8 @@
 
         <th>Type</th>
 
+        
+        <th>Attributes</th>
         
 
         
@@ -102,6 +102,14 @@
             </td>
 
             
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
 
             
 
@@ -112,15 +120,12 @@
 
         <tr>
             
-                <td class="name"><code>type</code></td>
+                <td class="name"><code>name</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Object</span>
-|
-
 <span class="param-type">String</span>
 
 
@@ -128,17 +133,60 @@
             </td>
 
             
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
 
             
 
-            <td class="description last"><p>The type of the current selection.</p></td>
+            <td class="description last"><p>A name for the mutation.</p></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>builderFunction</code></td>
+                <td class="name"><code>variables</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;Object></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>A list of variables in the mutation. See <a href="Client.html#variable">Client#variable</a>.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>selectionSetCallback</code></td>
             
 
             <td class="type">
@@ -151,11 +199,19 @@
             </td>
 
             
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
 
             
 
-            <td class="description last"><p>Callback function used to build the SelectionSet.
-  The callback takes a <a href="SelectionSetBuilder.html">SelectionSetBuilder</a> as its argument.</p></td>
+            <td class="description last"><p>The mutation builder callback.
+  A <a href="SelectionSet.html">SelectionSet</a> is created using this callback.</p></td>
         </tr>
 
     
@@ -196,7 +252,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="selection-set.js.html">selection-set.js</a>, <a href="selection-set.js.html#line218">line 218</a>
+        <a href="mutation.js.html">mutation.js</a>, <a href="mutation.js.html#line19">line 19</a>
     </li></ul></dd>
     
 
@@ -241,118 +297,6 @@
 
     
 
-    
-        <h3 class="subsection-title">Methods</h3>
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="toString"><span class="type-signature"></span>toString<span class="signature">()</span><span class="type-signature"> &rarr; {String}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    <p>Returns the GraphQL query string for the SelectionSet (e.g. <code>{ cat { name } }</code>).</p>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="selection-set.js.html">selection-set.js</a>, <a href="selection-set.js.html#line267">line 267</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>The GraphQL query string for the SelectionSet.</p>
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">String</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
     
 
     

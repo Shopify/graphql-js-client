@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Global</title>
+    <title>JSDoc: Class: Field</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Global</h1>
+    <h1 class="page-title">Class: Field</h1>
 
     
 
@@ -28,7 +28,7 @@
 
 <header>
     
-        <h2></h2>
+        <h2><span class="attribs"><span class="type-signature"></span></span>Field<span class="signature">(name, options<span class="signature-attributes">opt</span>, selectionSet)</span><span class="type-signature"></span></h2>
         
     
 </header>
@@ -38,73 +38,10 @@
     
         
 
-        
-
-
-<dl class="details">
-
     
 
     
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-        
-    
-    </div>
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <h3 class="subsection-title">Methods</h3>
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="decode"><span class="type-signature"></span>decode<span class="signature">(selection, responseData, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {<a href="GraphModel.html">GraphModel</a>}</span></h4>
+    <h4 class="name" id="Field"><span class="type-signature"></span>new Field<span class="signature">(name, options<span class="signature-attributes">opt</span>, selectionSet)</span><span class="type-signature"></span></h4>
     
 
     
@@ -112,7 +49,9 @@
 
 
 <div class="description">
-    <p>A function used to decode the response data.</p>
+    <p>This constructor should not be invoked directly.
+Fields are added to a selection by <a href="SelectionSetBuilder.html#add">SelectionSetBuilder#add</a>, <a href="SelectionSetBuilder.html#addConnection">SelectionSetBuilder#addConnection</a>
+and <a href="SelectionSetBuilder.html#addInlineFragmentOn">SelectionSetBuilder#addInlineFragmentOn</a>.</p>
 </div>
 
 
@@ -150,13 +89,13 @@
 
         <tr>
             
-                <td class="name"><code>selection</code></td>
+                <td class="name"><code>name</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type"><a href="SelectionSet.html">SelectionSet</a></span>
+<span class="param-type">String</span>
 
 
             
@@ -174,38 +113,7 @@
 
             
 
-            <td class="description last"><p>The selection set used to query the response data.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>responseData</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"><p>The response data returned.</p></td>
+            <td class="description last"><p>The name of the field.</p></td>
         </tr>
 
     
@@ -238,7 +146,7 @@
 
             
 
-            <td class="description last"><p>Options to use when decoding including:</p>
+            <td class="description last"><p>An options object containing:</p>
                 <h6>Properties</h6>
                 
 
@@ -266,13 +174,13 @@
 
         <tr>
             
-                <td class="name"><code>classRegistry</code></td>
+                <td class="name"><code>args</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type"><a href="ClassRegistry.html">ClassRegistry</a></span>
+<span class="param-type">Object</span>
 
 
             
@@ -292,7 +200,40 @@
 
             
 
-            <td class="description last"><p>A class registry to use when deserializing the data into classes.</p></td>
+            <td class="description last"><p>Arguments for the field.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>alias</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>An alias for the field.</p></td>
         </tr>
 
     
@@ -300,6 +241,37 @@
 </table>
 
             </td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>selectionSet</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="SelectionSet.html">SelectionSet</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>The selection set on the field.</p></td>
         </tr>
 
     
@@ -340,7 +312,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="decode.js.html">decode.js</a>, <a href="decode.js.html#line140">line 140</a>
+        <a href="selection-set.js.html">selection-set.js</a>, <a href="selection-set.js.html#line53">line 53</a>
     </li></ul></dd>
     
 
@@ -363,34 +335,28 @@
 
 
 
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>The decoded response data.</p>
-</div>
 
 
 
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="GraphModel.html">GraphModel</a></span>
 
 
-    </dd>
-</dl>
+    
+    </div>
 
     
 
+    
 
+    
 
+    
 
+    
 
-        
+    
+
+    
+
     
 
     

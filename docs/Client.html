@@ -28,7 +28,7 @@
 
 <header>
     
-        <h2>Client</h2>
+        <h2><span class="attribs"><span class="type-signature"></span></span>Client<span class="signature">(typeBundle, options)</span><span class="type-signature"></span></h2>
         
             <div class="class-description"><p>The Client class used to create and send GraphQL documents, fragments, queries and mutations.</p></div>
         
@@ -44,7 +44,9 @@
     <h2>Constructor</h2>
     
 
+    
     <h4 class="name" id="Client"><span class="type-signature"></span>new Client<span class="signature">(typeBundle, options)</span><span class="type-signature"></span></h4>
+    
 
     
 
@@ -333,6 +335,8 @@
 
 
 
+
+
     
     </div>
 
@@ -342,7 +346,9 @@
 
     
 
-     
+    
+
+    
 
     
 
@@ -356,7 +362,9 @@
 
     
 
+    
     <h4 class="name" id="document"><span class="type-signature"></span>document<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="Document.html">Document</a>}</span></h4>
+    
 
     
 
@@ -454,6 +462,8 @@
     
 
 
+
+
     <h5>Example</h5>
     
     <pre class="prettyprint"><code>const document = client.document();</code></pre>
@@ -465,7 +475,9 @@
 
     
 
+    
     <h4 class="name" id="enum"><span class="type-signature"></span>enum<span class="signature">(key)</span><span class="type-signature"> &rarr; {<a href="Enum.html">Enum</a>}</span></h4>
+    
 
     
 
@@ -565,7 +577,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="client.js.html">client.js</a>, <a href="client.js.html#line278">line 278</a>
+        <a href="client.js.html">client.js</a>, <a href="client.js.html#line287">line 287</a>
     </li></ul></dd>
     
 
@@ -612,6 +624,8 @@
     
 
 
+
+
     <h5>Example</h5>
     
     <pre class="prettyprint"><code>const titleEnum = client.enum('TITLE');</code></pre>
@@ -623,7 +637,9 @@
 
     
 
+    
     <h4 class="name" id="fetchAllPages"><span class="type-signature"></span>fetchAllPages<span class="signature">(paginatedModels, options)</span><span class="type-signature"> &rarr; {Promise.&lt;Array.&lt;<a href="GraphModel.html">GraphModel</a>>>}</span></h4>
+    
 
     
 
@@ -795,7 +811,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="client.js.html">client.js</a>, <a href="client.js.html#line220">line 220</a>
+        <a href="client.js.html">client.js</a>, <a href="client.js.html#line229">line 229</a>
     </li></ul></dd>
     
 
@@ -842,6 +858,8 @@
     
 
 
+
+
     <h5>Example</h5>
     
     <pre class="prettyprint"><code>client.fetchAllPages(nodes, {pageSize: 20}).then((result) => {
@@ -856,7 +874,9 @@
 
     
 
+    
     <h4 class="name" id="fetchNextPage"><span class="type-signature"></span>fetchNextPage<span class="signature">(nodeOrNodes, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise.&lt;Array.&lt;<a href="GraphModel.html">GraphModel</a>>>}</span></h4>
+    
 
     
 
@@ -1063,7 +1083,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="client.js.html">client.js</a>, <a href="client.js.html#line186">line 186</a>
+        <a href="client.js.html">client.js</a>, <a href="client.js.html#line190">line 190</a>
     </li></ul></dd>
     
 
@@ -1110,6 +1130,8 @@
     
 
 
+
+
     <h5>Example</h5>
     
     <pre class="prettyprint"><code>client.fetchNextPage(node, {first: 10}).then((result) => {
@@ -1124,7 +1146,9 @@
 
     
 
+    
     <h4 class="name" id="mutation"><span class="type-signature"></span>mutation<span class="signature">(name<span class="signature-attributes">opt</span>, variables<span class="signature-attributes">opt</span>, selectionSetCallback)</span><span class="type-signature"> &rarr; {<a href="Mutation.html">Mutation</a>}</span></h4>
+    
 
     
 
@@ -1348,6 +1372,8 @@
     
 
 
+
+
     <h5>Example</h5>
     
     <pre class="prettyprint"><code>const input = client.variable('input', 'CatCreateInput!');
@@ -1367,7 +1393,9 @@ const mutation = client.mutation('myMutation', [input], (root) => {
 
     
 
+    
     <h4 class="name" id="query"><span class="type-signature"></span>query<span class="signature">(name<span class="signature-attributes">opt</span>, variables<span class="signature-attributes">opt</span>, selectionSetCallback)</span><span class="type-signature"> &rarr; {<a href="Query.html">Query</a>}</span></h4>
+    
 
     
 
@@ -1591,6 +1619,8 @@ const mutation = client.mutation('myMutation', [input], (root) => {
     
 
 
+
+
     <h5>Example</h5>
     
     <pre class="prettyprint"><code>const query = client.query('myQuery', (root) => {
@@ -1606,7 +1636,9 @@ const mutation = client.mutation('myMutation', [input], (root) => {
 
     
 
+    
     <h4 class="name" id="refetch"><span class="type-signature"></span>refetch<span class="signature">(nodeType)</span><span class="type-signature"> &rarr; {Promise.&lt;<a href="GraphModel.html">GraphModel</a>>}</span></h4>
+    
 
     
 
@@ -1706,7 +1738,7 @@ const mutation = client.mutation('myMutation', [input], (root) => {
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="client.js.html">client.js</a>, <a href="client.js.html#line244">line 244</a>
+        <a href="client.js.html">client.js</a>, <a href="client.js.html#line253">line 253</a>
     </li></ul></dd>
     
 
@@ -1753,6 +1785,8 @@ const mutation = client.mutation('myMutation', [input], (root) => {
     
 
 
+
+
     <h5>Example</h5>
     
     <pre class="prettyprint"><code>client.refetch(node).then((result) => {
@@ -1767,7 +1801,9 @@ const mutation = client.mutation('myMutation', [input], (root) => {
 
     
 
-    <h4 class="name" id="send"><span class="type-signature"></span>send<span class="signature">(request, variableValues<span class="signature-attributes">opt</span>, otherProperties<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise.&lt;Object>}</span></h4>
+    
+    <h4 class="name" id="send"><span class="type-signature"></span>send<span class="signature">(request, variableValues<span class="signature-attributes">opt</span>, otherProperties<span class="signature-attributes">opt</span>, headers<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise.&lt;Object>}</span></h4>
+    
 
     
 
@@ -1865,7 +1901,7 @@ as a function, it must return <code>Query</code>, <code>Mutation</code>, or <cod
             <td class="type">
             
                 
-<span class="param-type">Array.&lt;Object></span>
+<span class="param-type">Object</span>
 
 
             
@@ -1934,6 +1970,45 @@ as a function, it must return <code>Query</code>, <code>Mutation</code>, or <cod
         </tr>
 
     
+
+        <tr>
+            
+                <td class="name"><code>headers</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    null
+                
+                </td>
+            
+
+            <td class="description last"><p>Additional headers to be applied on a request by request basis.</p></td>
+        </tr>
+
+    
     </tbody>
 </table>
 
@@ -1971,7 +2046,7 @@ as a function, it must return <code>Query</code>, <code>Mutation</code>, or <cod
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="client.js.html">client.js</a>, <a href="client.js.html#line125">line 125</a>
+        <a href="client.js.html">client.js</a>, <a href="client.js.html#line126">line 126</a>
     </li></ul></dd>
     
 
@@ -2018,9 +2093,11 @@ as a function, it must return <code>Query</code>, <code>Mutation</code>, or <cod
     
 
 
+
+
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>client.send(query, [{id: '12345'}]).then((result) => {
+    <pre class="prettyprint"><code>client.send(query, {id: '12345'}).then((result) => {
   // Do something with the returned result
   console.log(result);
 });</code></pre>
@@ -2032,7 +2109,9 @@ as a function, it must return <code>Query</code>, <code>Mutation</code>, or <cod
 
     
 
+    
     <h4 class="name" id="variable"><span class="type-signature"></span>variable<span class="signature">(name, type, defaultValue<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {<a href="VariableDefinition.html">VariableDefinition</a>}</span></h4>
+    
 
     
 
@@ -2206,7 +2285,7 @@ as a function, it must return <code>Query</code>, <code>Mutation</code>, or <cod
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="client.js.html">client.js</a>, <a href="client.js.html#line265">line 265</a>
+        <a href="client.js.html">client.js</a>, <a href="client.js.html#line274">line 274</a>
     </li></ul></dd>
     
 
@@ -2253,6 +2332,8 @@ as a function, it must return <code>Query</code>, <code>Mutation</code>, or <cod
     
 
 
+
+
     <h5>Example</h5>
     
     <pre class="prettyprint"><code>const idVariable = client.variable('id', 'ID!', '12345');</code></pre>
@@ -2275,13 +2356,13 @@ as a function, it must return <code>Query</code>, <code>Mutation</code>, or <cod
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="ClassRegistry.html">ClassRegistry</a></li><li><a href="Client.html">Client</a></li><li><a href="Document.html">Document</a></li><li><a href="Enum.html">Enum</a></li><li><a href="Field.html">Field</a></li><li><a href="FragmentDefinition.html">FragmentDefinition</a></li><li><a href="FragmentSpread.html">FragmentSpread</a></li><li><a href="GraphModel.html">GraphModel</a></li><li><a href="InlineFragment.html">InlineFragment</a></li><li><a href="Mutation.html">Mutation</a></li><li><a href="Operation.html">Operation</a></li><li><a href="Query.html">Query</a></li><li><a href="SelectionSet.html">SelectionSet</a></li><li><a href="SelectionSetBuilder.html">SelectionSetBuilder</a></li><li><a href="VariableDefinition.html">VariableDefinition</a></li></ul><h3>Global</h3><ul><li><a href="global.html#decode">decode</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="ClassRegistry.html">ClassRegistry</a></li><li><a href="Client.html">Client</a></li><li><a href="Document_Document.html">Document</a></li><li><a href="Enum_Enum.html">Enum</a></li><li><a href="Field_Field.html">Field</a></li><li><a href="FragmentDefinition_FragmentDefinition.html">FragmentDefinition</a></li><li><a href="FragmentSpread_FragmentSpread.html">FragmentSpread</a></li><li><a href="GraphModel.html">GraphModel</a></li><li><a href="GraphModel_GraphModel.html">GraphModel</a></li><li><a href="InlineFragment_InlineFragment.html">InlineFragment</a></li><li><a href="Mutation.html">Mutation</a></li><li><a href="Mutation_Mutation.html">Mutation</a></li><li><a href="Mutation_Operation.html">Operation</a></li><li><a href="Operation.html">Operation</a></li><li><a href="Operation_Operation.html">Operation</a></li><li><a href="Query.html">Query</a></li><li><a href="Query_Operation.html">Operation</a></li><li><a href="Query_Query.html">Query</a></li><li><a href="SelectionSet.html">SelectionSet</a></li><li><a href="SelectionSetBuilder.html">SelectionSetBuilder</a></li><li><a href="VariableDefinition_VariableDefinition.html">VariableDefinition</a></li></ul><h3>Global</h3><ul><li><a href="global.html#decode">decode</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Mon Jul 10 2017 19:00:20 GMT-0400 (EDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Jan 29 2019 15:12:29 GMT-0500 (EST)
 </footer>
 
 <script> prettyPrint(); </script>

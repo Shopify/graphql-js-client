@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: graph-model.js</title>
+    <title>JSDoc: Class: GraphModel</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,56 +17,181 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: graph-model.js</h1>
+    <h1 class="page-title">Class: GraphModel</h1>
 
     
 
 
 
+
+<section>
+
+<header>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>/**
- * The base class used when deserializing response data.
- * Provides rich features, like functions to generate queries to refetch a node or fetch the next page.
- *
- * @class
- */
-export default class GraphModel {
+        <h2><span class="attribs"><span class="type-signature"></span></span>
+            <span class="ancestors"><a href="GraphModel.html">GraphModel</a>#</span>GraphModel<span class="signature">(attrs)</span><span class="type-signature"></span></h2>
+        
+    
+</header>
 
-  /**
-   * @param {Object} attrs Attributes on the GraphModel.
-   */
-  constructor(attrs) {
-    Object.defineProperty(this, 'attrs', {value: attrs, enumerable: false});
+<article>
+    <div class="container-overview">
+    
+        
 
-    Object.keys(this.attrs).filter((key) => {
-      return !(key in this);
-    }).forEach((key) => {
-      let descriptor;
+    
 
-      if (attrs[key] === null) {
-        descriptor = {
-          enumerable: true,
-          get() {
-            return null;
-          }
-        };
-      } else {
-        descriptor = {
-          enumerable: true,
-          get() {
-            return this.attrs[key].valueOf();
-          }
-        };
-      }
-      Object.defineProperty(this, key, descriptor);
-    });
-  }
-}
-</code></pre>
-        </article>
-    </section>
+    
+    <h4 class="name" id="GraphModel"><span class="type-signature"></span>new GraphModel<span class="signature">(attrs)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>attrs</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Attributes on the GraphModel.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="graph-model.js.html">graph-model.js</a>, <a href="graph-model.js.html#line12">line 12</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 

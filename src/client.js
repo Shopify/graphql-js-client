@@ -118,9 +118,10 @@ export default class Client {
    * as a function, it must return `Query`, `Mutation`, or `Document` and recieve the client as the only param.
    * @param {Object} [variableValues] The values for variables in the operation or document.
    * @param {Object} [otherProperties] Other properties to send with the query. For example, a custom operation name.
+   * @param {Object} [headers] Additional headers to be applied on a request by request basis.
    * @return {Promise.<Object>} A promise resolving to an object containing the response data.
    */
-  send(request, variableValues = null, otherProperties = null) {
+  send(request, variableValues = null, otherProperties = null, headers = null) {
     let operationOrDocument;
 
     if (Function.prototype.isPrototypeOf(request)) {
@@ -158,7 +159,7 @@ export default class Client {
       }
     }
 
-    return this.fetcher(graphQLParams).then((response) => {
+    return this.fetcher(graphQLParams, headers).then((response) => {
       if (response.data) {
         response.model = decode(operation, response.data, {
           classRegistry: this.classRegistry,

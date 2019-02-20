@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: graph-model.js</title>
+    <title>JSDoc: Class: Operation</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,56 +17,141 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: graph-model.js</h1>
+    <h1 class="page-title">Class: Operation</h1>
 
     
 
 
 
+
+<section>
+
+<header>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>/**
- * The base class used when deserializing response data.
- * Provides rich features, like functions to generate queries to refetch a node or fetch the next page.
- *
- * @class
- */
-export default class GraphModel {
+        <h2><span class="attribs"><span class="type-signature"></span></span>
+            <span class="ancestors"><a href="Query.html">Query</a>#</span>Operation<span class="signature">()</span><span class="type-signature"></span></h2>
+        
+    
+</header>
 
-  /**
-   * @param {Object} attrs Attributes on the GraphModel.
-   */
-  constructor(attrs) {
-    Object.defineProperty(this, 'attrs', {value: attrs, enumerable: false});
+<article>
+    <div class="container-overview">
+    
+        
 
-    Object.keys(this.attrs).filter((key) => {
-      return !(key in this);
-    }).forEach((key) => {
-      let descriptor;
+    
 
-      if (attrs[key] === null) {
-        descriptor = {
-          enumerable: true,
-          get() {
-            return null;
-          }
-        };
-      } else {
-        descriptor = {
-          enumerable: true,
-          get() {
-            return this.attrs[key].valueOf();
-          }
-        };
-      }
-      Object.defineProperty(this, key, descriptor);
-    });
-  }
-}
-</code></pre>
-        </article>
-    </section>
+    
+    <h4 class="name" id="Operation"><span class="type-signature"></span>new Operation<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>This constructor should not be invoked. The subclasses <a href="Query.html">Query</a> and <a href="Mutation.html">Mutation</a> should be used instead.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="Operation_Operation.html">Operation#Operation</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="operation.js.html">operation.js</a>, <a href="operation.js.html#line55">line 55</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 

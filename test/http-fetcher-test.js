@@ -4,7 +4,12 @@ import httpFetcher from '../src/http-fetcher';
 
 suite('http-fetcher-test', () => {
   setup(() => {
-    fetchMock.mock('https://graphql.example.com', {data: {}});
+    fetchMock.mock('https://graphql.example.com', {
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: {data: {}}
+    });
   });
 
   teardown(() => {
@@ -23,6 +28,39 @@ suite('http-fetcher-test', () => {
       const [url, {body, method, mode, headers}] = fetchMock.lastCall();
 
       assert.deepEqual(data, {data: {}});
+      assert.equal(url, 'https://graphql.example.com');
+      assert.equal(method, 'POST');
+      assert.equal(mode, 'cors');
+
+      assert.deepEqual(headers, {
+        'Content-Type': 'application/json',
+        Accept: 'application/json'
+      });
+
+      assert.deepEqual(body, JSON.stringify({
+        query: '{ shop { name } }',
+        variables: {}
+      }));
+    });
+  });
+
+  test('it should handle non-json repsonses', () => {
+    fetchMock.restore();
+
+    fetchMock.mock('https://graphql.example.com', 'Text Response');
+
+    const request = {
+      query: '{ shop { name } }',
+      variables: {}
+    };
+
+    const fetcher = httpFetcher('https://graphql.example.com');
+
+    return fetcher(request).then((data) => {
+
+      const [url, {body, method, mode, headers}] = fetchMock.lastCall();
+
+      assert.deepEqual(data, {data: 'Text Response'});
       assert.equal(url, 'https://graphql.example.com');
       assert.equal(method, 'POST');
       assert.equal(mode, 'cors');

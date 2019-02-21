@@ -11,6 +11,14 @@ export default function httpFetcher(url, options = {}) {
         ...options.headers,
         ...headers
       }
-    }).then((response) => response.json());
+    }).then((response) => {
+      const contentType = response.headers.get('content-type');
+
+      if (contentType.includes('application/json')) {
+        return response.json();
+      }
+
+      return response.text().then((text) => ({text}));
+    });
   };
 }

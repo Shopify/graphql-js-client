@@ -63,7 +63,6 @@ suite('http-fetcher-test', () => {
     const fetcher = httpFetcher('https://graphql.example.com');
 
     return fetcher(request).then((data) => {
-
       const [url, {body, method, mode, headers}] = fetchMock.lastCall();
 
       assert.deepEqual(data, {data: 'Text Response'});

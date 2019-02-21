@@ -65,7 +65,7 @@ suite('http-fetcher-test', () => {
     return fetcher(request).then((data) => {
       const [url, {body, method, mode, headers}] = fetchMock.lastCall();
 
-      assert.deepEqual(data, {data: 'Text Response'});
+      assert.deepEqual(data, {text: 'Text Response'});
       assert.equal(url, 'https://graphql.example.com');
       assert.equal(method, 'POST');
       assert.equal(mode, 'cors');

@@ -26,5 +26,5 @@ function _handleResponse(response) {
 }
 
 function _handleTextResponse(response) {
-  return response.text().then((responseText) => ({data: responseText}));
+  return response.text().then((responseText) => ({text: responseText}));
 }

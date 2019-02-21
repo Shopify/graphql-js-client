@@ -47,7 +47,13 @@ suite('http-fetcher-test', () => {
   test('it should handle non-json repsonses', () => {
     fetchMock.restore();
 
-    fetchMock.mock('https://graphql.example.com', 'Text Response');
+    fetchMock.mock('https://graphql.example.com', {
+      headers: {
+        'Content-Type': 'text/html'
+      },
+      body: 'Text Response'
+    }
+    );
 
     const request = {
       query: '{ shop { name } }',

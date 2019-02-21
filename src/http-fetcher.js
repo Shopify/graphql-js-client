@@ -18,8 +18,7 @@ export default function httpFetcher(url, options = {}) {
         return response.json();
       }
 
-      return response.text()
-        .then((responseText) => ({text: responseText}));
+      return response.text().then((text) => ({text}));
     });
   };
 }

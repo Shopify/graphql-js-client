@@ -116,11 +116,13 @@ function transformScalars(context, value) {
 }
 
 function recordTypeInformation(context, value) {
+  const {typeBundle, typeSchema} = context.selection.selectionSet;
+
   if (isValue(value)) {
     if (value.__typename) {
-      value.type = schemaForType(context.selection.selectionSet.typeBundle, value.__typename);
+      value.type = schemaForType(typeBundle, value.__typename, typeSchema);
     } else {
-      value.type = context.selection.selectionSet.typeSchema;
+      value.type = typeSchema;
     }
   }
 

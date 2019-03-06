@@ -1,6 +1,6 @@
 {
   "name": "graphql-js-client",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "description": "Feature light client library for fetching resources via GraphQL",
   "main": "index.js",
   "module": "index.es.js",

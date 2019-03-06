@@ -47,13 +47,14 @@ suite('http-fetcher-test', () => {
   test('it should handle non-json repsonses', () => {
     fetchMock.restore();
 
+    const responseBody = 'Text Response';
+
     fetchMock.mock('https://graphql.example.com', {
       headers: {
         'Content-Type': 'text/html'
       },
-      body: 'Text Response'
-    }
-    );
+      body: responseBody
+    });
 
     const request = {
       query: '{ shop { name } }',
@@ -65,7 +66,7 @@ suite('http-fetcher-test', () => {
     return fetcher(request).then((data) => {
       const [url, {body, method, mode, headers}] = fetchMock.lastCall();
 
-      assert.deepEqual(data, {text: 'Text Response'});
+      assert.deepEqual(data, {text: responseBody});
       assert.equal(url, 'https://graphql.example.com');
       assert.equal(method, 'POST');
       assert.equal(mode, 'cors');

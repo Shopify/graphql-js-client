@@ -12,13 +12,11 @@ export default function httpFetcher(url, options = {}) {
         ...headers
       }
     }).then((response) => {
-      const contentType = response.headers.get('content-type');
+      const responseCopy = response.clone();
 
-      if (contentType.includes('application/json')) {
-        return response.json();
-      }
-
-      return response.text().then((text) => ({text}));
+      return response.json().catch(() => {
+        return responseCopy.text().then((text) => ({text}));
+      });
     });
   };
 }

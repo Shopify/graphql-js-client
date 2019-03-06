@@ -4,12 +4,7 @@ import httpFetcher from '../src/http-fetcher';
 
 suite('http-fetcher-test', () => {
   setup(() => {
-    fetchMock.mock('https://graphql.example.com', {
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: {data: {}}
-    });
+    fetchMock.mock('https://graphql.example.com', {data: {}});
   });
 
   teardown(() => {
@@ -44,17 +39,12 @@ suite('http-fetcher-test', () => {
     });
   });
 
-  test('it should handle non-json repsonses', () => {
+  test('it should handle non-json responses', () => {
     fetchMock.restore();
 
     const responseBody = 'Text Response';
 
-    fetchMock.mock('https://graphql.example.com', {
-      headers: {
-        'Content-Type': 'text/html'
-      },
-      body: responseBody
-    });
+    fetchMock.mock('https://graphql.example.com', responseBody);
 
     const request = {
       query: '{ shop { name } }',

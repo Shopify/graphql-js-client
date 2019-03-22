@@ -37,7 +37,7 @@ import types from './types.js';
 const client = new GraphQLClient(types, {
   url: 'https://graphql.myshopify.com/api/graphql',
   fetcherOptions: {
-    headers: `Authorization: Basic aGV5LXRoZXJlLWZyZWluZCA=`
+    headers: { Authorization: 'Basic aGV5LXRoZXJlLWZyZWluZCA=' }
   }
 });
 ```

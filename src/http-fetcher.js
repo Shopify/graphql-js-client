@@ -14,7 +14,7 @@ export default function httpFetcher(url, options = {}) {
     }).then((response) => {
       const contentType = response.headers.get('content-type');
 
-      if (contentType.includes('application/json')) {
+      if (contentType.indexOf('application/json') > -1) {
         return response.json();
       }
 

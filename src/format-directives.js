@@ -7,7 +7,8 @@ export default function formatDirectives(directives) {
   }
 
   const directiveStrings = Object.keys(directives).map((key) => {
-    const arg = directives[key] ? `(${formatObject(directives[key])})` : '';
+    const directiveArgs = directives[key];
+    const arg = (directiveArgs && Object.keys(directiveArgs).length) ? `(${formatObject(directiveArgs)})` : '';
 
     return `@${key}${arg}`;
   });

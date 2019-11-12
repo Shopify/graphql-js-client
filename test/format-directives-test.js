@@ -53,6 +53,12 @@ suite('format-directives-test', () => {
     assert.equal(result, ' @upper');
   });
 
+  test('it formats directives with empty objects', () => {
+    const result = formatDirectives({upper: {}});
+
+    assert.equal(result, ' @upper');
+  });
+
   test('it formats multiple directives', () => {
     const result = formatDirectives({include: {if: variable('includeBool', 'Boolean')}, upper: null, format: {as: 'YYYY'}});
 

@@ -314,7 +314,7 @@ suite('selection-set-test', () => {
     const set = new SelectionSet(typeBundle, 'QueryRoot', (root) => {
       root.add('node', {args: {id: variable('productId', 'ID!')}}, (node) => {
         node.addInlineFragmentOn('Product', (product) => {
-          product.add('title');
+          product.add('title', {directives: {include: {if: variable('includeTitle', 'Boolean')}}});
         });
       });
     });
@@ -368,6 +368,99 @@ suite('selection-set-test', () => {
               weightUnit
             }
           }
+        }
+      }
+    }`));
+  });
+
+  test('it can add a directive with a scalar', () => {
+    const directives = {
+      include: {
+        if: true
+      }
+    };
+    const shopSelectionSet = new SelectionSet(typeBundle, 'Shop', (shop) => {
+      shop.add('name', {directives});
+    });
+
+    const set = new SelectionSet(typeBundle, 'QueryRoot', (root) => {
+      root.add('shop', shopSelectionSet);
+    });
+
+    assert.deepEqual(tokens(set.toString()), tokens(`{
+      shop {
+        name @include(if: true)
+      }
+    }`));
+  });
+
+  test('it can add a directive with a variable', () => {
+    const directives = {
+      include: {
+        if: variable('includeName', 'Boolean')
+      }
+    };
+    const shopSelectionSet = new SelectionSet(typeBundle, 'Shop', (shop) => {
+      shop.add('name', {directives});
+    });
+
+    const set = new SelectionSet(typeBundle, 'QueryRoot', (root) => {
+      root.add('shop', shopSelectionSet);
+    });
+
+    assert.deepEqual(tokens(set.toString()), tokens(`{
+      shop {
+        name @include(if: $includeName)
+      }
+    }`));
+  });
+
+  test('it can add multiple directives', () => {
+    const directives = {
+      include: {
+        if: variable('includeName', 'Boolean')
+      },
+      skip: {
+        if: variable('skipName', 'Boolean')
+      },
+      lower: null
+    };
+    const shopSelectionSet = new SelectionSet(typeBundle, 'Shop', (shop) => {
+      shop.add('name', {directives});
+    });
+
+    const set = new SelectionSet(typeBundle, 'QueryRoot', (root) => {
+      root.add('shop', shopSelectionSet);
+    });
+
+    assert.deepEqual(tokens(set.toString()), tokens(`{
+      shop {
+        name @include(if: $includeName) @skip(if: $skipName) @lower
+      }
+    }`));
+  });
+
+  test('it can add a directive after args', () => {
+    const directives = {
+      include: {
+        if: variable('includeProducts', 'Boolean')
+      }
+    };
+    const productConnection = new SelectionSet(typeBundle, 'ProductConnection', (connection) => {
+      connection.add('pageInfo', (pageInfo) => {
+        pageInfo.add('hasNextPage');
+        pageInfo.add('hasPreviousPage');
+      });
+    });
+    const set = new SelectionSet(typeBundle, 'Shop', (shop) => {
+      shop.add('products', {args: {first: 10}, directives}, productConnection);
+    });
+
+    assert.deepEqual(tokens(set.toString()), tokens(` {
+      products (first: 10) @include(if: $includeProducts) {
+        pageInfo {
+          hasNextPage
+          hasPreviousPage
         }
       }
     }`));

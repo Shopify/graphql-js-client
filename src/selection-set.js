@@ -2,6 +2,7 @@ import deepFreezeCopyExcept from './deep-freeze-copy-except';
 import join from './join';
 import schemaForType from './schema-for-type';
 import formatArgs from './format-args';
+import formatDirectives from './format-directives';
 import noop from './noop';
 import {isVariable} from './variable';
 import Profiler from './profile-schema-usage';
@@ -36,6 +37,7 @@ function parseFieldCreationArgs(creationArgs) {
 }
 
 const emptyArgs = Object.freeze({});
+const emptyDirectives = Object.freeze({});
 
 export class Field {
 
@@ -48,6 +50,7 @@ export class Field {
    * @param {Object} [options] An options object containing:
    *   @param {Object} [options.args] Arguments for the field.
    *   @param {String} [options.alias] An alias for the field.
+   *   @param {Object} [options.directives] Directives for the field.
    * @param {SelectionSet} selectionSet The selection set on the field.
    */
   constructor(name, options, selectionSet) {
@@ -55,6 +58,7 @@ export class Field {
     this.alias = options.alias || null;
     this.responseKey = this.alias || this.name;
     this.args = (options.args ? deepFreezeCopyExcept(isVariable, options.args) : emptyArgs);
+    this.directives = (options.directives ? deepFreezeCopyExcept(isVariable, options.directives) : emptyDirectives);
     this.selectionSet = selectionSet;
     Object.freeze(this);
   }
@@ -67,7 +71,7 @@ export class Field {
   toString() {
     const aliasPrefix = this.alias ? `${this.alias}: ` : '';
 
-    return `${aliasPrefix}${this.name}${formatArgs(this.args)}${this.selectionSet}`;
+    return `${aliasPrefix}${this.name}${formatArgs(this.args)}${formatDirectives(this.directives)}${this.selectionSet}`;
   }
 }
 

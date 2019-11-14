@@ -196,4 +196,27 @@ suite('client-fetch-next-page-test', () => {
       assert.equal(fetcherGraphQLParams.variables.sort, 'ID');
     });
   });
+
+  test('it fetches the next page with persistent directive values', () => {
+    const fetcher = mockFetcherMultiple();
+    const mockClient = new Client(typeBundle, {fetcher});
+    const sortVar = mockClient.variable('sort', 'ProductSortKeys');
+    const handleFormatVar = mockClient.variable('handleFormat', 'String');
+    const queryWithAdditionalVars = new Query(typeBundle, [sortVar, handleFormatVar], (root) => {
+      root.add('shop', (shop) => {
+        shop.addConnection('collections', {args: {first: 1}}, (collection) => {
+          collection.addConnection('products', {args: {first: 1, sortKey: sortVar}}, (product) => {
+            product.add('handle', {directives: {format: {as: handleFormatVar}}});
+          });
+        });
+      });
+    });
+
+    const decodedWithAdditionalVars = decode(queryWithAdditionalVars, pageOneData, {variableValues: {handleFormatVar: 'exFormat'}});
+
+    return mockClient.fetchNextPage(decodedWithAdditionalVars.shop.collections[0].products).then(() => {
+      assert.equal(fetcherGraphQLParams.query, decodedWithAdditionalVars.shop.collections[0].products[0].nextPageQueryAndPath()[0].toString());
+      assert.equal(fetcherGraphQLParams.variables.handleFormatVar, 'exFormat');
+    });
+  });
 });

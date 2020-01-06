@@ -51,8 +51,12 @@ function initializeDocumentAndVars(currentContext, contextChain) {
   });
 
   if (!firstVar) {
-    firstVar = variable('first', 'Int', first);
-    variableDefinitions.push(firstVar);
+    if (isVariable(first)) {
+      firstVar = first;
+    } else {
+      firstVar = variable('first', 'Int', first);
+      variableDefinitions.push(firstVar);
+    }
   }
 
   const document = new Document(currentContext.selection.selectionSet.typeBundle);

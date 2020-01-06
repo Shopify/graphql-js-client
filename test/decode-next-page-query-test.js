@@ -9,6 +9,7 @@ suite('decode-next-page-query-test', () => {
   const collectionId = 'gid://shopify/Collection/67890';
   const collectionCursor = 'collection-cursor';
   const productId = 'gid://shopify/Product/72727';
+  const variantId = 'gid://shopify/ProductVariant/72727';
   const variantsCursor = 'variants-cursor';
   const fixture = {
     data: {
@@ -45,7 +46,7 @@ suite('decode-next-page-query-test', () => {
                 edges: [{
                   cursor: variantsCursor,
                   node: {
-                    id: 'gid://shopify/ProductVariant/72727',
+                    id: variantId,
                     title: 'large'
                   }
                 }]
@@ -525,6 +526,208 @@ suite('decode-next-page-query-test', () => {
               cursor
               node {
                 id
+              }
+            }
+          }
+        }
+      }
+    `), 'page three query is as expected');
+  });
+
+  test('it can generate the next page query when the first variable is not named `first`', () => {
+    const productFirstDefault = 10;
+    const variables = [variable('productFirst', 'Int', productFirstDefault)];
+    const cursor = 'product-cursor';
+    const fragmentFixture = {
+      data: {
+        shop: {
+          products: {
+            pageInfo: {
+              hasNextPage: true,
+              hasPreviousPage: false
+            },
+            edges: [{
+              cursor,
+              node: {
+                id: productId
+              }
+            }]
+          }
+        }
+      }
+    };
+    const document = new Document(typeBundle);
+
+    document.addQuery(variables, (root) => {
+      root.add('shop', (shop) => {
+        shop.addConnection('products', {args: {first: variables[0]}}, (products) => {
+          products.add('id');
+        });
+      });
+    });
+
+    const decodedPageOne = decode(document.operations[0], fragmentFixture.data);
+
+    const [pageTwoQuery] = decodedPageOne.shop.products[0].nextPageQueryAndPath();
+
+    assert.deepEqual(tokens(pageTwoQuery.toString()), tokens(`
+      query ($productFirst: Int = ${productFirstDefault}) {
+        shop {
+          products (first: $productFirst, after: "${cursor}") {
+            pageInfo {
+              hasNextPage
+              hasPreviousPage
+            }
+            edges {
+              cursor
+              node {
+                id
+              }
+            }
+          }
+        }
+      }
+    `), 'page two query is as expected');
+
+    const decodedPageTwo = decode(pageTwoQuery.operations[0], fragmentFixture.data);
+
+    const [pageThreeQuery] = decodedPageTwo.shop.products[0].nextPageQueryAndPath();
+
+    assert.deepEqual(tokens(pageThreeQuery.toString()), tokens(`
+      query ($productFirst: Int = ${productFirstDefault}) {
+        shop {
+          products (first: $productFirst, after: "${cursor}") {
+            pageInfo {
+              hasNextPage
+              hasPreviousPage
+            }
+            edges {
+              cursor
+              node {
+                id
+              }
+            }
+          }
+        }
+      }
+    `), 'page three query is as expected');
+  });
+
+  test('it can generate the next page query when there are multiple first variables', () => {
+    const productFirstDefault = 10;
+    const variantsFirstDefault = 15;
+    const variables = [variable('first', 'Int', productFirstDefault), variable('variantsFirst', 'Int', variantsFirstDefault)];
+    const cursor = 'product-cursor';
+    const fragmentFixture = {
+      data: {
+        shop: {
+          products: {
+            pageInfo: {
+              hasNextPage: true,
+              hasPreviousPage: false
+            },
+            edges: [{
+              cursor,
+              node: {
+                id: productId,
+                variants: {
+                  pageInfo: {
+                    hasNextPage: true,
+                    hasPreviousPage: false
+                  },
+                  edges: [{
+                    cursor: variantsCursor,
+                    node: {
+                      id: variantId
+                    }
+                  }]
+                }
+              }
+            }]
+          }
+        }
+      }
+    };
+    const document = new Document(typeBundle);
+
+    document.addQuery(variables, (root) => {
+      root.add('shop', (shop) => {
+        shop.addConnection('products', {args: {first: variables[0]}}, (products) => {
+          products.add('id');
+          products.addConnection('variants', {args: {first: variables[1]}}, (variants) => {
+            variants.add('id');
+          });
+        });
+      });
+    });
+
+    const decodedPageOne = decode(document.operations[0], fragmentFixture.data);
+
+    const [pageTwoQuery] = decodedPageOne.shop.products[0].variants[0].nextPageQueryAndPath();
+
+    assert.deepEqual(tokens(pageTwoQuery.toString()), tokens(`
+      query ($variantsFirst: Int = ${variantsFirstDefault}) {
+        node (id: "${productId}") {
+          __typename
+          ... on Product {
+            id
+            variants (first: $variantsFirst, after: "${variantsCursor}") {
+              pageInfo {
+                hasNextPage
+                hasPreviousPage
+              }
+              edges {
+                cursor
+                node {
+                  id
+                }
+              }
+            }
+          }
+        }
+      }
+    `), 'page two query is as expected');
+
+    const fragmentPaginationFixture = {
+      data: {
+        node: {
+          id: productId,
+          variants: {
+            pageInfo: {
+              hasNextPage: true,
+              hasPreviousPage: false
+            },
+            edges: [{
+              cursor: variantsCursor,
+              node: {
+                id: variantId
+              }
+            }]
+          }
+        }
+      }
+    };
+
+    const decodedPageTwo = decode(pageTwoQuery.operations[0], fragmentPaginationFixture.data);
+
+    const [pageThreeQuery] = decodedPageTwo.node.variants[0].nextPageQueryAndPath();
+
+    assert.deepEqual(tokens(pageThreeQuery.toString()), tokens(`
+      query ($variantsFirst: Int = ${variantsFirstDefault}) {
+        node (id: "${productId}") {
+          __typename
+          ... on Product {
+            id
+            variants (first: $variantsFirst, after: "${variantsCursor}") {
+              pageInfo {
+                hasNextPage
+                hasPreviousPage
+              }
+              edges {
+                cursor
+                node {
+                  id
+                }
               }
             }
           }

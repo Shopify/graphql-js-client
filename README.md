@@ -210,6 +210,41 @@ the object graph to those models may not be obvious due to the query generation
 algorithm. Page size and fields on the paginated object are retained, while
 fields not in the paginated set are pruned.
 
+#### Directives
+
+```javascript
+const query = client.query((root) => {
+  root.add('shop', (shop) => {
+    shop.add('name');
+    shop.addConnection('products', {args: {first: 10}}, (product) => {
+      product.add('title', {directives: {include: {if: true}}});
+    });
+  });
+});
+
+/* Will generate the following query:
+
+  query {
+    shop {
+      name
+      products (first: 10) {
+        pageInfo {
+          hasNextPage
+          hasPreviousPage
+        }
+        edges {
+          cursor
+          node {
+            id
+            title @include(if: true)
+          }
+        }
+      }
+    }
+  }
+
+*/
+
 ## Documentation
 
 For full API documentation, check out the [API docs](https://shopify.github.io/graphql-js-client).

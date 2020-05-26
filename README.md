@@ -244,6 +244,7 @@ const query = client.query((root) => {
   }
 
 */
+```
 
 ## Documentation
 

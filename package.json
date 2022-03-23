@@ -33,7 +33,7 @@
     "jsdoc": "3.5.5",
     "jsdoc-export-default-interop": "0.3.1",
     "klaw-sync": "1.1.0",
-    "minimist": "1.2.0",
+    "minimist": "1.2.6",
     "mocha": "3.2.0",
     "node-fetch": "1.6.3",
     "node-jq": "0.5.0",

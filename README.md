@@ -1,3 +1,7 @@
+> # This package has been deprecated
+>
+> For more information, please see our [changelog announcement](https://shopify.dev/changelog/deprecation-of-js-buy-sdk).
+
 [![Travis](https://travis-ci.com/Shopify/graphql-js-client.svg?branch=master)](https://travis-ci.com/Shopify/graphql-js-client)
 # graphql-js-client
 

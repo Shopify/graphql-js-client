@@ -276,11 +276,16 @@ export default class Client {
   /**
    * Creates an enum to be used in a {@link Query} or {@link Mutation}.
    *
+   * The key is written into the query document unquoted, so it must be a valid GraphQL
+   * name. Do not pass untrusted input here without allow-listing it first; prefer sending
+   * request-derived values as a typed variable (see {@link Client#variable}).
+   *
    * @example
    * const titleEnum = client.enum('TITLE');
    *
    * @param {String} key The key of the enum.
    * @return {Enum} An enum object that can be used in a {@link Query} or {@link Mutation}.
+   * @throws {Error} If `key` is not a valid GraphQL name.
    */
   enum(key) {
     return enumFunction(key);

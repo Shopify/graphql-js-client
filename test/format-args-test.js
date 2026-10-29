@@ -34,6 +34,23 @@ suite('format-args-test', () => {
     assert.equal(result, ' (list: [ONE TWO])');
   });
 
+  test('it rejects enum keys that are not valid GraphQL names', () => {
+    const payload = 'SAFE) { id } deleteAllWidgets { count } } #';
+
+    assert.throws(() => formatArgs({mode: _enum(payload)}), /Invalid enum key/);
+    assert.throws(() => _enum(''), /Invalid enum key/);
+    assert.throws(() => _enum('ONE TWO'), /Invalid enum key/);
+    assert.throws(() => _enum('1ONE'), /Invalid enum key/);
+    assert.throws(() => _enum('ONE\n'), /Invalid enum key/);
+    assert.throws(() => _enum('ONE)'), /Invalid enum key/);
+  });
+
+  test('it still formats enums with valid GraphQL names unquoted', () => {
+    const result = formatArgs({mode: _enum('SAFE'), other: _enum('_private_1')});
+
+    assert.equal(result, ' (mode: SAFE other: _private_1)');
+  });
+
   test('it formats args with wrapped scalars', () => {
     const result = formatArgs({int: new Scalar(1), float: new Scalar(0.1), string: new Scalar('two'), boolean: new Scalar(true)});
 
